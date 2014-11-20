@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="do-deploy" name="GenTree">
+
+	<macrodef name="copy-to-dir">
+		<attribute name="todir"/>
+		<attribute name="fromdir"/>
+		<attribute name="exclude" default=""/>
+		<sequential>
+		    <copy todir="@{todir}">
+		      <fileset dir="@{fromdir}" excludes="@{exclude}"/>		        		      
+		    </copy>
+		</sequential>	
+	</macrodef>
+
+	<target name="do-deploy">
+		<copydir src="./src/main/java/genlib" dest="d:/cvicenia/utils/MasterThesis-weka/src/main/java/genlib"/>		
+		<delete dir="./build/libs" />
+		<delete dir="./build/classes/locales" />
+		<delete file="./build/classes/GenLib.log" />
+		<delete file="./build/classes/config.properties" />		
+		<!--Prekopirovanie lokalizacnych suborov-->
+		<copy todir="./build/classes/genlib/locales">
+			<fileset dir="./src/main/java/genlib/locales" excludes="**/*.java" />
+		</copy>
+		<jar destfile="./build/libs/GenLib.jar">
+			<manifest>
+				<attribute name="Main-Class" value="genlib.GenLib" />				
+			</manifest>
+			<fileset dir="./build/classes" />
+		</jar>
+	</target>
+	
+</project>	

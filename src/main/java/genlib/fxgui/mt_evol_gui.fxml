@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="400.0" maxWidth="600.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<children><VBox prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+<children>
+<Label prefHeight="100.0" text="Evolutionary Decision Trees" BorderPane.alignment="TOP_LEFT">
+<effect>
+<DropShadow spread="0.07" />
+</effect>
+<font>
+<Font name="Segoe UI Semibold" size="34.0" />
+</font>
+</Label><TabPane prefHeight="600.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE">
+  <tabs>
+    <Tab text="Operators">
+<content>
+    <AnchorPane prefHeight="200.0" prefWidth="598.0">
+<children><VBox prefHeight="321.0" prefWidth="600.0" AnchorPane.bottomAnchor="-55.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+<children>
+<HBox prefHeight="60.0" prefWidth="598.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+<children><Label alignment="CENTER" prefHeight="40.0" text="Selection operator">
+<HBox.margin>
+<Insets left="10.0" top="10.0" />
+</HBox.margin></Label><ChoiceBox prefHeight="40.0" prefWidth="150.0">
+<HBox.margin>
+<Insets left="30.0" top="10.0" />
+</HBox.margin></ChoiceBox>
+</children>
+</HBox><HBox prefHeight="60.0" prefWidth="598.0">
+<children>
+<Label alignment="CENTER" prefHeight="40.0" text="Mutation operator">
+<HBox.margin>
+<Insets left="10.0" top="10.0" />
+</HBox.margin>
+</Label>
+<ChoiceBox prefHeight="40.0" prefWidth="150.0">
+<HBox.margin>
+<Insets left="30.0" top="10.0" />
+</HBox.margin>
+</ChoiceBox>
+</children>
+</HBox><HBox prefHeight="60.0" prefWidth="598.0">
+<children>
+<Label alignment="CENTER" prefHeight="40.0" text="CrossOver Operator">
+<HBox.margin>
+<Insets left="10.0" top="10.0" />
+</HBox.margin>
+</Label>
+<ChoiceBox prefHeight="40.0" prefWidth="150.0">
+<HBox.margin>
+<Insets left="30.0" top="10.0" />
+</HBox.margin>
+</ChoiceBox>
+</children>
+</HBox>
+</children></VBox>
+</children></AnchorPane>
+</content>
+    </Tab>
+    <Tab text="Evolution properties">
+<content><AnchorPane prefHeight="200.0" prefWidth="200.0">
+<children><VBox prefHeight="321.0" prefWidth="600.0">
+<children>
+<HBox prefHeight="60.0" prefWidth="598.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+<children>
+<Label alignment="CENTER" prefHeight="40.0" text="Crossover probability">
+<HBox.margin>
+<Insets left="10.0" top="10.0" />
+</HBox.margin>
+</Label><TextField alignment="CENTER_RIGHT" prefHeight="30.0" text="0.8">
+<HBox.margin>
+<Insets left="20.0" top="10.0" />
+</HBox.margin></TextField>
+</children>
+</HBox>
+<HBox prefHeight="60.0" prefWidth="598.0">
+<children>
+<Label alignment="CENTER" prefHeight="40.0" text="Mutation probability">
+<HBox.margin>
+<Insets left="10.0" top="10.0" />
+</HBox.margin>
+</Label><TextField alignment="CENTER_RIGHT" prefHeight="30.0" text="0.1">
+<HBox.margin>
+<Insets left="20.0" top="10.0" />
+</HBox.margin></TextField>
+</children>
+</HBox>
+<HBox prefHeight="60.0" prefWidth="598.0">
+<children>
+<Label alignment="CENTER" prefHeight="40.0" text="Node mutation probability">
+<HBox.margin>
+<Insets left="10.0" top="10.0" />
+</HBox.margin>
+</Label><TextField alignment="CENTER_RIGHT" prefHeight="30.0" text="0.05">
+<HBox.margin>
+<Insets left="20.0" top="10.0" />
+</HBox.margin></TextField>
+</children>
+</HBox>
+</children>
+</VBox>
+</children></AnchorPane>
+</content>
+    </Tab>
+<Tab text="Tree Pruning" />
+  </tabs>
+</TabPane><ScrollPane fitToHeight="true" hbarPolicy="NEVER" prefHeight="301.0" prefWidth="600.0" />
+</children>
+</VBox>
+</children></AnchorPane>
