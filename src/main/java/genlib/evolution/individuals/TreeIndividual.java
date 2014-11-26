@@ -11,6 +11,7 @@ public class TreeIndividual extends Individual {
 	private Node root;
 
 	public TreeIndividual(TreeIndividual toCopy) {
+		this.fitness = toCopy.fitness;
 		if (toCopy.getRootNode() instanceof BinaryNode) {
 			this.root = new BinaryNode((BinaryNode)toCopy.root);
 		} else {

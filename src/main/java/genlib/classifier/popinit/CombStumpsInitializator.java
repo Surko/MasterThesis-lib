@@ -18,11 +18,12 @@ import java.util.Random;
  * further defining which generator this initializator use. Initialization is
  * done by calling {@link #initPopulation()} method implemented from interface
  * PopulationInitializator. Firstly, to initialize, it has to generate stumps
- * via instance of TreeGenerator. Generated stumps are then combined at leaves
- * for as long as trees does not reach maxDepth in method
- * {@link #combineTrees()}.
+ * via instance of TreeGenerator. Generated stumps are then combined (that's why
+ * CombStumpInitializator) at leaves for as long as trees does not reach
+ * maxDepth in method {@link #combineTrees()}. 
  * 
  * @author kirrie
+ * @see PopulationInitializator
  * @see WekaCombStumpsInitializator
  */
 public class CombStumpsInitializator implements
@@ -146,6 +147,10 @@ public class CombStumpsInitializator implements
 
 	}
 
+	/**
+	 * Method that returns population of generated individuals from
+	 * TreeGenerator.
+	 */
 	public TreeIndividual[] getPopulation() {
 		return stumpPopulation;
 	}

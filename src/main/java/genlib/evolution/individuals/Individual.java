@@ -7,7 +7,7 @@ public abstract class Individual implements Comparable<Individual>, Serializable
 
 	/** for serialization */
 	private static final long serialVersionUID = 8997460860747264220L;
-	private double fitness;
+	protected double fitness;
 
 	public double getFitness() {
 		return fitness;

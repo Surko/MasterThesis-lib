@@ -7,6 +7,7 @@ import genlib.locales.PermMessages;
 import genlib.locales.TextResource;
 
 import java.io.File;
+import java.util.Locale;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -14,6 +15,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+/**
+ * If we use GenLib as a standalone application then this class with main static
+ * method is used. It typically parses parameters handed to the main method.
+ * Class defines root logger and configures it inside static block that is
+ * called after first access to GenLib class. This class has even a
+ * reconfiguration method {@link #reconfig()} that can be globally called from
+ * other places in this project. Mentioned static block calls reconfig method
+ * because GenLib is typically one of the first class that is accessed from
+ * project (because of main method).
+ * 
+ * @author kirrie
+ *
+ */
 public class GenLib {
 
 	/** logger for this class */
@@ -30,7 +44,6 @@ public class GenLib {
 	 */
 	static {
 		PathManager pm = PathManager.getInstance();
-		pm.init();
 		/*
 		 * When app runs with property -Djava.util.logging.config.file then we
 		 * skip all of if-condition and set the logger configuration from the
@@ -71,16 +84,19 @@ public class GenLib {
 	 * to utilize localizations, additional logging, etc... Usually it's called
 	 * only once but this behavior can be altered by changing Config.configured
 	 * to false (weka end is using this altered behavior)
+	 * 
+	 * @return true - reconfiguration initialized, false - already configured
 	 */
-	public static void reconfig() {
+	public static boolean reconfig() {
 		if (Config.configured)
-			return;
+			return false;
 		// Essential configuration
 		Config c = Config.getInstance();
 		c.init();
 		c.saveProperties();
 		// reinit of TextResource if there was change in locales
 		TextResource.reinit();
+		return true;
 	}
 
 	/**

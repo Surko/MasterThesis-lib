@@ -10,7 +10,15 @@ import java.util.Random;
  * PopInitializator interface that is implemented by classes which are supposed
  * to make init population for an evolutionary algorithm. This interface is not
  * dependent on any library (weka,...) so it can be implemented in either way
- * what current project actually uses.
+ * what current project actually uses. Initialization is done by calling
+ * {@link #initPopulation()} and it generates individuals in a form of
+ * Individual object. That's because in some cases of population initializators
+ * we can compute fitness function of these generated individuals right as they
+ * are created. Fill the population pool is then only matter of copying
+ * individuals with their apropriate fitness. It eases up the computation
+ * because otherwise we should have to first compute fitness (test instances)
+ * after calling initPopulation (that itself traverse the tree and tests
+ * instances) and then copying.
  * 
  * @author kirrie
  * @param <T>

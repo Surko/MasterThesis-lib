@@ -77,11 +77,19 @@ public class Config {
 		//TODO
 	}
 	
+	public boolean changeProperty(String key, String value) {
+		if (prop.containsKey(key)) {
+			prop.setProperty(key, value);
+			return true;
+		}
+		return false;
+	}
+	
 	private void putIfAbsent(String key, String value) {
 		if (!prop.containsKey(key)) {
 			prop.put(key, value);
 		}
-	}
+	}	
 	
 	public String getCurrentTime() {
 		return DateFormat.getInstance().format(Calendar.getInstance().getTime());

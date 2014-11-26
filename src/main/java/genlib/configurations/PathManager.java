@@ -28,6 +28,8 @@ public class PathManager {
 	public static PathManager getInstance() {
 		if (instance == null) {			
 			instance = new PathManager();
+			// Instance of this PathManager is universal for this run.
+			instance.init();
 		}
 		return instance;
 	}
@@ -40,8 +42,8 @@ public class PathManager {
 	 */
 	public void init() {
 		/*
-		 *  Ziskame lokaciu triedy. Pri spustani v IDE vrati zlozku pri spustani z jar
-		 *  zase cestu k jaru 
+		 *  Ziskame lokaciu triedy. Pri spustani v IDE vrati zlozku. Pri spustani z jar
+		 *  zase cestu k jaru.
 		 */
 		
 		URL url = GenLib.class.getProtectionDomain().getCodeSource().getLocation();		

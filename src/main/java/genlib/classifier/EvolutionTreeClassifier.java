@@ -57,10 +57,8 @@ public class EvolutionTreeClassifier implements Serializable {
 		random.setSeed(seed);
 		// Shuffle data
 		data.randomize(random);
-		// initialization of population		
-		popInit.setRandomGenerator(random);
-		popInit.setInstances(data);
-		popInit.initPopulation();		
+				
+		initPopulation(data);
 		// initial population of trees
 		TreeIndividual[] initPopulation = (TreeIndividual[]) popInit.getPopulation();
 		ArrayList<TreeIndividual> l = new ArrayList<TreeIndividual>(Arrays.asList(initPopulation));
@@ -68,6 +66,13 @@ public class EvolutionTreeClassifier implements Serializable {
 		
 		// dalsie evolucne prikazy s populaciou volane z EvolutionTreeClassifier
 		// TODO
+	}
+	
+	public void initPopulation(Instances data) throws Exception {
+		// initialization of population		
+		popInit.setRandomGenerator(random);
+		popInit.setInstances(data);
+		popInit.initPopulation();
 	}
 
 	public void buildClassifier(ArrayInstances data) throws Exception {

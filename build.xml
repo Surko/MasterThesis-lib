@@ -1,33 +1,52 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="do-deploy" name="GenTree">
+<project default="allTests" name="GenTree">
+
+	<property name="project.class.path" value="./build/classes/main" />
+	<property name="test.class.path" value="./build/classes/test" />
 
 	<macrodef name="copy-to-dir">
-		<attribute name="todir"/>
-		<attribute name="fromdir"/>
-		<attribute name="exclude" default=""/>
+		<attribute name="todir" />
+		<attribute name="fromdir" />
+		<attribute name="exclude" default="" />
 		<sequential>
-		    <copy todir="@{todir}">
-		      <fileset dir="@{fromdir}" excludes="@{exclude}"/>		        		      
-		    </copy>
-		</sequential>	
+			<copy todir="@{todir}">
+				<fileset dir="@{fromdir}" excludes="@{exclude}" />
+			</copy>
+		</sequential>
 	</macrodef>
 
 	<target name="do-deploy">
-		<copydir src="./src/main/java/genlib" dest="d:/cvicenia/utils/MasterThesis-weka/src/main/java/genlib"/>		
+		<copydir src="./src/main/java/genlib" dest="d:/cvicenia/utils/MasterThesis-weka/src/main/java/genlib" />
 		<delete dir="./build/libs" />
-		<delete dir="./build/classes/locales" />
-		<delete file="./build/classes/GenLib.log" />
-		<delete file="./build/classes/config.properties" />		
-		<!--Prekopirovanie lokalizacnych suborov-->
-		<copy todir="./build/classes/genlib/locales">
-			<fileset dir="./src/main/java/genlib/locales" excludes="**/*.java" />
-		</copy>
+		<delete file="./build/classes/main/GenLib.log" />
+		<delete file="./build/classes/main/config.properties" />
 		<jar destfile="./build/libs/GenLib.jar">
 			<manifest>
-				<attribute name="Main-Class" value="genlib.GenLib" />				
+				<attribute name="Main-Class" value="genlib.GenLib" />
 			</manifest>
-			<fileset dir="./build/classes" />
+			<fileset dir="./build/classes/main" />
 		</jar>
 	</target>
-	
-</project>	
+
+	<target name="allTests" depends="do-deploy">
+		<mkdir dir="${test.class.path}/reports" />
+		<junit printsummary="yes" haltonfailure="no">
+
+			<classpath>
+				<pathelement location="${eclipse.home}/plugins/org.junit_4.11.0.v201303080030/junit.jar" />
+				<pathelement location="${eclipse.home}/plugins/org.hamcrest.core_1.3.0.v201303031735.jar"/>
+				<pathelement location="${project.class.path}" />
+				<pathelement location="${test.class.path}" />
+				<pathelement path="${java.class.path}" />
+			</classpath>
+
+			<formatter type="plain" />			
+
+			<batchtest fork="yes" todir="${test.class.path}/reports">
+				<fileset dir="${test.class.path}"/>									
+			</batchtest>
+
+		</junit>
+	</target>
+
+</project>
