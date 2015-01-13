@@ -28,6 +28,11 @@ import java.util.Random;
 public interface PopulationInitializator<T extends PopGenerator<?>> extends
 		Serializable {
 
+	public enum Type {
+		DECISION_STUMP,
+		TREE;
+	}	
+	
 	public Individual[] getPopulation();
 
 	public void setInstances(Object data);
@@ -43,4 +48,6 @@ public interface PopulationInitializator<T extends PopGenerator<?>> extends
 	public T getGenerator();
 
 	public void setGenerator(T generator);
+	
+	public String objectInfo();
 }

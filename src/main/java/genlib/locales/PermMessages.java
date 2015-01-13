@@ -20,4 +20,11 @@ public interface PermMessages {
 	public static final String _cfg_file_miss = "Config file does not exist. New one will be created";
 	public static final String _cfg_err_load = "Problem occured when loading property file. Exception : %s";
 	public static final String _cfg_set = "Missing values were succesfully set.";
+	// Exception errors
+	public static final String _exc_badins = "Bad type of instances";
+	public static final String _exc_nonwsupp = "No support without using weka";
+	// Default operator text
+	public static final String _def_mut = "DEFAULT=0";
+	public static final String _def_xover = "DEFAULT=0";
+	
 }

@@ -2,6 +2,7 @@ package genlib.classifier.gens;
 
 import genlib.classifier.popinit.PopulationInitializator;
 import genlib.classifier.splitting.SplitCriteria;
+import genlib.evolution.individuals.Individual;
 import genlib.evolution.individuals.TreeIndividual;
 
 public abstract class TreeGenerator implements PopGenerator<TreeGenerator> {
@@ -15,7 +16,8 @@ public abstract class TreeGenerator implements PopGenerator<TreeGenerator> {
 	 * @author kirrie	 
 	 */
 	public enum TreeGenerators {
-		SSGEN
+		SSGEN,
+		J48;
 	}
 	
 	/** Splitting criteria at nodes for attributes, computes information gain, etc... */
@@ -65,6 +67,10 @@ public abstract class TreeGenerator implements PopGenerator<TreeGenerator> {
 		this.gatherGen = gatherGen;		
 	}
 
+	public void setIndividuals(TreeIndividual[] individuals) {
+		this.individuals = individuals;
+	}	
+	
 	protected synchronized int incCountOfIndividuals(int count) {
 		int returnValue = individualCount;
 		individualCount += count;
@@ -93,6 +99,5 @@ public abstract class TreeGenerator implements PopGenerator<TreeGenerator> {
 		}
 	}
 	
-	
-	
+
 }

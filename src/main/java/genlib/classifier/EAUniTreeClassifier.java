@@ -29,16 +29,16 @@ TechnicalInformationHandler {
 	private static final long serialVersionUID = 5314273117546487901L;
 	/** Evolution classificator not dependant on weka. */
 	private EvolutionTreeClassifier e_tree_class;
-	private String popInitString = "type=DECISION_STUMP;depth=2";
 
 	/**
 	 * Constructor for EvolutionClassifier which initialize EvolutionTreeClasifier class that 
 	 * is used as main classificator not dependant on weka. This approach let you use the library 
 	 * in weka as well as in different projects.
+	 * @throws Exception Throws exception if 
 	 */
-	public EAUniTreeClassifier() {
+	public EAUniTreeClassifier() throws Exception{
 		GenLib.reconfig();
-		this.e_tree_class = new EvolutionTreeClassifier();			
+		this.e_tree_class = new EvolutionTreeClassifier(true);			
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -48,12 +48,16 @@ TechnicalInformationHandler {
 
 		newVector.
 		addElement(new Option("\tMutation probability.\n" + 
-				"\t(default " + e_tree_class.getMutProb() + ")",
+				"\t(default " + e_tree_class.getMutString() + ")",
 				"MP", 0, "-MP <mutation probability"));
 		newVector.
 		addElement(new Option("\tCrossover probability.\n" +
-				"\t(default " + e_tree_class.getXoverProb() + ")",
+				"\t(default " + e_tree_class.getXoverString() + ")",
 				"XP", 1, "-XP <xover probability>"));
+		newVector.
+		addElement(new Option("\tElitism rate.\n" +
+				"\t(default " + e_tree_class.getElitism() + ")",
+				"E", 1, "-E <elitism rate>"));
 		newVector.
 		addElement(new Option("\tSeed for random data shuffling.\n" +
 				"\t(default " + e_tree_class.getSeed() + ")",
@@ -61,20 +65,15 @@ TechnicalInformationHandler {
 		newVector.
 		addElement(new Option("\tPopulation generator",
 				"PopP", 1, "-PopP <pop_params>"));
-
 		newVector.
 		addElement(new Option("\tPopulation size",
 				"IP", 1, "-IP <pop_size>"));
-
-
 		newVector.
 		addElement(new Option("\tForced Reconfiguration?",
 				"C", 1, "-C <True|False>"));
 
-
 		return newVector.elements();
 	}
-
 
 	/**
 	 * Gets the current settings of the evolution classifier. SuppressWarnings are present because 
@@ -93,12 +92,16 @@ TechnicalInformationHandler {
 
 		// stands for mutation probability
 		result.add("-MP");
-		result.add("" + getMutProb());
+		result.add("" + getMutString());
 
 		// stands for crossover probability
 		result.add("-XP");
-		result.add("" + getXoverProb());
+		result.add("" + getXoverString());
 
+		// stands for elitism
+		result.add("-E");
+		result.add("" + getElitism());
+		
 		// stands for initial population size
 		result.add("-IP");
 		result.add("" + getPopulationSize());
@@ -128,24 +131,27 @@ TechnicalInformationHandler {
 
 		tmpStr = Utils.getOption("MP", options);
 		if (tmpStr.length() != 0) {
-			e_tree_class.setMutProb(Double.parseDouble(tmpStr));
+			e_tree_class.setMutString(tmpStr);
 		}
 
 		tmpStr = Utils.getOption("XP", options);
 		if (tmpStr.length() != 0) {
-			e_tree_class.setXoverProb(Double.parseDouble(tmpStr));
+			e_tree_class.setXoverString(tmpStr);
 		}
 
-		tmpStr = Utils.getOption("PopP",options);
+		tmpStr = Utils.getOption("E", options);
 		if (tmpStr.length() != 0) {
-			this.popInitString = tmpStr;
-			final Properties popProp = parseParameters();			
-			e_tree_class.setPopInitializator(popProp,true);
+			e_tree_class.setElitism(Double.parseDouble(tmpStr));
+		}
+		
+		tmpStr = Utils.getOption("PopP",options);
+		if (tmpStr.length() != 0) {		
+			e_tree_class.setPopInit(tmpStr);
 		}
 
 		tmpStr = Utils.getOption("IP", options);
 		if (tmpStr.length() != 0) {
-			setPopulationSize(Integer.parseInt(tmpStr));
+			e_tree_class.setPopulationSize(Integer.parseInt(tmpStr));
 		}
 
 		tmpStr = Utils.getOption('S', options);
@@ -164,37 +170,21 @@ TechnicalInformationHandler {
 	}
 
 	@Override
-	public void buildClassifier(Instances data) throws Exception {		
+	public void buildClassifier(Instances data) throws Exception {
+		if (e_tree_class.getMutString() == null || e_tree_class.getXoverString() == null)				
+			throw new Exception(TextResource.getString("eBadOperators"));
+		if (e_tree_class.getPopInitializator() == null)
+			throw new Exception(TextResource.getString("eBadPopInit"));
+			
 		// can classifier tree handle the data?
 		getCapabilities().testWithFail(data);
 
 		// remove instances with missing class
 		data = new Instances(data);
 		data.deleteWithMissingClass();		
-
-		// parse initial population generator parameter, set and build classifier
-		final Properties popProp = parseParameters();	
-		e_tree_class.setPopInitializator(popProp,true);
+				
 		e_tree_class.buildClassifier(data);
 		// that's all for this method
-	}
-
-	/**
-	 * Method accessed only from this method that parses parameter IP which contains
-	 * information about initial population generator. Different informations
-	 * are stored into Properties object that is further used inside buildClassifier method.
-	 * 
-	 * @return Properties file with stored information about initial pop. generator
-	 */
-	private Properties parseParameters() {
-		Properties prop = new Properties();
-
-		String[] parameters = popInitString.split("[=;]");
-
-		for (int i = 0; i < parameters.length; i+=2)
-			prop.put(parameters[i], parameters[i+1]);
-
-		return prop;
 	}
 
 	/**
@@ -215,7 +205,7 @@ TechnicalInformationHandler {
 	 * @return String value of parameter IP
 	 */
 	public String getPopInit() {
-		return popInitString;
+		return e_tree_class.getPopInitializator().objectInfo();
 	}
 
 	/**
@@ -224,8 +214,8 @@ TechnicalInformationHandler {
 	 * 
 	 * @param popInitString value of parameter IP
 	 */
-	public void setPopInit(String popInitString) {
-		this.popInitString = popInitString;
+	public void setPopInit(String popInitString) throws Exception {
+		e_tree_class.setPopInit(popInitString);
 	}
 
 	/**
@@ -266,12 +256,12 @@ TechnicalInformationHandler {
 		return TextResource.getString("wSeedTipText");
 	}
 
-	public double getMutProb() {
-		return e_tree_class.getMutProb();
+	public String getMutString() {
+		return e_tree_class.getMutString();
 	}
 
-	public void setMutProb(double mutProb) {
-		e_tree_class.setMutProb(mutProb);
+	public void setMutString(String mutParam) {
+		e_tree_class.setMutString(mutParam);
 	}
 	
 	/**
@@ -279,16 +269,16 @@ TechnicalInformationHandler {
 	 * @return tip text for this property suitable for
 	 * displaying in the explorer/experimenter gui
 	 */
-	public String mutProbTipText() {
+	public String mutStringTipText() {
 		return TextResource.getString("wMutProbTipText");
 	}
 
-	public double getXoverProb() {
-		return e_tree_class.getXoverProb();
+	public String getXoverString() {
+		return e_tree_class.getXoverString();
 	}
 
-	public void setXoverProb(double xoverProb) {
-		e_tree_class.setXoverProb(xoverProb);
+	public void setXoverString(String xoverParam) {
+		e_tree_class.setXoverString(xoverParam);
 	}
 	
 	/**
@@ -296,10 +286,28 @@ TechnicalInformationHandler {
 	 * @return tip text for this property suitable for
 	 * displaying in the explorer/experimenter gui
 	 */
-	public String xoverProbTipText() {
+	public String xoverStringTipText() {
 		return TextResource.getString("wXoverProbTipText");
 	}
 
+	public double getElitism() {
+		return e_tree_class.getElitism();
+	}
+	
+	
+	public void setElitism(double elitism) {
+		e_tree_class.setElitism(elitism);
+	}
+	
+	/**
+	 * Return the tip text for this property 
+	 * @return tip text for this property suitable for
+	 * displaying in the explorer/experimenter gui
+	 */
+	public String elitismTipText() {
+		return TextResource.getString("wPopSizeTipText");
+	}
+	
 	public int getPopulationSize() {
 		return e_tree_class.getPopulationSize();
 	}

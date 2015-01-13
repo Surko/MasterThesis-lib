@@ -1,5 +1,6 @@
 package genlib.classifier.gens;
 
+import genlib.classifier.splitting.SplitCriteria;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.structures.MultiWayNode;
 import weka.classifiers.trees.j48.Distribution;
@@ -10,6 +11,18 @@ public class WekaSimpleStumpGenerator extends SimpleStumpGenerator {
 
 	/** for serialization */
 	private static final long serialVersionUID = 9199025876883616284L;
+	
+	public WekaSimpleStumpGenerator() {
+		super();		
+	}
+
+	public WekaSimpleStumpGenerator(SimpleStumpGenerator gen) {
+		super(gen);
+	}
+
+	public WekaSimpleStumpGenerator(SplitCriteria splitCriteria) {
+		super(splitCriteria);
+	}
 
 	private TreeIndividual[] createPopulation(Instances data) throws Exception {
 		individuals = new TreeIndividual[data.numAttributes()-1];		
@@ -24,14 +37,16 @@ public class WekaSimpleStumpGenerator extends SimpleStumpGenerator {
 				MultiWayNode rootNode = (MultiWayNode)attrIndividual.getRootNode();
 				// configure root node with attribute and count of child nodes
 				rootNode.setAttribute(attrIndex);
-				rootNode.setChildLength(cAttr.numValues());
+				rootNode.setChildLength(cAttr.numValues());	
+				// setting tree depth with force to skip depth recounting
+				rootNode.setTreeDepthForced(1);
+				MultiWayNode[] childs = rootNode.getChilds();
 				// distribution of classes for each child
 				Distribution distribution = splitCriteria.handleEnumeratedAttribute(data,attrIndex,cAttr.numValues());
 				for (int bagIndex = 0; bagIndex < cAttr.numValues(); bagIndex++) {
-					MultiWayNode classNode = new MultiWayNode();
-					classNode.setParent(rootNode);
+					MultiWayNode classNode = new MultiWayNode();					
 					classNode.setValue(distribution.maxClass(bagIndex));						
-					rootNode.setChildAt(bagIndex, classNode);
+					childs[bagIndex] =  classNode;
 				}
 				rootNode.setCriteriaValue(splitCriteria.computeCriteria(distribution));
 			}
@@ -42,20 +57,19 @@ public class WekaSimpleStumpGenerator extends SimpleStumpGenerator {
 				MultiWayNode rootNode = (MultiWayNode)attrIndividual.getRootNode();
 				// configure of root node with attribute and count of child nodes
 				rootNode.setAttribute(attrIndex);
-				rootNode.setChildLength(cAttr.numValues());
+				rootNode.setChildLength(2);
+				// setting tree depth with force to skip depth recounting
+				rootNode.setTreeDepthForced(1);
+				MultiWayNode[] childs = rootNode.getChilds();
 				// distribution of classes for each child
 				Distribution distribution = splitCriteria.handleNumericAttribute(data,attrIndex,data.numClasses());
 				// It should be checked if distribution is null but for simple stumps it's not needed
 				// Numeric attribute is two-divided 
-				MultiWayNode leftNode = new MultiWayNode();
-				MultiWayNode rightNode = new MultiWayNode();
-				leftNode.setParent(rootNode);
-				leftNode.setValue(distribution.maxClass(0));
-				rightNode.setParent(rootNode);
-				rightNode.setValue(distribution.maxClass(1));
-				rootNode.setValue(splitCriteria.getSplitPoint());
-				rootNode.setChildAt(0, leftNode);											
-				rootNode.setChildAt(1, rightNode);																
+				childs[0] = new MultiWayNode();
+				childs[1] = new MultiWayNode();				
+				childs[0].setValue(distribution.maxClass(0));				
+				childs[1].setValue(distribution.maxClass(1));
+				rootNode.setValue(splitCriteria.getSplitPoint());																
 				rootNode.setCriteriaValue(splitCriteria.getCriteriaValue());
 			}
 			individualCount++;
@@ -78,4 +92,5 @@ public class WekaSimpleStumpGenerator extends SimpleStumpGenerator {
 		return "Single tree generator, extended for weka use, that generates stump decision trees";
 	}	
 
+	
 }

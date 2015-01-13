@@ -7,7 +7,6 @@ import genlib.locales.PermMessages;
 import genlib.locales.TextResource;
 
 import java.io.File;
-import java.util.Locale;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -42,8 +41,7 @@ public class GenLib {
 	 * Console takes only message with Level higher or equal to Level.SEVERE.
 	 * GenTree.log recognize all the messages.
 	 */
-	static {
-		PathManager pm = PathManager.getInstance();
+	static {		
 		/*
 		 * When app runs with property -Djava.util.logging.config.file then we
 		 * skip all of if-condition and set the logger configuration from the

@@ -10,8 +10,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class Config {
@@ -68,8 +70,10 @@ public class Config {
 	}
 	
 	public void setAbsentProperties() {
-		putIfAbsent("mut-prob", "0.04");
-		putIfAbsent("xover-prob", "0.8");
+		putIfAbsent("mut-operators", "DEFAULT=0.04");
+		putIfAbsent("xover-prob", "DEFAULT=0.8");
+		putIfAbsent("elitism", "0.15");
+		putIfAbsent("population-init","type=DECISION_STUMP;depth=2");
 		putIfAbsent("pop-size", "100");
 		putIfAbsent("seed", "28041991");
 		putIfAbsent("file-localization", "false");
@@ -89,7 +93,7 @@ public class Config {
 		if (!prop.containsKey(key)) {
 			prop.put(key, value);
 		}
-	}	
+	}		
 	
 	public String getCurrentTime() {
 		return DateFormat.getInstance().format(Calendar.getInstance().getTime());
@@ -103,12 +107,20 @@ public class Config {
 		return prop.getProperty("file-localization").equals("true");
 	}
 		
-	public double getMutationProbability() {
-		return Double.parseDouble(prop.getProperty("mut-prob"));
+	public String getMutationOperators() {
+		return prop.getProperty("mut-operators");
 	}
 	
-	public double getXoverProbability() {
-		return Double.parseDouble(prop.getProperty("xover-prob"));
+	public String getXoverOperators() {
+		return prop.getProperty("xover-operators");
+	}
+	
+	public double getElitismRate() {
+		return Double.parseDouble(prop.getProperty("elitism"));
+	}
+	
+	public String getPopulationInit() {
+		return prop.getProperty("population-init");
 	}
 	
 	public int getPopulationSize() {

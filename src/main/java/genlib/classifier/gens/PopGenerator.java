@@ -12,4 +12,5 @@ public interface PopGenerator<T extends PopGenerator<?>> extends Runnable, Seria
 	public void setInstances(Object data);
 	public void setGatherGen(T gatherGen);
 	public T copy();
+	public String getGenName();
 }

@@ -57,6 +57,10 @@ public class SimpleStumpGenerator extends TreeGenerator {
 	@Override
 	public String getInfo() {
 		return "Single tree generator that generates stump decision trees";
-	}	
+	}
+	
+	public String getGenName() {
+		return "SSGEN";
+	}
 
 }

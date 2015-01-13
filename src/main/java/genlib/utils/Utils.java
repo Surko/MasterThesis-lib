@@ -1,11 +1,14 @@
 package genlib.utils;
 
+import java.util.Random;
+
 /**
  * Class that contains a lot of static methods for computing different often used measures. 
  * @author kirrie 
  */
 public class Utils {
-
+	
+	public static final Random randomGen = new Random();
 	/**
 	 * Natural logarithm of 2. Used to make logarithms at base 2. 
 	 */

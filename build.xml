@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="allTests" name="GenTree">
-
+	
+	<property name="weka.genlib.path" value="../MasterThesis-weka/src/main/java/genlib" />
 	<property name="project.class.path" value="./build/classes/main" />
 	<property name="test.class.path" value="./build/classes/test" />
 
@@ -16,7 +17,7 @@
 	</macrodef>
 
 	<target name="do-deploy">
-		<copydir src="./src/main/java/genlib" dest="d:/cvicenia/utils/MasterThesis-weka/src/main/java/genlib" />
+		<copydir src="./src/main/java/genlib" dest="${weka.genlib.path}" />
 		<delete dir="./build/libs" />
 		<delete file="./build/classes/main/GenLib.log" />
 		<delete file="./build/classes/main/config.properties" />
