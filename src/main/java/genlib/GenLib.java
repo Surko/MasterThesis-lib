@@ -1,10 +1,11 @@
 package genlib;
 
-import genlib.classifier.EAUniTreeClassifier;
+import genlib.classifier.weka.EAUniTreeClassifier;
 import genlib.configurations.Config;
 import genlib.configurations.PathManager;
 import genlib.locales.PermMessages;
 import genlib.locales.TextResource;
+import genlib.plugins.PluginManager;
 
 import java.io.File;
 import java.util.logging.ConsoleHandler;
@@ -94,6 +95,7 @@ public class GenLib {
 		c.saveProperties();
 		// reinit of TextResource if there was change in locales
 		TextResource.reinit();
+		PluginManager.initPlugins();
 		return true;
 	}
 
@@ -108,7 +110,7 @@ public class GenLib {
 		LOG.info(PermMessages._arg_pars);
 		// COMMAND LINE
 		int _counter = 0;
-
+		
 		try {
 			while (_counter < args.length) {
 				switch (args[_counter]) {

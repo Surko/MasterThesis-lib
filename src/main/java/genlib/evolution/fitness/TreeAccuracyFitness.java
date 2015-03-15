@@ -11,21 +11,40 @@ import weka.core.Instances;
 
 public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 
-	private Object data;
+	public static final String initName = "tAcc";
+	private Object testData;
 
+	/** Constructor that will set index of tree accuracy fitness which is used in an individual fitness array.*/ 
+	public TreeAccuracyFitness() {
+		this.index = TREE_ACCURACY;
+	}
+	
+	/**
+	 * This method that overrides computeFitness from FitnessFunction class computes
+	 * accuracy for an individual handed as parameter. If the individual hasn't changed then
+	 * we can return value of this fitness right away from individual. Method calls other method
+	 * with the same name that depends on type of data on which this fitness function
+	 * works (weka or built-in type).
+	 */
 	@Override
-	public void computeFitness(TreeIndividual individual) {
-
-		if (data instanceof Instances) {
-			computeFitness((Instances) data, individual);
-			return;
+	public double computeFitness(TreeIndividual individual) {
+		if (!individual.hasChanged()) {
+			return individual.getFitnessValue(index);
 		}
-		if (data instanceof ArrayInstances) {
+		
+		if (testData instanceof Instances) {
+			return computeFitness((Instances) testData, individual);			
 		}
+		if (testData instanceof ArrayInstances) {
+			return computeFitness((ArrayInstances)testData, individual);
+		}
+		
+		return 0;
 
 	}
 
-	private void computeFitness(Instances instances, TreeIndividual individual) {
+	@SuppressWarnings("unchecked")
+	private double computeFitness(Instances instances, TreeIndividual individual) {	
 		Node root = individual.getRootNode();
 		double allData = instances.numInstances();
 		double correct = 0;
@@ -48,6 +67,27 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 			if (instance.classValue() == root.getValue())
 				correct++;
 		}
-		individual.setFitnessValue(ACCURACY, correct / allData);
+		double val = correct/allData;
+		individual.setFitnessValue(index, val);
+		// set to unchange for speeding up next time computation if the individual stays the same.
+		individual.unchange();
+		return val;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private double computeFitness(ArrayInstances instances, TreeIndividual individual) {
+		Node root = individual.getRootNode();
+		double allData = instances.numInstances();
+		double correct = 0;
+		
+		double val = correct/allData;
+		// set to unchange for speeding up next time computation if the individual stays the same.
+		individual.unchange();
+		return correct;
+	}
+
+	@Override
+	public Class<TreeIndividual> getIndividualClassType() {
+		return TreeIndividual.class;
 	}
 }

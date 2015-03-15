@@ -1,7 +1,7 @@
 package genlib.classifier.gens;
 
-import genlib.evolution.individuals.Individual;
 import genlib.evolution.individuals.TreeIndividual;
+import genlib.utils.WekaUtils;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
 
@@ -9,19 +9,20 @@ public class WekaJ48TreeGenerator extends TreeGenerator  {
 	
 	/** for serialization */
 	private static final long serialVersionUID = -266323902512927931L;	
-	private J48 tree;
+	public static final String initName = "wJ48Gen";
+	private J48 j48Tree;
 	
 	public WekaJ48TreeGenerator() {
-		this.tree = new J48();		
+		this.j48Tree = new J48();		
 	}
 	
 	public WekaJ48TreeGenerator(String[] options) throws Exception {
-		this.tree = new J48();
-		this.tree.setOptions(options);		
+		this.j48Tree = new J48();
+		this.j48Tree.setOptions(options);
 	}	
 
 	@Override
-	public Individual[] createPopulation() throws Exception {
+	public TreeIndividual[] createPopulation() throws Exception {
 		if (data instanceof Instances) {
 			return createPopulation((Instances)data);
 		} else {
@@ -30,13 +31,18 @@ public class WekaJ48TreeGenerator extends TreeGenerator  {
 	}
 
 	private TreeIndividual[] createPopulation(Instances data) throws Exception {
-		tree.buildClassifier(data);
-		String prefixTree = tree.prefix();
-		return individuals;		
+		individuals = new TreeIndividual[1];
+		
+		// TODO ONLY ONE INDIVIDUAL IS HERE. ADD SOME SORT OF ATTRIBUTE REMOVING OR DIFFERENT PRUNING MECHANISMS?
+		j48Tree.buildClassifier(data);
+		String sTree = j48Tree.graph();
+		individuals[0] = WekaUtils.constructTreeIndividual(sTree, j48Tree.measureTreeSize(), data.numInstances(), treeInit.getAttrIndexMap(),
+				treeInit.getAttrValueIndexMap(), treeInit.getAutoDepth());		
+		return individuals;
 	}
 	
 	public void setOptions(String[] options) throws Exception{
-		this.tree.setOptions(options);
+		this.j48Tree.setOptions(options);
 	}
 	
 	@Override
@@ -45,12 +51,12 @@ public class WekaJ48TreeGenerator extends TreeGenerator  {
 	}
 
 	public J48 getJ48() {
-		return tree;
+		return j48Tree;
 	}
 	
 	@Override
 	public String getGenName() {		
-		return "J48";
+		return initName;
 	}
 	
 	@Override
@@ -58,4 +64,12 @@ public class WekaJ48TreeGenerator extends TreeGenerator  {
 		return "Tree generator which generates C4.5 trees via weka J48 algorithm";
 	}
 
+	public boolean isWekaCompatible() {
+		return true;
+	}
+	
+	@Override
+	public void setAdditionalOptions(String[] options) throws Exception {
+		this.j48Tree.setOptions(options);
+	}
 }

@@ -1,22 +1,27 @@
 package genlib.evolution.operators;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import genlib.evolution.EvolutionAlgorithm;
+import genlib.evolution.Population;
 import genlib.evolution.individuals.Individual;
+import genlib.evolution.individuals.TreeIndividual;
 
-public interface Operator<T extends Individual> {
+public abstract class Operator<T extends Individual> {
 
-	public enum MutationOperators {
-		DEFAULT
-	}
+	public static final HashMap<String,Class<Operator<TreeIndividual>>> tXOper = new HashMap<>();
+	public static final HashMap<String,Class<Operator<TreeIndividual>>> tMOper = new HashMap<>();
 	
-	public enum XoverOperators {
-		DEFAULT
-	}
+	protected EvolutionAlgorithm<T> ea;
 	
-	public void setOperatorProbability(double prob);
-	public double getOperatorProbability();	
-	public void execute(ArrayList<T> parents, ArrayList<T> childs);
-	public String objectInfo();
+	public abstract void setOperatorProbability(double prob);
+	public abstract double getOperatorProbability();
+	public abstract void execute(Population<T> parents, Population<T> childs);
+	public abstract String objectInfo();
+	
+	public void setEvolutionAlgorithm(EvolutionAlgorithm<T> ea) {
+		this.ea = ea;
+	}
 	
 }

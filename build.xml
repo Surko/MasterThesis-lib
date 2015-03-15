@@ -4,6 +4,7 @@
 	<property name="weka.genlib.path" value="../MasterThesis-weka/src/main/java/genlib" />
 	<property name="project.class.path" value="./build/classes/main" />
 	<property name="test.class.path" value="./build/classes/test" />
+	<property name="libs.class.path" value="./libraries" />
 
 	<macrodef name="copy-to-dir">
 		<attribute name="todir" />
@@ -38,6 +39,7 @@
 				<pathelement location="${eclipse.home}/plugins/org.hamcrest.core_1.3.0.v201303031735.jar"/>
 				<pathelement location="${project.class.path}" />
 				<pathelement location="${test.class.path}" />
+				<pathelement location="${libs.class.path}/weka.jar" />
 				<pathelement path="${java.class.path}" />
 			</classpath>
 

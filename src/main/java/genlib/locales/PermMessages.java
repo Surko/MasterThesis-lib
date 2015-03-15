@@ -23,6 +23,20 @@ public interface PermMessages {
 	// Exception errors
 	public static final String _exc_badins = "Bad type of instances";
 	public static final String _exc_nonwsupp = "No support without using weka";
+	// Plugin load
+	public static final String _plug_type_err = "Bad type of loaded plugin %s. Move it to correct dir.";
+	public static final String _c_plug_loaded="Number of %s plugins loaded : %s.";
+	public static final String _c_class_loaded="Number of %s classes recognized : %s.";
+	public static final String _class_duplkey="Duplicate key %s for classes %s, %s.";
+	// population init
+	public static final String _s_popinit="Loading of available population initializators";		
+	public static final String _popclass_loaded="Class with population initializator %s is recognized. Usage parameter registered as %s.";
+	// generator init
+	public static final String _s_geninit="Loading of available individual generators.";		
+	public static final String _genclass_loaded="Class with individual generator %s is recognized. Usage parameter registered as %s.";
+	// fitness init
+	public static final String _s_fitinit="Loading of available fitness functions";		
+	public static final String _fitclass_loaded="Class with fitness function %s is recognized. Usage parameter registered as %s.";
 	// Default operator text
 	public static final String _def_mut = "DEFAULT=0";
 	public static final String _def_xover = "DEFAULT=0";

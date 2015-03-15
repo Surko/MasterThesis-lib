@@ -4,13 +4,14 @@ import java.io.Serializable;
 
 import genlib.evolution.individuals.Individual;
 
-public interface PopGenerator<T extends PopGenerator<?>> extends Runnable, Serializable {
+public interface PopGenerator<T extends Individual> extends Runnable, Serializable {
 	
-	public Individual[] getIndividuals();
-	public Individual[] createPopulation() throws Exception;
+	public T[] getIndividuals();
+	public T[] createPopulation() throws Exception;
 	public String getInfo();	
 	public void setInstances(Object data);
-	public void setGatherGen(T gatherGen);
-	public T copy();
+	public void setGatherGen(PopGenerator<T> gatherGen);
+	public void setAdditionalOptions(String[] options) throws Exception;
+	public boolean isWekaCompatible();
 	public String getGenName();
 }

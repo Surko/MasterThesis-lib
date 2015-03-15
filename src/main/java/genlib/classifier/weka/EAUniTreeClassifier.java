@@ -1,0 +1,438 @@
+package genlib.classifier.weka;
+//TODO - JavaDOC
+import genlib.GenLib;
+import genlib.classifier.EvolutionTreeClassifier;
+import genlib.configurations.Config;
+import genlib.locales.TextResource;
+
+import java.util.Enumeration;
+import java.util.Vector;
+
+import weka.classifiers.Classifier;
+import weka.core.Capabilities;
+import weka.core.Capabilities.Capability;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.Option;
+import weka.core.OptionHandler;
+import weka.core.Randomizable;
+import weka.core.TechnicalInformation;
+import weka.core.TechnicalInformation.Field;
+import weka.core.TechnicalInformation.Type;
+import weka.core.TechnicalInformationHandler;
+import weka.core.Utils;
+
+public class EAUniTreeClassifier extends Classifier implements Randomizable, OptionHandler,
+TechnicalInformationHandler {
+
+	/** for serialization */
+	private static final long serialVersionUID = 5314273117546487901L;
+	/** Evolution classificator not dependant on weka. */
+	private EvolutionTreeClassifier e_tree_class;
+
+	/**
+	 * Constructor for EvolutionClassifier which initialize EvolutionTreeClasifier class that 
+	 * is used as main classificator not dependant on weka. This approach let you use the library 
+	 * in weka as well as in different projects.
+	 * @throws Exception Throws exception if 
+	 */
+	public EAUniTreeClassifier() throws Exception{
+		GenLib.reconfig();
+		this.e_tree_class = new EvolutionTreeClassifier(true);			
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Enumeration listOptions() {
+
+		Vector newVector = new Vector(4);
+
+		newVector.
+		addElement(new Option("\tMutation probability.\n" + 
+				"\t(default " + e_tree_class.getMutString() + ")",
+				"MP", 0, "-MP <mutation probability"));
+		newVector.
+		addElement(new Option("\tCrossover probability.\n" +
+				"\t(default " + e_tree_class.getXoverString() + ")",
+				"XP", 1, "-XP <xover probability>"));
+		newVector.
+		addElement(new Option("\tElitism rate.\n" +
+				"\t(default " + e_tree_class.getElitism() + ")",
+				"E", 1, "-E <elitism rate>"));
+		newVector.
+		addElement(new Option("\tSeed for random data shuffling.\n" +
+				"\t(default " + e_tree_class.getSeed() + ")",
+				"S", 1, "-S <seed>"));
+		newVector.
+		addElement(new Option("\tPopulation generator",
+				"PopP", 1, "-PopP <pop_params>"));
+		newVector.
+		addElement(new Option("\tPopulation size",
+				"IP", 1, "-IP <pop_size>"));
+		newVector.
+		addElement(new Option("\tForced Reconfiguration?",
+				"C", 1, "-C <True|False>"));
+
+		return newVector.elements();
+	}
+
+	/**
+	 * Gets the current settings of the evolution classifier. SuppressWarnings are present because 
+	 * of usage of Vector, but for the back-compatibility with Weka we are using it anyways.	
+	 *    
+	 * @return an array of strings suitable for passing to setOptions()
+	 */
+	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public String[] getOptions() {		
+		Vector result;
+		String[] options;
+		int i;
+
+		result = new Vector();
+
+		// stands for mutation probability
+		result.add("-MP");
+		result.add("" + getMutString());
+
+		// stands for crossover probability
+		result.add("-XP");
+		result.add("" + getXoverString());
+
+		// stands for elitism
+		result.add("-E");
+		result.add("" + getElitism());
+		
+		// stands for initial population size
+		result.add("-IP");
+		result.add("" + getPopulationSize());
+
+		// stands for population generator parameters
+		result.add("-PopP");
+		result.add(getPopInit());
+
+		// stands for seed
+		result.add("-S");
+		result.add("" + getSeed());	    
+
+		// stands for configuration configured :)
+		result.add("-C");
+		result.add("" + getConfigured());
+
+		options = super.getOptions();
+		for (i = 0; i < options.length; i++)
+			result.add(options[i]);
+
+		return (String[]) result.toArray(new String[result.size()]);
+	}
+
+	@Override
+	public void setOptions(String[] options) throws Exception {
+		String tmpStr;
+
+		tmpStr = Utils.getOption("MP", options);
+		if (tmpStr.length() != 0) {
+			e_tree_class.setMutString(tmpStr);
+		}
+
+		tmpStr = Utils.getOption("XP", options);
+		if (tmpStr.length() != 0) {
+			e_tree_class.setXoverString(tmpStr);
+		}
+
+		tmpStr = Utils.getOption("E", options);
+		if (tmpStr.length() != 0) {
+			e_tree_class.setElitism(Double.parseDouble(tmpStr));
+		}
+		
+		tmpStr = Utils.getOption("PopP",options);
+		if (tmpStr.length() != 0) {		
+			e_tree_class.setPopInit(tmpStr);
+		}
+
+		tmpStr = Utils.getOption("IP", options);
+		if (tmpStr.length() != 0) {
+			e_tree_class.setPopulationSize(Integer.parseInt(tmpStr));
+		}
+
+		tmpStr = Utils.getOption('S', options);
+		if (tmpStr.length() != 0) {
+			e_tree_class.setSeed(Integer.parseInt(tmpStr));
+		}
+
+		tmpStr = Utils.getOption('C', options);
+		if (tmpStr.length() != 0) {
+			setConfigured(Boolean.parseBoolean(tmpStr));
+		}
+
+		super.setOptions(options);
+
+		Utils.checkForRemainingOptions(options);
+	}
+
+	@Override
+	public void buildClassifier(Instances data) throws Exception {
+		if (e_tree_class.getMutString() == null || e_tree_class.getXoverString() == null)				
+			throw new Exception(TextResource.getString("eBadOperators"));
+		if (e_tree_class.getPopInitializator() == null)
+			throw new Exception(TextResource.getString("eBadPopInit"));
+			
+		// can classifier tree handle the data?
+		getCapabilities().testWithFail(data);
+
+		// remove instances with missing class
+		data = new Instances(data);
+		data.deleteWithMissingClass();		
+						
+		e_tree_class.buildClassifier(data);
+		// that's all for this method
+	}
+
+	/**
+	 * Classifies an instance.
+	 *
+	 * @param instance the instance to classify
+	 * @return the classification for the instance
+	 * @throws Exception if instance can't be classified successfully
+	 */
+	public double classifyInstance(Instance instance) throws Exception {		
+		return 0d;
+	}
+
+	/**
+	 * Getter method for the parameter IP. It contains information about
+	 * initial population generator.
+	 * 
+	 * @return String value of parameter IP
+	 */
+	public String getPopInit() {
+		return e_tree_class.getPopInitializator().objectInfo();
+	}
+
+	/**
+	 * Setter method for the parameter IP. It contains information about 
+	 * initial population generator
+	 * 
+	 * @param popInitString value of parameter IP
+	 */
+	public void setPopInit(String popInitString) throws Exception {
+		e_tree_class.setPopInit(popInitString);
+	}
+
+	/**
+	 * Return the tip text for this property 
+	 * @return tip text for this property suitable for
+	 * displaying in the explorer/experimenter gui
+	 */
+	public String popInitTipText() {
+		return TextResource.getString("wPopInitTipText");
+	}
+
+	/**
+	 * Get the value of Seed.
+	 *
+	 * @return Value of Seed.
+	 */
+	@Override
+	public int getSeed() {
+		return e_tree_class.getSeed();
+	}
+
+	/**
+	 * Set the value of Seed.
+	 *
+	 * @param seed Value to assign to Seed.
+	 */
+	@Override
+	public void setSeed(int seed) {
+		e_tree_class.setSeed(seed);	
+	}
+
+	/**
+	 * Return the tip text for this property 
+	 * @return tip text for this property suitable for
+	 * displaying in the explorer/experimenter gui
+	 */
+	public String seedTipText() {
+		return TextResource.getString("wSeedTipText");
+	}
+
+	public String getMutString() {
+		return e_tree_class.getMutString();
+	}
+
+	public void setMutString(String mutParam) {
+		e_tree_class.setMutString(mutParam);
+	}
+	
+	/**
+	 * Return the tip text for this property 
+	 * @return tip text for this property suitable for
+	 * displaying in the explorer/experimenter gui
+	 */
+	public String mutStringTipText() {
+		return TextResource.getString("wMutProbTipText");
+	}
+
+	public String getXoverString() {
+		return e_tree_class.getXoverString();
+	}
+
+	public void setXoverString(String xoverParam) {
+		e_tree_class.setXoverString(xoverParam);
+	}
+	
+	/**
+	 * Return the tip text for this property 
+	 * @return tip text for this property suitable for
+	 * displaying in the explorer/experimenter gui
+	 */
+	public String xoverStringTipText() {
+		return TextResource.getString("wXoverProbTipText");
+	}
+
+	/**
+	 * Method returns fraction of population that will be elitized (advanced) to the next
+	 * offspring. It is wide known parameter in an Evolution Algorithms.
+	 * @return Value of elitism parameter.
+	 */
+	public double getElitism() {
+		return e_tree_class.getElitism();
+	}
+	
+	/**
+	 * Method set the fraction of population that will be elitized (advanced) to the next
+	 * offspring. It is wide known parameter in an Evolution Algorithms.
+	 * @param elitism Value of elitism parameter.
+	 * 
+	 */
+	public void setElitism(double elitism) {
+		e_tree_class.setElitism(elitism);
+	}
+	
+	
+	/**
+	 * Return the tip text for this property 
+	 * @return tip text for this property suitable for
+	 * displaying in the explorer/experimenter gui
+	 */
+	public String elitismTipText() {
+		return TextResource.getString("wPopSizeTipText");
+	}
+	
+	
+	/**
+	 * Returns the size of population which we are working with.
+	 * @return size of population
+	 */	
+	public int getPopulationSize() {
+		return e_tree_class.getPopulationSize();
+	}
+	
+
+	/**
+	 * Sets the size of population which we are going to work with.
+	 * @param populationSize new size of population
+	 */
+	public void setPopulationSize(int populationSize) {
+		e_tree_class.setPopulationSize(populationSize);
+	}
+	
+
+	/**
+	 * Return the tip text for this property 
+	 * @return tip text for this property suitable for
+	 * displaying in the explorer/experimenter gui
+	 */
+	public String populationSizeTipText() {
+		return TextResource.getString("wPopSizeTipText");
+	}
+	
+	
+	/**
+	 * Sets if this classifier is already configured.
+	 * @param configured true/false if it's configured or not.
+	 */
+	public void setConfigured(boolean configured) {
+		Config.configured = configured;		
+		GenLib.reconfig();
+	}
+
+
+	/**
+	 * I would call it isConfigured but weka is sometimes strange.
+	 * 
+	 * @return true/false if the configuration is already configured
+	 */
+	public boolean getConfigured() {		
+		return Config.configured;
+	}
+	
+	
+	/**
+	 * Return the tip text for this property 
+	 * @return tip text for this property suitable for
+	 * displaying in the explorer/experimenter gui
+	 */	
+	public String configuredTipText() {
+		return TextResource.getString("wConfigTipText");
+	}
+
+	
+	/**
+	 * Get capabilities of this classifier what it can be working with. 
+	 * This classifier can work with nominal, numeric attributes even
+	 * if some values are missing. It is normal classifier (no regression) 
+	 * so it classifies into nominal classes and even if provided data are missing
+	 * some values. </br>
+	 * It must be set because without further specification this classificator
+	 * would be capable of nothing (what we do not want).
+	 * @return Object Capabilities that is defined inside weka.
+	 * @see Capabilities
+	 */
+	@Override
+	public Capabilities getCapabilities() {
+		Capabilities result = super.getCapabilities();
+		result.disableAll();
+
+		// attributes
+		result.enable(Capability.NOMINAL_ATTRIBUTES);
+		result.enable(Capability.NUMERIC_ATTRIBUTES);
+		result.enable(Capability.MISSING_VALUES);
+
+		// class
+		result.enable(Capability.NOMINAL_CLASS);
+		result.enable(Capability.MISSING_CLASS_VALUES);
+
+		return result;
+	}
+
+	/**
+	 * Creates globalInfo about this classifier. It consists of simple description of this classificator 
+	 * with conjuction of technical information that can be returned via getTechnicalInformation method.
+	 * @return global info of this classificator.
+	 */
+	public String globalInfo() {
+		return "Class for constructing decision tree with evolution metaheuristic.\n\n"
+				+ "For more information see: \n\n"
+				+ getTechnicalInformation();				
+	}
+
+	/**
+	 * Method will built up the TechnicalInformation object with basic 
+	 * information about this classificator that can be accessed from weka.
+	 * @return Object TechnicalInformation with basic stats
+	 * @see TechnicalInformation
+	 */
+	@Override
+	public TechnicalInformation getTechnicalInformation() {
+		TechnicalInformation result;
+		result = new TechnicalInformation(Type.ARTICLE);
+		result.setValue(Field.AUTHOR, "Lukas Surin");
+		result.setValue(Field.YEAR, "2015");
+		result.setValue(Field.TITLE, "Evolutionary Trees");		
+		return result;
+	}
+
+
+
+}

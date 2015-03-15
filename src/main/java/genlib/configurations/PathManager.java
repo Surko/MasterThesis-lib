@@ -1,29 +1,24 @@
 package genlib.configurations;
 import genlib.GenLib;
-
 import java.io.File;
 import java.net.URL;
-import java.util.logging.Logger;
-
 
 public class PathManager {
-	private static final Logger LOG = Logger.getLogger(PathManager.class.getName());
 	
+	/** instance of this PathManager */
 	private static PathManager instance;
 	
-	/**
-	 * Defaultny korenovy adresar 
-	 */
+	/** Default root directory */
 	private File rootPath;
-	/**
-	 * Cesta k dodatocnym local suborom.
-	 */
+	/** Path to local files */	 
 	private File localePath;
+	/** Path to plugins */
+	private File pluginPath;
 	
 	/**
-	 * Metoda ktora navrati instanciu PathManager. Pre unikatnost tejto instancie pre celu aplikaciu
-	 * dodrziavame principy Singleton navrhoveho vzoru.
-	 * @return Singleton instanciu PathManageru
+	 * Method which will return instance of PathManager. Uniqueness of this instance can be
+	 * done via singleton design pattern.
+	 * @return singleton instance of PathManager
 	 */
 	public static PathManager getInstance() {
 		if (instance == null) {			
@@ -35,10 +30,11 @@ public class PathManager {
 	}
 	
 	/**
-	 * Inicializacia PathManageru s defaultnymi cestami. 
-	 * Root zlozka je miesto kde sa nachadza aplikacia.
-	 * Plugin zlozka je v root zlozke pod nazvom plugins.
-	 * User zlozka je pocas behu aplikacie menitelna no defaultne je rovnaka ako root.
+	 * Initialization of PathManager with default paths. </br>
+	 * Root directory is a place where the application is located. </br>
+	 * Plugin directory is inside root directory under the name plugins. </br>
+	 * User directory can be changed throughout the run of application but the default value
+	 * is the same as root directory. This directory contains future saved files, databases. 
 	 */
 	public void init() {
 		/*
@@ -60,10 +56,12 @@ public class PathManager {
 	}
 
 	/**
-	 * Getter pre root zlozku. Root zlozka je pociatkom alebo tiez miestom tejto aplikacie.
-	 * Ostatne zlozky cerpaju priamo z nej
+	 * 
+	 * Getter which will get you root path. Root directory is starter location or in other words
+	 * place where the application resides.
+	 * Other directories are branching from here.
 	 * @see #getPluginPath() 
-	 * @return Root/korenova cesta/subor. 
+	 * @return root directory as a file
 	 */
 	public File getRootPath() {			
 		return rootPath;
@@ -73,7 +71,13 @@ public class PathManager {
 		return localePath;
 	}
 		
-	
+	/**
+	 * Gets the value of the property pluginPath.
+	 * @return plugin directory as a file
+	 */
+	public File getPluginPath() {
+		return pluginPath;
+	}
 	
 	
 }

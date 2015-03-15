@@ -25,29 +25,24 @@ import java.util.Random;
  *            Type of generator for population (TreeGenerator,...)
  * @see PopGenerator
  */
-public interface PopulationInitializator<T extends PopGenerator<?>> extends
-		Serializable {
-
-	public enum Type {
-		DECISION_STUMP,
-		TREE;
-	}	
+public interface PopulationInitializator<T extends Individual> extends
+		Serializable {	
 	
-	public Individual[] getPopulation();
-
-	public void setInstances(Object data);
-
+	public T[] getPopulation();
+	public T[] getOriginPopulation();
 	public void initPopulation() throws Exception;
-
-	public void setRandomGenerator(Random random);
-
-	public int getPopulationSize();
-
-	public void setPopulationSize(int popSize);
-
-	public T getGenerator();
-
-	public void setGenerator(T generator);
 	
-	public String objectInfo();
+	public void setInstances(Object data);
+	public void setRandomGenerator(Random random);
+	public void setPopulationSize(int popSize);
+	public void setGenerator(PopGenerator<T> generator);
+	
+	public int getPopulationSize();
+	public PopGenerator<T> getGenerator();
+	public String getInitName();
+	public boolean isWekaCompatible();
+	
+	public String objectInfo();	
+	
+	
 }

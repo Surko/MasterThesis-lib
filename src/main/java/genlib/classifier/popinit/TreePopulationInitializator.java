@@ -1,23 +1,30 @@
 package genlib.classifier.popinit;
 
+import genlib.classifier.gens.PopGenerator;
 import genlib.classifier.gens.TreeGenerator;
 import genlib.evolution.individuals.TreeIndividual;
-import genlib.locales.TextResource;
 
+import java.util.HashMap;
 import java.util.Random;
 
-public abstract class TreePopulationInitializator implements PopulationInitializator<TreeGenerator> {
-
+public abstract class TreePopulationInitializator implements PopulationInitializator<TreeIndividual> {
+	
 	/** for serialization */
 	private static final long serialVersionUID = 7222530982342870829L;
+	/** loaded population initializators */
+	public static final HashMap<String, Class<? extends TreePopulationInitializator>> treePopInits = new HashMap<>();
 	/** depth of generated trees. */
 	protected int maxDepth;
 	/** number of division of trainin data */
 	protected int divideParam;
 	/** only resampling instead of dividing */
 	protected boolean resample;
+	/** recounting of depth inside trees */
+	protected boolean autoDepth;
 	/** Individuals that makes this population */
 	protected TreeIndividual[] population;
+	/** Number of threads that will be creating population */
+	protected int nThreads;
 
 	/** Generator of tree population. It contains all of the generated trees that are used to combine. */
 	protected TreeGenerator gen;
@@ -27,6 +34,10 @@ public abstract class TreePopulationInitializator implements PopulationInitializ
 	protected Object data;
 	/** Final population size */
 	protected int popSize;
+	/** Index of attribute values to access correct array values */
+	protected HashMap<String, Integer>[] attrValueIndexMap;
+	/** Index of attribute to access correct attribute from String */
+	protected HashMap<String,Integer> attrIndexMap;
 	
 	/**
 	 * Method that returns population of generated individuals from
@@ -36,6 +47,11 @@ public abstract class TreePopulationInitializator implements PopulationInitializ
 		return population;
 	}
 
+	@Override
+	public TreeIndividual[] getOriginPopulation() {
+		return gen.getIndividuals();
+	}
+	
 	/**
 	 * Gets the depth of the combined trees (population trees) from generated trees. 
 	 * @return Depth of the trees in population.
@@ -47,12 +63,33 @@ public abstract class TreePopulationInitializator implements PopulationInitializ
 	public int getDivideParam() {
 		return divideParam;
 	}
+	
+	public boolean getAutoDepth() {
+		return autoDepth;
+	}
 
 	@Override
 	public TreeGenerator getGenerator() {
 		return gen;
 	}
 
+	public HashMap<String, Integer>[] getAttrValueIndexMap() {
+		return attrValueIndexMap;
+	}
+	
+	public HashMap<String, Integer> getAttrIndexMap() {
+		return attrIndexMap;
+	}
+	
+	public boolean isResampling() {
+		return resample;
+	}
+	
+	@Override
+	public int getPopulationSize() {
+		return popSize;
+	}
+	
 	public void setRandomGenerator(Random random) {
 		this.random = random;
 	}
@@ -69,9 +106,15 @@ public abstract class TreePopulationInitializator implements PopulationInitializ
 		this.resample = resample;
 	}
 
+	public void setAutoDepth(boolean autoDepth) {
+		this.autoDepth = autoDepth;
+	}
+	
 	@Override
-	public void setGenerator(TreeGenerator gen) {
-		this.gen = gen;
+	public void setGenerator(PopGenerator<TreeIndividual> gen) {
+		if (gen instanceof TreeGenerator) {
+			this.gen = (TreeGenerator)gen;
+		}
 	}
 
 	@Override
@@ -80,13 +123,15 @@ public abstract class TreePopulationInitializator implements PopulationInitializ
 	}
 
 	@Override
-	public int getPopulationSize() {
-		return popSize;
-	}
-
-	@Override
 	public void setPopulationSize(int popSize) {
 		this.popSize = popSize;
 	}
+
+	public void setNumOfThreads(int nThreads) {
+		this.nThreads = nThreads;
+	}
+
+	
+	
 	
 }

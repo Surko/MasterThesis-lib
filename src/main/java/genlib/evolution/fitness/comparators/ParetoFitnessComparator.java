@@ -2,13 +2,11 @@ package genlib.evolution.fitness.comparators;
 
 import genlib.evolution.individuals.Individual;
 
-import java.util.Comparator;
-
-public class ParetoFitnessComparator implements Comparator<Individual> {
-
+public class ParetoFitnessComparator<T extends Individual> extends FitnessComparator<T> {
+	
 	@Override
-	public int compare(Individual o1, Individual o2) {
+	public int compare(T o1, T o2) {
 		return 0;
 	}
-
+	
 }

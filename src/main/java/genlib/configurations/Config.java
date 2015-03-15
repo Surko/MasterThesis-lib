@@ -10,13 +10,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.Set;
 import java.util.logging.Logger;
 
-public class Config {
+public class Config {		
 	
 	public static boolean configured = false;
 	private static final Logger LOG = Logger.getLogger(Config.class.getName());
@@ -25,7 +23,7 @@ public class Config {
 	private String sFile;
 	private Properties prop;	
 		
-	public static Config getInstance() {		
+	public static synchronized Config getInstance() {		
 		if (instance == null) {
 			instance = new Config();
 		}
@@ -70,10 +68,17 @@ public class Config {
 	}
 	
 	public void setAbsentProperties() {
-		putIfAbsent("mut-operators", "DEFAULT=0.04");
-		putIfAbsent("xover-prob", "DEFAULT=0.8");
+		putIfAbsent("fit-threads", "1");
+		putIfAbsent("gen-threads", "1");
+		putIfAbsent("oper-threads", "1");
+		putIfAbsent("fit-eval", "SINGLE");
+		putIfAbsent("fit-functions", "tAcc");
+		putIfAbsent("mut-operators", "DEFAULT 0.04");
+		putIfAbsent("xover-prob", "DEFAULT 0.8");
 		putIfAbsent("elitism", "0.15");
-		putIfAbsent("population-init","type=DECISION_STUMP;depth=2");
+		putIfAbsent("selectors", "Tmt 0");
+		putIfAbsent("env-selectors", "");
+		putIfAbsent("population-init","type DECISION_STUMP;depth 2");
 		putIfAbsent("pop-size", "100");
 		putIfAbsent("seed", "28041991");
 		putIfAbsent("file-localization", "false");
@@ -106,7 +111,7 @@ public class Config {
 	public boolean isFileLocalized() {
 		return prop.getProperty("file-localization").equals("true");
 	}
-		
+	
 	public String getMutationOperators() {
 		return prop.getProperty("mut-operators");
 	}
@@ -127,7 +132,36 @@ public class Config {
 		return Integer.parseInt(prop.getProperty("pop-size"));
 	}
 	
+	public int getGenNumOfThreads() {
+		return Integer.parseInt(prop.getProperty("gen-threads"));
+	}
+	
+	public int getFitNumOfThreads() {
+		return Integer.parseInt(prop.getProperty("fit-threads"));
+	}
+	
+	public int getOperNumOfThreads() {
+		return Integer.parseInt(prop.getProperty("oper-threads"));
+	}
+	
+	public String getSelectors() {
+		return prop.getProperty("selectors");
+	}
+	
+	public String getEnvSelectors() {
+		return prop.getProperty("env-selectors");
+	}
+	
 	public int getSeed() {
 		return Integer.parseInt(prop.getProperty("seed"));
+	}
+
+	
+	public String getFitnessComparator() {
+		return prop.getProperty("fit-eval");
+	}
+	
+	public String getFitnessFunctions() {
+		return prop.getProperty("fit-functions");
 	}
 }

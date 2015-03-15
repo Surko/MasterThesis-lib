@@ -8,9 +8,9 @@ public class SimpleStumpGenerator extends TreeGenerator {
 
 	/** for serialization */
 	private static final long serialVersionUID = -4049246410003742780L;
-
+	public static final String initName = "SSGen";
 	public SimpleStumpGenerator(SimpleStumpGenerator gen) {
-		this.genDepth = gen.getGeneratorDepth();
+		this.genHeight = gen.getGeneratorHeight();
 		this.splitCriteria = splitCriteria.copy();		
 	}
 
@@ -20,7 +20,7 @@ public class SimpleStumpGenerator extends TreeGenerator {
 	 * that we generate.
 	 */
 	public SimpleStumpGenerator() {
-		this.genDepth = 1;
+		this.genHeight = 2;
 	}
 
 	/**
@@ -31,7 +31,7 @@ public class SimpleStumpGenerator extends TreeGenerator {
 	 * @param splitCriteria Splitting criteria for which we generate trees
 	 */
 	public SimpleStumpGenerator(SplitCriteria splitCriteria) {		
-		this.genDepth = 1;	
+		this.genHeight = 2;	
 		this.splitCriteria = splitCriteria;
 	}
 
@@ -59,8 +59,12 @@ public class SimpleStumpGenerator extends TreeGenerator {
 		return "Single tree generator that generates stump decision trees";
 	}
 	
+	public boolean isWekaCompatible() {
+		return false;
+	}
+	
 	public String getGenName() {
-		return "SSGEN";
+		return initName;
 	}
 
 }

@@ -1,20 +1,28 @@
 package genlib.structures;
 
+import genlib.utils.Utils.Sign;
+
 public class BinaryNode implements Node {
 
 	/** for serialization */
 	private static final long serialVersionUID = -5557876005762565687L;
-	private BinaryNode parent;
-	private BinaryNode[] childs;
-	private int treeDepth;
-	private int attribute = -1;
-	private double value = Integer.MIN_VALUE;
-	private double criteriaValue;
+	protected BinaryNode parent;
+	protected BinaryNode[] childs;
+	protected int treeHeight;
+	protected int attribute = -1;
+	protected double value = Integer.MIN_VALUE;
+	protected double criteriaValue;
+	protected Sign sign;
+
+	public BinaryNode() {
+		this.treeHeight = 1;
+	}
 
 	public BinaryNode(BinaryNode toCopy) {
 		this.attribute = toCopy.attribute;
 		this.value = toCopy.value;
-		this.treeDepth = toCopy.treeDepth;
+		this.treeHeight = toCopy.treeHeight;
+		this.sign = toCopy.sign;
 		if (!toCopy.isLeaf()) {
 			this.childs = new BinaryNode[2];
 			this.childs[0] = new BinaryNode(toCopy.childs[0]);
@@ -24,9 +32,11 @@ public class BinaryNode implements Node {
 		}
 	}
 
-	public BinaryNode() {
-		this.childs = new BinaryNode[2];
-		this.treeDepth = 0;
+	public BinaryNode(int attribute, Sign sign, double value) {
+		this.attribute = attribute;
+		this.sign = sign;
+		this.treeHeight = 1;
+		this.value = value;
 	}
 
 	@Override
@@ -37,6 +47,10 @@ public class BinaryNode implements Node {
 	@Override
 	public double getValue() {
 		return value;
+	}
+
+	public Sign getSign() {
+		return sign;
 	}
 
 	public Node getRightNode() {
@@ -56,51 +70,37 @@ public class BinaryNode implements Node {
 		this.parent = (BinaryNode) parent;
 	}
 
+	public void setAttribute(int attribute) {
+		this.attribute = attribute;
+	}
+
+	public void setValue(double value) {
+		this.value = value;
+	}
+
+	public void setSign(Sign sign) {
+		this.sign = sign;
+	}
+
 	public void setChildAt(int index, Node node) {
-		if (index < 2 && node != null) {
-			int nodeExtendDepth = node.getTreeDepth() + 1;
-			if (childs[index] == null) {
-				// set the child
-				childs[index] = (BinaryNode) node;
-				// set the parent of a child
-				node.setParent(this);
-				// only if node depth is bigger than up to now
-				if (treeDepth < nodeExtendDepth) {
-					// set the max depth
-					this.treeDepth = nodeExtendDepth;
-					// if parent not null => propagate to parent
-					if (parent != null)
-						parent.recount(treeDepth + 1);
-				}
-			} else {
-				// set the child
-				childs[index] = (BinaryNode) node;
-				// set the parent of a child
-				node.setParent(this);
-
-				// node depth has to be different
-				if (nodeExtendDepth != treeDepth) {
-					recount(nodeExtendDepth);
-
-					if (parent != null)
-						parent.recount(treeDepth + 1);
-				}
-			}
+		if (childs == null) {
+			childs = new BinaryNode[2];
 		}
+
+		if (index < 2) {
+			childs[index] = (BinaryNode) node;
+		}
+	}
+
+	public void setChildCount(int childCount) {
 	}
 
 	public void setChilds(Node[] childs) {
 		this.childs = (BinaryNode[]) childs;
-		recount(0);
-		if (parent != null) {
-			parent.recount(treeDepth);
-		}
 	}
 
 	public BinaryNode getChildAt(int index) {
-		if (index < 2)
-			return childs[index];
-		return null;
+		return childs[index];
 	}
 
 	public BinaryNode[] getChilds() {
@@ -114,6 +114,7 @@ public class BinaryNode implements Node {
 	public void makeLeaf() {
 		this.attribute = -1;
 		this.childs = null;
+		this.treeHeight = 1;
 	}
 
 	public void setInfoGain(double criteriaValue) {
@@ -128,12 +129,12 @@ public class BinaryNode implements Node {
 		return 2;
 	}
 
-	public int getTreeDepth() {
-		return treeDepth;
+	public int getTreeHeight() {
+		return treeHeight;
 	}
 
-	public void setTreeDepthForced(int treeDepth) {
-		this.treeDepth = treeDepth;
+	public void setTreeHeightForced(int treeDepth) {
+		this.treeHeight = treeDepth;
 	}
 
 	/**
@@ -143,19 +144,17 @@ public class BinaryNode implements Node {
 	@Override
 	public void clearChilds() {
 		childs = new BinaryNode[childs.length];
-		treeDepth = 0;
-		if (parent != null)
-			parent.recount(0);
+		treeHeight = 1;
 	}
 
 	/**
 	 * Reconfigure/recounts actual depth of a tree from its childs.
 	 */
-	private void recount(int possibleMax) {
-		if (possibleMax > treeDepth) {
-			this.treeDepth = possibleMax;
+	public void recount(int possibleMax) {
+		if (possibleMax > treeHeight) {
+			this.treeHeight = possibleMax;
 			if (parent != null) {
-				parent.recount(treeDepth);
+				parent.recount(treeHeight);
 			}
 			return;
 		}
@@ -163,19 +162,48 @@ public class BinaryNode implements Node {
 		for (BinaryNode node : childs) {
 			if (node == null)
 				continue;
-			max = node.getTreeDepth() > max ? node.getTreeDepth() : max;
+			max = node.getTreeHeight() > max ? node.getTreeHeight() : max;
 		}
 		max++;
-		if (max != this.treeDepth) {
-			this.treeDepth = max;
+		if (max != this.treeHeight) {
+			this.treeHeight = max;
 			if (parent != null) {
-				parent.recount(treeDepth);
+				parent.recount(treeHeight);
 			}
 		}
 	}
 
 	public BinaryNode copy() {
 		return new BinaryNode(this);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+
+		BinaryNode node = ((BinaryNode) obj);
+
+		if (this.attribute != node.attribute || this.value != node.value
+				|| this.sign != node.sign
+				|| this.criteriaValue != node.criteriaValue) {
+			return false;
+		}
+
+		if ((this.childs == null && node.childs != null)
+				|| (this.childs != null && node.childs == null)) {
+			return false;
+		}
+
+		if (this.childs != null && node.childs != null) {
+			if (!this.childs[0].equals(node.childs[0])
+					|| !this.childs[1].equals(node.childs[1]))
+				return false;
+		}
+
+		return true;
+
 	}
 
 }
