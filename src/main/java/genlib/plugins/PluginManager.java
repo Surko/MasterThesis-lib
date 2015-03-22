@@ -1,12 +1,18 @@
 package genlib.plugins;
 
+import genlib.annotations.EnvSelectAnnot;
 import genlib.annotations.FitnessAnnot;
 import genlib.annotations.GenAnnot;
+import genlib.annotations.MOperatorAnnot;
+import genlib.annotations.MateSelectAnnot;
 import genlib.annotations.PopInitAnnot;
+import genlib.annotations.XOperatorAnnot;
 import genlib.classifier.gens.PopGenerator;
 import genlib.classifier.popinit.PopulationInitializator;
 import genlib.configurations.PathManager;
 import genlib.evolution.fitness.FitnessFunction;
+import genlib.evolution.operators.Operator;
+import genlib.evolution.selectors.Selector;
 import genlib.locales.PermMessages;
 import genlib.utils.Utils;
 
@@ -39,6 +45,8 @@ public class PluginManager {
 		initPopInitPlugins();
 		initGeneratorPlugins();
 		initFitnessPlugins();
+		initOperatorPlugins();
+		initSelectorPlugins();
 	}
 	
 	private static void initPopInitPlugins() {
@@ -54,30 +62,8 @@ public class PluginManager {
 		for (Annotation rawAnot : p.getAnnotations()) {			
 			PopInitAnnot popInitAnot = (PopInitAnnot)rawAnot;
 			
-			if (popInitAnot.toInjectClasses().length == popInitAnot.toInjectNames().length) {
-				try {
-					Field f = popInitAnot.toInjectClass().getField(popInitAnot.toInjectField());					
-					// it's static map, so null object as parameter is adequate				
-					HashMap<String,Class<? extends PopulationInitializator<?>>> h = (HashMap<String, Class<? extends PopulationInitializator<?>>>) f.get(null);
-					for (int i = 0; i < popInitAnot.toInjectClasses().length; i++) {
-						String key = popInitAnot.toInjectNames()[i];
-						if (h.containsKey(key)) {
-							LOG.log(Level.WARNING, String.format(PermMessages._class_duplkey,
-									key,
-									h.get(key).getName(),
-									popInitAnot.toInjectClasses()[i].getName()));
-							continue;
-						}
-						h.put(popInitAnot.toInjectNames()[i], popInitAnot.toInjectClasses()[i]);
-						classLoaded++;
-						LOG.log(Level.INFO,String.format(PermMessages._popclass_loaded,
-								popInitAnot.toInjectClasses()[i].getName(),
-								popInitAnot.toInjectNames()[i]));
-					}									
-				} catch (Exception e) {
-					LOG.log(Level.SEVERE, e.toString());
-				}
-			}
+			classLoaded = classLoader(popInitAnot.toInjectClasses(), popInitAnot.toInjectClass(), 
+					popInitAnot.toInjectNames(), popInitAnot.toInjectField(), PermMessages._popclass_loaded);
 			
 		}
 
@@ -113,7 +99,7 @@ public class PluginManager {
 	
 	private static void initFitnessPlugins() {
 		LOG.log(Level.INFO, String.format(PermMessages._s_fitinit,FitnessFunction.class.getName()));
-		int plugLoaded = 0;
+		int plugLoaded = 0;	
 		int classLoaded = 0;
 						
 		Package p = Package.getPackage("genlib.evolution.fitness");		
@@ -124,30 +110,8 @@ public class PluginManager {
 		for (Annotation rawAnot : p.getAnnotations()) {			
 			FitnessAnnot fitnessAnot = (FitnessAnnot)rawAnot;
 			
-			if (fitnessAnot.toInjectClasses().length == fitnessAnot.toInjectNames().length) {
-				try {
-					Field f = fitnessAnot.toInjectClass().getField(fitnessAnot.toInjectField());					
-					// it's static map, so null object as parameter is adequate				
-					HashMap<String,Class<? extends FitnessFunction<?>>> h = (HashMap<String, Class<? extends FitnessFunction<?>>>) f.get(null);
-					for (int i = 0; i < fitnessAnot.toInjectClasses().length; i++) {
-						String key = fitnessAnot.toInjectNames()[i];
-						if (h.containsKey(key)) {
-							LOG.log(Level.WARNING, String.format(PermMessages._class_duplkey,
-									key,
-									h.get(key).getName(),
-									fitnessAnot.toInjectClasses()[i].getName()));
-							continue;
-						}
-						h.put(fitnessAnot.toInjectNames()[i], fitnessAnot.toInjectClasses()[i]);
-						classLoaded++;
-						LOG.log(Level.INFO,String.format(PermMessages._fitclass_loaded,
-								fitnessAnot.toInjectClasses()[i].getName(),
-								fitnessAnot.toInjectNames()[i]));
-					}									
-				} catch (Exception e) {
-					LOG.log(Level.SEVERE, e.toString());
-				}
-			}
+			classLoaded = classLoader(fitnessAnot.toInjectClasses(), fitnessAnot.toInjectClass(), 
+					fitnessAnot.toInjectNames(), fitnessAnot.toInjectField(), PermMessages._fitclass_loaded);
 			
 		}
 
@@ -194,30 +158,8 @@ public class PluginManager {
 		for (Annotation rawAnot : p.getAnnotations()) {			
 			GenAnnot genAnot = (GenAnnot)rawAnot;
 			
-			if (genAnot.toInjectClasses().length == genAnot.toInjectNames().length) {
-				try {
-					Field f = genAnot.toInjectClass().getField(genAnot.toInjectField());					
-					// it's static map, so null object as parameter is adequate				
-					HashMap<String,Class<? extends PopGenerator>> h = (HashMap<String, Class<? extends PopGenerator>>) f.get(null);
-					for (int i = 0; i < genAnot.toInjectClasses().length; i++) {
-						String key = genAnot.toInjectNames()[i];
-						if (h.containsKey(key)) {
-							LOG.log(Level.WARNING, String.format(PermMessages._class_duplkey,
-									key,
-									h.get(key).getName(),
-									genAnot.toInjectClasses()[i].getName()));
-							continue;
-						}
-						h.put(genAnot.toInjectNames()[i], genAnot.toInjectClasses()[i]);
-						classLoaded++;
-						LOG.log(Level.INFO,String.format(PermMessages._genclass_loaded,
-								genAnot.toInjectClasses()[i].getName(),
-								genAnot.toInjectNames()[i]));
-					}									
-				} catch (Exception e) {
-					LOG.log(Level.SEVERE, e.toString());
-				}
-			}
+			classLoaded = classLoader(genAnot.toInjectClasses(), genAnot.toInjectClass(), 
+					genAnot.toInjectNames(), genAnot.toInjectField(), PermMessages._genclass_loaded);
 			
 		}
 
@@ -250,4 +192,152 @@ public class PluginManager {
 		LOG.log(Level.INFO, String.format(PermMessages._c_plug_loaded, sPopInit, plugLoaded));		
 	}
 	
+	private static void initOperatorPlugins() {
+		LOG.log(Level.INFO, String.format(PermMessages._s_operinit,Operator.class.getName()));
+		int plugLoaded = 0;
+		int classLoaded = 0;
+						
+		Package p = Package.getPackage("genlib.evolution.operators");		
+		if (p.getAnnotations() == null) {
+			return;
+		}
+		
+		for (Annotation rawAnot : p.getAnnotations()) {	
+			if (rawAnot instanceof MOperatorAnnot) {
+				MOperatorAnnot mOperAnot = (MOperatorAnnot)rawAnot;
+				
+				classLoaded += classLoader(mOperAnot.toInjectClasses(), mOperAnot.toInjectClass(), 
+						mOperAnot.toInjectNames(), mOperAnot.toInjectField(), PermMessages._operclass_loaded);
+				
+			}
+			if (rawAnot instanceof XOperatorAnnot) {
+				XOperatorAnnot xOperAnot = (XOperatorAnnot)rawAnot;
+				
+				classLoaded += classLoader(xOperAnot.toInjectClasses(), xOperAnot.toInjectClass(), 
+						xOperAnot.toInjectNames(), xOperAnot.toInjectField(), PermMessages._operclass_loaded);
+				
+			}						
+			
+		}
+
+		// loading jar plugins inside plugin directory
+		PathManager pm = PathManager.getInstance();		
+		File operPluginPath = new File(pm.getPluginPath(), "operators");
+		
+		if (operPluginPath.exists() && operPluginPath.isDirectory()) {			
+				
+			for (File plugFile : operPluginPath.listFiles(Utils.jarFilter)) {
+				try {
+					URLClassLoader authorizedLoader = URLClassLoader.newInstance(new URL[] { plugFile.toURI().toURL() });
+		            URL url = authorizedLoader.findResource("META-INF/MANIFEST.MF"); 
+		            Manifest mf = new Manifest(url.openStream());
+		            Attributes mfAttributes = mf.getMainAttributes();
+		            OperatorPlugin plugin = (OperatorPlugin) authorizedLoader.loadClass(
+	                        mfAttributes.getValue(pluginClassTag)).newInstance();
+		            plugin.initOperators();
+					plugLoaded++;
+				} catch (ClassCastException cce) {
+					LOG.log(Level.WARNING, String.format(PermMessages._plug_type_err,plugFile.getName()));
+				} catch (Exception e) {
+					LOG.log(Level.SEVERE, e.toString());
+				}
+			}
+		}
+		
+		String sPopInit = "operator";
+		LOG.log(Level.INFO, String.format(PermMessages._c_class_loaded, sPopInit, classLoaded));
+		LOG.log(Level.INFO, String.format(PermMessages._c_plug_loaded, sPopInit, plugLoaded));		
+	}
+	
+	private static void initSelectorPlugins() {
+		LOG.log(Level.INFO, String.format(PermMessages._s_selinit,Selector.class.getName()));
+		int plugLoaded = 0;
+		int classLoaded = 0;
+						
+		Package p = Package.getPackage("genlib.evolution.selectors");		
+		if (p.getAnnotations() == null) {
+			return;
+		}
+		
+		for (Annotation rawAnot : p.getAnnotations()) {	
+			if (rawAnot instanceof EnvSelectAnnot) {
+				EnvSelectAnnot selectAnot = (EnvSelectAnnot)rawAnot;
+				
+				classLoaded += classLoader(selectAnot.toInjectClasses(), selectAnot.toInjectClass(), 
+						selectAnot.toInjectNames(), selectAnot.toInjectField(), PermMessages._selclass_loaded);
+				
+			}
+			if (rawAnot instanceof MateSelectAnnot) {
+				MateSelectAnnot selectAnot = (MateSelectAnnot)rawAnot;
+				
+				classLoaded += classLoader(selectAnot.toInjectClasses(), selectAnot.toInjectClass(), 
+						selectAnot.toInjectNames(), selectAnot.toInjectField(), PermMessages._selclass_loaded);
+				
+			}						
+			
+		}
+
+		// loading jar plugins inside plugin directory
+		PathManager pm = PathManager.getInstance();		
+		File selPluginPath = new File(pm.getPluginPath(), "selectors");
+		
+		if (selPluginPath.exists() && selPluginPath.isDirectory()) {			
+				
+			for (File plugFile : selPluginPath.listFiles(Utils.jarFilter)) {
+				try {
+					URLClassLoader authorizedLoader = URLClassLoader.newInstance(new URL[] { plugFile.toURI().toURL() });
+		            URL url = authorizedLoader.findResource("META-INF/MANIFEST.MF"); 
+		            Manifest mf = new Manifest(url.openStream());
+		            Attributes mfAttributes = mf.getMainAttributes();
+		            SelectorPlugin plugin = (SelectorPlugin) authorizedLoader.loadClass(
+	                        mfAttributes.getValue(pluginClassTag)).newInstance();
+		            plugin.initSelectors();
+					plugLoaded++;
+				} catch (ClassCastException cce) {
+					LOG.log(Level.WARNING, String.format(PermMessages._plug_type_err,plugFile.getName()));
+				} catch (Exception e) {
+					LOG.log(Level.SEVERE, e.toString());
+				}
+			}
+		}
+		
+		String sPopInit = "selector";
+		LOG.log(Level.INFO, String.format(PermMessages._c_class_loaded, sPopInit, classLoaded));
+		LOG.log(Level.INFO, String.format(PermMessages._c_plug_loaded, sPopInit, plugLoaded));	
+	}
+
+	private static int classLoader(Class[] toInjectClasses, Class toInjectClass, 
+			String[] toInjectNames, String toInjectField,
+			String loadMsg) {
+		
+		if (toInjectClasses.length != toInjectNames.length) {
+			return 0;
+		}
+		
+		int classLoaded = 0;
+		try {
+			Field f = toInjectClass.getField(toInjectField);
+			HashMap<String,Class> h = (HashMap<String, Class>) f.get(null);
+			
+			for (int i = 0; i < toInjectClasses.length; i++) {
+				String key = toInjectNames[i];
+				if (h.containsKey(key)) {
+					LOG.log(Level.WARNING, String.format(PermMessages._class_duplkey,
+							key,
+							h.get(key).getName(),
+							toInjectClasses[i].getName()));
+					continue;
+				}
+				h.put(toInjectNames[i], toInjectClasses[i]);
+				classLoaded++;
+				LOG.log(Level.INFO,String.format(loadMsg,
+						toInjectClasses[i].getName(),
+						toInjectNames[i]));
+			}	
+			
+		} catch (Exception e) {
+			LOG.log(Level.SEVERE, e.toString());
+		}
+		return classLoaded;
+	}
 }

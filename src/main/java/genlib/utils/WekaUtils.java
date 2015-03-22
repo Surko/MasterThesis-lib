@@ -1,6 +1,7 @@
 package genlib.utils;
 
 import genlib.evolution.fitness.FitnessFunction;
+import genlib.evolution.fitness.TreeAccuracyFitness;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.structures.MultiWayDepthNode;
 import genlib.structures.MultiWayNode;
@@ -144,7 +145,7 @@ public class WekaUtils {
 		}
 
 		TreeIndividual treeInd = new TreeIndividual(nodes[0]);
-		treeInd.setFitnessValue(FitnessFunction.TREE_ACCURACY, 1 - incorrClass/instCount);
+		treeInd.setFitnessValue(TreeAccuracyFitness.TREE_ACCURACY, 1 - incorrClass/instCount);
 		return treeInd;
 	}
 

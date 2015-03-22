@@ -9,6 +9,7 @@ import genlib.utils.WekaUtils;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import weka.core.Instances;
 
@@ -64,9 +65,10 @@ public class WekaCompletedTrees extends CompletedTrees {
 			es.shutdown();			
 
 			// Here we should be waiting for generating to stop. 
-			synchronized(gen) {
-				while (!es.isTerminated())
-					gen.wait();
+			try {
+				es.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+			} catch (InterruptedException e) {
+				
 			}
 			
 			population = gen.getIndividuals();

@@ -5,6 +5,7 @@ import genlib.evolution.Population;
 import genlib.evolution.individuals.Individual;
 import genlib.evolution.individuals.TreeIndividual;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -21,20 +22,34 @@ public abstract class FitnessFunction<T extends Individual> {
 	
 	public static final HashMap<String, Class<FitnessFunction<TreeIndividual>>> tFitFuncs = new HashMap<>();
 	
+	public enum FitnessIndeces {
+		/** index of accuracy fitness in an individual fitness array*/ 
+		TREE_ACCURACY(0),
+		/** 
+		 * Index of tree height fitness in an individual fitness array.
+		 * It is same as for tree depth because it's almost the same.
+		 */  
+		TREE_HEIGHT(1),
+		/** 
+		 * Index of tree depth fitness in an individual fitness array.
+		 * It is same as for tree height because it's almost the same.
+		 */ 
+		TREE_DEPTH(1);
+		
+		private FitnessIndeces(int value) {
+			this.value = value;
+		}
+		
+		public int getIndex() {
+			return value;
+		}
+		
+		private int value;
+		
+	}
+	
 	protected EvolutionAlgorithm<T> ea;
-	protected int index;
-	/** index of accuracy fitness in an individual fitness array*/ 
-	public static final int TREE_ACCURACY = 0;
-	/** 
-	 * Index of tree height fitness in an individual fitness array.
-	 * It is same as for tree depth because it's almost the same.
-	 */  
-	public static final int TREE_HEIGHT = 1;
-	/** 
-	 * Index of tree depth fitness in an individual fitness array.
-	 * It is same as for tree height because it's almost the same.
-	 */ 
-	public static final int TREE_DEPTH = 1;
+	protected int index = -1;
 	
 	/**
 	 * Abstract method which should compute fitness for specific class that 
@@ -55,14 +70,28 @@ public abstract class FitnessFunction<T extends Individual> {
 			computeFitness(individual);
 	}
 
+	public void computeFitness(ArrayList<T> population, int start, int end) {
+		end = Math.min(population.size(), end);
+		for (int i = start; i < end; i++) {		
+			computeFitness(population.get(i));
+		}
+	}
+	
 	public abstract Class<T> getIndividualClassType();
 	
+	public abstract void setData(Object data);
+	
 	public void setEvolutionAlgorithm(EvolutionAlgorithm<T> ea) {
-		this.ea = ea;
+		this.ea = ea;		
 	}
 	
 	public int getIndex() {
 		return index;
 	}	
 	
+	public void setIndex(int index) {
+		this.index = index;
+	}
+	
+	public abstract void setParam(String param);
 }

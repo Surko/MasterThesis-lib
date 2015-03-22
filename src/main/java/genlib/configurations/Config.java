@@ -26,17 +26,24 @@ public class Config {
 	public static synchronized Config getInstance() {		
 		if (instance == null) {
 			instance = new Config();
+			instance.init();
 		}
 		return instance;		
 	}
+		
+	public void reset() {
+		prop.clear();
+		setAbsentProperties();
+	}
 	
 	public void init() {
+		if (configured) return;
 		sFile = PathManager.getInstance().getRootPath() + File.separator + "config.properties";	
 		loadProperties();
 		configured = true;
 	}
-	
-	public void loadProperties() {
+		
+	private void loadProperties() {
 		prop = new Properties();
 		try {
 			InputStream istream = new FileInputStream(sFile);			
@@ -71,14 +78,15 @@ public class Config {
 		putIfAbsent("fit-threads", "1");
 		putIfAbsent("gen-threads", "1");
 		putIfAbsent("oper-threads", "1");
-		putIfAbsent("fit-eval", "SINGLE");
-		putIfAbsent("fit-functions", "tAcc");
-		putIfAbsent("mut-operators", "DEFAULT 0.04");
-		putIfAbsent("xover-prob", "DEFAULT 0.8");
+		putIfAbsent("fit-eval", "SINGLE x");
+		putIfAbsent("fit-functions", "tAcc x");
+		putIfAbsent("mut-operators", "dtM 0.04");
+		putIfAbsent("xover-prob", "dtX 0.8");
 		putIfAbsent("elitism", "0.15");
-		putIfAbsent("selectors", "Tmt 0");
-		putIfAbsent("env-selectors", "");
-		putIfAbsent("population-init","type DECISION_STUMP;depth 2");
+		putIfAbsent("selectors", "Tmt x");
+		putIfAbsent("env-selectors", "Tmt x");
+		putIfAbsent("population-init","type CompTree;depth 2");
+		putIfAbsent("ind-gen","wJ48Gen -C,0.25,-M,2");
 		putIfAbsent("pop-size", "100");
 		putIfAbsent("seed", "28041991");
 		putIfAbsent("file-localization", "false");
@@ -109,7 +117,11 @@ public class Config {
 	}
 	
 	public boolean isFileLocalized() {
-		return prop.getProperty("file-localization").equals("true");
+		if (prop.containsKey("file-localization") && prop.getProperty("file-localization").equals("true")) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public String getMutationOperators() {
@@ -126,6 +138,10 @@ public class Config {
 	
 	public String getPopulationInit() {
 		return prop.getProperty("population-init");
+	}
+	
+	public String getGenerators() {
+		return prop.getProperty("ind-gen");
 	}
 	
 	public int getPopulationSize() {
@@ -156,7 +172,6 @@ public class Config {
 		return Integer.parseInt(prop.getProperty("seed"));
 	}
 
-	
 	public String getFitnessComparator() {
 		return prop.getProperty("fit-eval");
 	}

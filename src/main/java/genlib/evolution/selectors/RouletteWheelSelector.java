@@ -98,7 +98,7 @@ public class RouletteWheelSelector implements Selector {
 	}
 	
 	public void setRandomGenerator(Random random) {
-		
+		this.rng = random;
 	}
 	
 	public void setParam(String s) {

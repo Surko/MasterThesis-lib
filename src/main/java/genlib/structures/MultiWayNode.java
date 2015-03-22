@@ -14,6 +14,22 @@ public class MultiWayNode implements Node {
 	protected double criteriaValue = 0;
 	protected Sign sign;
 
+	public static MultiWayNode makeLeaf(double value) {
+		MultiWayNode leaf = new MultiWayNode();
+		leaf.setAttribute(-1);
+		leaf.setValue(value);
+		return leaf;		
+	}
+	
+	public static MultiWayNode makeNode(int childCount, int attribute, Sign sign, double value) {
+		MultiWayNode node = new MultiWayNode();
+		node.setChildCount(childCount);
+		node.setAttribute(-1);
+		node.setSign(sign);
+		node.setValue(value);
+		return node;		
+	}
+	
 	public MultiWayNode() {
 		this.treeHeight = 1;
 	}
@@ -36,7 +52,7 @@ public class MultiWayNode implements Node {
 		this.childs = new MultiWayNode[childLength];
 		this.treeHeight = 1;
 	}
-
+	
 	public MultiWayNode(int attribute, Sign sign, double value) {
 		this.sign = sign;
 		this.attribute = attribute;
@@ -47,7 +63,7 @@ public class MultiWayNode implements Node {
 	/**** SETTERS ****/
 	
 	/**
-	 * Set child as node at index.
+	 * Set node as child at index.
 	 * @param index Index in an array of a new child
 	 * @param node Child to add 
 	 */
@@ -57,7 +73,8 @@ public class MultiWayNode implements Node {
 			return;
 		}
 		
-		childs[index] = (MultiWayNode)node;		
+		childs[index] = (MultiWayNode)node;	
+		node.setParent(this);
 	}
 
 	public void setAttribute(int attribute) {

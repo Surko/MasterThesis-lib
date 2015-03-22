@@ -47,10 +47,14 @@ public class WeightedFitnessComparator<T extends Individual>  extends FitnessCom
 		}
 		
 		String[] sValues = s.split(",");
+		int min = Math.min(sValues.length,weights.length);
 		
-		for (int i = 0; i < sValues.length; i++) {
+		for (int i = 0; i < min; i++) {
 			weights[i] = Double.parseDouble(sValues[i]);
 		}
 	}
 	
+	public double[] getWeights() {
+		return weights;
+	}
 }

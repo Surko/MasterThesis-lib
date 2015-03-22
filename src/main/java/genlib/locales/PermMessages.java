@@ -1,7 +1,7 @@
 package genlib.locales;
 
 public interface PermMessages {
-	
+
 	// Application msgs
 	public static final String _app_started = "Application started";
 	public static final String _app_ending = "Application ending";
@@ -34,11 +34,17 @@ public interface PermMessages {
 	// generator init
 	public static final String _s_geninit="Loading of available individual generators.";		
 	public static final String _genclass_loaded="Class with individual generator %s is recognized. Usage parameter registered as %s.";
+	// operator init
+	public static final String _s_operinit="Loading of available operators.";		
+	public static final String _operclass_loaded="Class with operator %s is recognized. Usage parameter registered as %s.";
 	// fitness init
 	public static final String _s_fitinit="Loading of available fitness functions";		
 	public static final String _fitclass_loaded="Class with fitness function %s is recognized. Usage parameter registered as %s.";
+	// selector init
+	public static final String _s_selinit="Loading of available selectors";		
+	public static final String _selclass_loaded="Class with selector %s is recognized. Usage parameter registered as %s.";
 	// Default operator text
 	public static final String _def_mut = "DEFAULT=0";
 	public static final String _def_xover = "DEFAULT=0";
-	
+
 }

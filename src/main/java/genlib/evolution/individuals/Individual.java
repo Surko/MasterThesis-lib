@@ -2,8 +2,12 @@ package genlib.evolution.individuals;
 
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.fitness.comparators.FitnessComparator;
+import genlib.exceptions.NotInitializedFieldException;
+import genlib.locales.TextResource;
 
 import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -15,6 +19,9 @@ public abstract class Individual implements Serializable {
 	
 	/** for serialization */
 	private static final long serialVersionUID = 8997460860747264220L;
+	private static final Logger LOG = Logger.getLogger(Individual.class.getName());
+	/** How many fitness functions is already registered */
+	public static int registeredFunctions = 0;
 	/** fitness values for this individual. Each element is different type of fitness */
 	protected double[] fitness;
 	/**
@@ -35,7 +42,12 @@ public abstract class Individual implements Serializable {
 	 */
 	public void setFitnessValue(int index, double fitness) {
 		if (this.fitness == null) {
-			this.fitness = new double[index+1];			
+			LOG.log(Level.SEVERE, String.format(TextResource.getString("eFieldInit"), "fitness"));
+			throw new NotInitializedFieldException(String.format(TextResource.getString("eFieldInit"), "fitness"));			
+		}
+		if (index >= this.fitness.length) {		
+			LOG.log(Level.SEVERE, TextResource.getString("eIndexOutOfBounds"));
+			throw new ArrayIndexOutOfBoundsException(TextResource.getString("eIndexOutOfBounds"));
 		}
 		this.fitness[index] = fitness;
 	}
@@ -54,6 +66,9 @@ public abstract class Individual implements Serializable {
 	 * @return fitness value at index
 	 */
 	public double getFitnessValue(int index) {
+		if (index == -1) {
+			return complexFitness;
+		}
 		return this.fitness[index];
 	}
 	
@@ -84,12 +99,16 @@ public abstract class Individual implements Serializable {
 	/**
 	 * Gets the state of this individual if it changed from the last time we unchanged him 
 	 * by calling unchange method.
-	 * @return
+	 * @return true/false if individual has changed
 	 */
 	public boolean hasChanged() {
 		return hasChanged;
 	}
 	
+	/**
+	 * Abstract method makes copy of individual. Each ancestor extends and fills it as it should.
+	 * @return Copy of this individual
+	 */
 	public abstract Individual copy();
 	
 }

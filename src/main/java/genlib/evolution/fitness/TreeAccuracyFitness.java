@@ -11,12 +11,13 @@ import weka.core.Instances;
 
 public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 
+	public static int TREE_ACCURACY = FitnessIndeces.TREE_ACCURACY.getIndex();
 	public static final String initName = "tAcc";
-	private Object testData;
+	private Object data;
 
 	/** Constructor that will set index of tree accuracy fitness which is used in an individual fitness array.*/ 
 	public TreeAccuracyFitness() {
-		this.index = TREE_ACCURACY;
+		index = TREE_ACCURACY;
 	}
 	
 	/**
@@ -32,11 +33,11 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 			return individual.getFitnessValue(index);
 		}
 		
-		if (testData instanceof Instances) {
-			return computeFitness((Instances) testData, individual);			
+		if (data instanceof Instances) {
+			return computeFitness((Instances) data, individual);			
 		}
-		if (testData instanceof ArrayInstances) {
-			return computeFitness((ArrayInstances)testData, individual);
+		if (data instanceof ArrayInstances) {
+			return computeFitness((ArrayInstances)data, individual);
 		}
 		
 		return 0;
@@ -69,8 +70,6 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 		}
 		double val = correct/allData;
 		individual.setFitnessValue(index, val);
-		// set to unchange for speeding up next time computation if the individual stays the same.
-		individual.unchange();
 		return val;
 	}
 	
@@ -81,13 +80,23 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 		double correct = 0;
 		
 		double val = correct/allData;
-		// set to unchange for speeding up next time computation if the individual stays the same.
-		individual.unchange();
 		return correct;
+	}
+		
+	@Override
+	public void setData(Object data) {
+		this.data = data;
+		
 	}
 
 	@Override
 	public Class<TreeIndividual> getIndividualClassType() {
 		return TreeIndividual.class;
 	}
+	
+	public void setIndex(int index) {}
+
+	@Override
+	public void setParam(String param) {}
+	
 }

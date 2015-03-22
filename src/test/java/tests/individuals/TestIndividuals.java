@@ -2,11 +2,15 @@ package tests.individuals;
 
 import java.util.HashMap;
 
+import genlib.evolution.Population;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.structures.ArrayInstances;
+import genlib.structures.MultiWayDepthNode;
 import genlib.utils.WekaUtils;
+import genlib.utils.Utils.Sign;
 
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 import weka.core.Instances;
 import weka.datagenerators.classifiers.classification.RDG1;
@@ -17,9 +21,34 @@ public class TestIndividuals {
 	public static ArrayInstances arrayData;
 	
 	@Test
-	public void testIndividualCreation() {
-		if (wekaData == null) {
-			
+	public void testIndividualCreation() {		
+		MultiWayDepthNode root = MultiWayDepthNode.makeNode(2, 1, Sign.LESS, 20d);
+		MultiWayDepthNode[] childs = new MultiWayDepthNode[2];
+		childs[0] = MultiWayDepthNode.makeLeaf(1);
+		childs[1] = MultiWayDepthNode.makeLeaf(0);
+		root.setChilds(childs);
+		TreeIndividual ind1 = new TreeIndividual(root);		
+		TreeIndividual[] testing = new TreeIndividual[10];
+		
+		for (int i = 0; i < 5; i++) {
+			testing[i] = new TreeIndividual(ind1);
+		}
+		for (int i = 5; i < 10; i++) {
+			testing[i] = ind1.copy();
+		}
+		
+		for (int i = 0; i < 10; i++) {
+			assertFalse(ind1 == testing[i]);			
+			assertFalse(ind1.getRootNode() == testing[i].getRootNode());			
+			assertFalse(ind1.getRootNode().getChildAt(0) == testing[i].getRootNode().getChildAt(0));
+			assertFalse(ind1.getRootNode().getChildAt(1) == testing[i].getRootNode().getChildAt(1));
+			assertTrue(ind1.getRootNode().getChildCount() == testing[i].getRootNode().getChildCount());
+			assertTrue(ind1.getRootNode().getAttribute() == 1);
+			assertTrue(ind1.getRootNode().getAttribute() == testing[i].getRootNode().getAttribute());
+			assertTrue(ind1.getRootNode().getValue() == 20d);
+			assertTrue(ind1.getRootNode().getValue() == testing[i].getRootNode().getValue());
+			assertTrue(ind1.getRootNode().getSign() == Sign.LESS);			
+			assertTrue(ind1.getRootNode().getSign() == testing[i].getRootNode().getSign());
 		}
 	}
 	
@@ -82,6 +111,7 @@ public class TestIndividuals {
 					+	"N20 [label=\"\'c0 (14.0/2.0)\'\" shape=box style=filled ]\n"
 					+	"}";
 		
+		TreeIndividual.registeredFunctions = 2;
 		TreeIndividual t1 = WekaUtils.constructTreeIndividual(sTree, 21, wekaData.numInstances(), attrIndexMap, attrValueIndexMap, false);
 		TreeIndividual t2 = WekaUtils.constructTreeIndividual(sTree, 21, wekaData.numInstances(), attrIndexMap, attrValueIndexMap, false);
 		

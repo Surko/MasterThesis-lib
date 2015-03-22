@@ -15,6 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import tests.individuals.TestIndividuals;
+
 /**
  * If we use GenLib as a standalone application then this class with main static
  * method is used. It typically parses parameters handed to the main method.
@@ -69,7 +71,7 @@ public class GenLib {
 			}
 		}
 
-		// Reconfig serves as a first initialization because it's in static
+		// Reconfig serves as a first initialization because it's inside static
 		// block
 		reconfig();
 	}
@@ -86,12 +88,13 @@ public class GenLib {
 	 * 
 	 * @return true - reconfiguration initialized, false - already configured
 	 */
-	public static boolean reconfig() {
-		if (Config.configured)
-			return false;
+	public static boolean reconfig() {		
 		// Essential configuration
+		if (Config.configured) return false;
 		Config c = Config.getInstance();
-		c.init();
+		if (!Config.configured) {
+			c.init();
+		}
 		c.saveProperties();
 		// reinit of TextResource if there was change in locales
 		TextResource.reinit();
@@ -106,7 +109,7 @@ public class GenLib {
 	 * @param args
 	 *            Arguments that application is run with
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) {		
 		LOG.info(PermMessages._arg_pars);
 		// COMMAND LINE
 		int _counter = 0;

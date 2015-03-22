@@ -15,7 +15,7 @@ import java.util.Random;
  * @author kirrie
  */
 public class Utils {
-	public static final String pDELIM = "[ ;]";
+	public static final String pDELIM = "(;|[ ]+)";
 	/**
 	 * Enum of different signs that can appear in node field sign. This serves
 	 * purpose in classifying data.

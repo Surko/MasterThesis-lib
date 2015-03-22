@@ -13,7 +13,7 @@ public class TreeDepthFitness extends FitnessFunction<TreeIndividual> {
 	 * It is same as for tree height because it's almost the same.
 	 */ 
 	public TreeDepthFitness() {
-		this.index = TREE_DEPTH;
+		this.index = FitnessIndeces.TREE_DEPTH.getIndex();
 	}
 	
 	/**
@@ -36,13 +36,19 @@ public class TreeDepthFitness extends FitnessFunction<TreeIndividual> {
 			individual.setFitnessValue(index, Utils.computeHeight(root) - 1);
 		}
 		
-		// set to unchange for speeding up next time computation if the individual stays the same.
-		individual.unchange();
 		return individual.getFitnessValue(index);
 	}
+		
+	@Override
+	public void setData(Object data) {}
 	
 	@Override
 	public Class<TreeIndividual> getIndividualClassType() {
 		return TreeIndividual.class;
 	}
+
+	public void setIndex(int index) {}
+	
+	@Override
+	public void setParam(String param) {}
 }

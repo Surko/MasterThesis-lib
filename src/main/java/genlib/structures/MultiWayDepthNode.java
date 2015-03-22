@@ -1,5 +1,7 @@
 package genlib.structures;
 
+import genlib.exceptions.NodeCreationException;
+import genlib.locales.TextResource;
 import genlib.structures.extensions.DepthExtension;
 import genlib.utils.Utils.Sign;
 
@@ -7,6 +9,25 @@ public class MultiWayDepthNode extends MultiWayNode implements DepthExtension {
 	/** for serialization */
 	private static final long serialVersionUID = 6475434862235450574L;
 
+	public static MultiWayDepthNode makeLeaf(double value) {
+		MultiWayDepthNode leaf = new MultiWayDepthNode();
+		leaf.setAttribute(-1);
+		leaf.setValue(value);
+		return leaf;		
+	}
+	
+	public static MultiWayDepthNode makeNode(int childCount, int attribute, Sign sign, double value) {
+		if (attribute == -1) {
+			throw new NodeCreationException(String.format(TextResource.getString("eNodeCreation"), "attribute"));
+		}
+		MultiWayDepthNode node = new MultiWayDepthNode();
+		node.setChildCount(childCount);
+		node.setAttribute(attribute);
+		node.setSign(sign);
+		node.setValue(value);
+		return node;		
+	}
+	
 	public MultiWayDepthNode() {
 		super();
 	}
@@ -15,10 +36,11 @@ public class MultiWayDepthNode extends MultiWayNode implements DepthExtension {
 		this.attribute = toCopy.attribute;
 		this.value = toCopy.value;
 		this.treeHeight = toCopy.treeHeight;
+		this.sign = toCopy.sign;		
 		if (!toCopy.isLeaf()) {
 			this.childs = new MultiWayDepthNode[toCopy.childs.length];
 			for (int i = 0; i < toCopy.childs.length; i++) {
-				childs[i] = new MultiWayDepthNode(toCopy.childs[i]);
+				childs[i] = toCopy.childs[i].copy();
 				childs[i].setParent(this);
 			}
 		}

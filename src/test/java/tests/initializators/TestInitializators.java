@@ -6,6 +6,7 @@ import genlib.classifier.popinit.RandomStumpCombinator;
 import genlib.classifier.popinit.TreePopulationInitializator;
 import genlib.classifier.popinit.WekaCompletedTrees;
 import genlib.classifier.popinit.WekaRandomStumpCombinator;
+import genlib.evolution.individuals.Individual;
 import genlib.structures.ArrayInstances;
 
 import java.lang.reflect.InvocationTargetException;
@@ -61,6 +62,7 @@ public class TestInitializators {
 		rdg.defineDataFormat();
 		wekaData = rdg.generateExamples();
 		
+		Individual.registeredFunctions = 2;
 		WekaCompletedTrees wct = new WekaCompletedTrees(200,10,false);
 		wct.setInstances(wekaData);
 		wct.initPopulation();
@@ -83,6 +85,7 @@ public class TestInitializators {
 		rdg.defineDataFormat();
 		wekaData = rdg.generateExamples();
 		
+		Individual.registeredFunctions = 2;
 		WekaCompletedTrees wct = new WekaCompletedTrees(200,10,false);
 		assertTrue(wct.getDivideParam()==10);
 		assertFalse(wct.isResampling());		

@@ -89,7 +89,8 @@ public class BinaryNode implements Node {
 
 		if (index < 2) {
 			childs[index] = (BinaryNode) node;
-		}
+			node.setParent(this);
+		}		
 	}
 
 	public void setChildCount(int childCount) {

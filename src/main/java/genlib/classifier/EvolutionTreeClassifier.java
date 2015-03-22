@@ -10,15 +10,21 @@ import genlib.configurations.Config;
 import genlib.evolution.EvolutionAlgorithm;
 import genlib.evolution.Population;
 import genlib.evolution.fitness.FitnessFunction;
+import genlib.evolution.fitness.FitnessFunction.FitnessIndeces;
 import genlib.evolution.fitness.comparators.FitnessComparator;
 import genlib.evolution.fitness.comparators.FitnessComparator.FitCompare;
 import genlib.evolution.fitness.comparators.ParetoFitnessComparator;
 import genlib.evolution.fitness.comparators.PriorityFitnessComparator;
 import genlib.evolution.fitness.comparators.SingleFitnessComparator;
 import genlib.evolution.fitness.comparators.WeightedFitnessComparator;
+import genlib.evolution.individuals.Individual;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.operators.Operator;
 import genlib.evolution.selectors.Selector;
+import genlib.exceptions.format.FitCompStringFormatException;
+import genlib.exceptions.format.FitnessStringFormatException;
+import genlib.exceptions.format.OperatorStringFormatException;
+import genlib.exceptions.format.SelectorStringFormatException;
 import genlib.locales.TextResource;
 import genlib.structures.ArrayInstances;
 import genlib.utils.Utils;
@@ -44,7 +50,7 @@ public class EvolutionTreeClassifier implements Serializable,WekaClassifierExten
 	private Random random;
 	private Config c;
 	private double elitism, improvementRate;
-	private String mutString, xoverString, popInitString,
+	private String mutString, xoverString, popInitString, genString,
 	fitFuncsString, fitCompString, selectorString, envSelectorString;
 	private FitnessComparator<TreeIndividual> fitComp;
 	private ArrayList<FitnessFunction<TreeIndividual>> fitFuncs;
@@ -65,6 +71,7 @@ public class EvolutionTreeClassifier implements Serializable,WekaClassifierExten
 		this.mutString = c.getMutationOperators();
 		this.xoverString = c.getXoverOperators();
 		this.popInitString = c.getPopulationInit();
+		this.genString = c.getGenerators();
 		this.fitFuncsString = c.getFitnessFunctions();
 		this.fitCompString = c.getFitnessComparator();
 		this.selectorString = c.getSelectors();
@@ -81,9 +88,11 @@ public class EvolutionTreeClassifier implements Serializable,WekaClassifierExten
 	public void buildClassifier(Instances data) throws Exception {
 		random.setSeed(seed);
 		// making properties from string
-		makePropsFromString();
+		makePropsFromString();		
 		// Shuffle data
 		data.randomize(random);
+		// setting additional params for created fields
+		setAdditionalParams(data);
 		
 		popInit.setRandomGenerator(new Random(random.nextLong()));
 		popInit.setInstances(data);
@@ -124,13 +133,20 @@ public class EvolutionTreeClassifier implements Serializable,WekaClassifierExten
 
 	}
 
+	public void setAdditionalParams(Object data) {
+		// set the data for fitness functions
+		for  (FitnessFunction<TreeIndividual> function : fitFuncs ) {
+			function.setData(data);
+		}
+	}
+	
 	@Override
 	public void makePropsFromString() throws Exception {
 		if (fitFuncsString != null) {
 			makeFitnessFunctionsSet(fitFuncsString);
 		}	
 		if (fitFuncsString != null) {
-			makeFitnessCompSet(fitFuncsString);
+			makeFitnessCompSet(fitCompString);
 		}
 		if (xoverString != null) {
 			makeXoverOperatorSet(xoverString);
@@ -154,7 +170,7 @@ public class EvolutionTreeClassifier implements Serializable,WekaClassifierExten
 		String[] parameters = param.split(Utils.pDELIM);
 		if (parameters.length % 2 != 0) {
 			// bad format
-			throw new Exception();
+			throw new SelectorStringFormatException(TextResource.getString("eSelFormat"));
 		}
 		
 		HashMap<String, Class<Selector>> h = Selector.selectors;
@@ -179,7 +195,7 @@ public class EvolutionTreeClassifier implements Serializable,WekaClassifierExten
 		String[] parameters = param.split(Utils.pDELIM);
 		if (parameters.length % 2 != 0) {
 			// bad format
-			throw new Exception();
+			throw new SelectorStringFormatException(TextResource.getString("eSelFormat"));
 		}
 		
 		HashMap<String, Class<Selector>> h = Selector.envSelectors;
@@ -203,9 +219,12 @@ public class EvolutionTreeClassifier implements Serializable,WekaClassifierExten
 		fitComp = null;
 		String[] parameters = param.split(Utils.pDELIM);
 		
-		if (parameters.length == 0) {
+		System.out.println(parameters.length);
+		System.out.println(parameters[0]);
+		System.out.println(parameters[1]);
+		if (parameters.length <= 0 || parameters.length > 2) {
 			// bad format
-			throw new Exception();
+			throw new FitCompStringFormatException(TextResource.getString("eFitCompFormat"));
 		}
 		
 		FitCompare fitCompare = FitCompare.valueOf(parameters[0]);
@@ -234,28 +253,41 @@ public class EvolutionTreeClassifier implements Serializable,WekaClassifierExten
 		
 	}
 	
-	private void makeFitnessFunctionsSet(String param) throws Exception {
-		// TODO - exceptions
+	private void makeFitnessFunctionsSet(String param) throws Exception {	
 		fitFuncs.clear();
 		String[] parameters = param.split(Utils.pDELIM);
 		if (parameters.length % 2 != 0) {
 			// bad format
-			throw new Exception();
+			throw new FitnessStringFormatException(TextResource.getString("eFitnessFormat"));
 		}
 
+		int max = 0;
+		for (FitnessIndeces fitnessIndex : FitnessIndeces.values()) {
+			if (fitnessIndex.getIndex() > max) {
+				max = fitnessIndex.getIndex();
+			}
+		}
+		max++;
+		
 		HashMap<String, Class<FitnessFunction<TreeIndividual>>> h = FitnessFunction.tFitFuncs;
 		for (int i = 0; i < parameters.length; i += 2) {
 			if (parameters[i] == "") {
 				fitFuncs.clear();
 				// blank alias
-				throw new Exception();
+				throw new FitnessStringFormatException(TextResource.getString("eFitnessFormat"));
 			}
 
 			// inner error
 			FitnessFunction<TreeIndividual> func = h.get(parameters[i])
 					.newInstance();
+			// if there's not already defined index than set the index
+			if (func.getIndex() == -1) {
+				func.setIndex(max++);
+			}
+			func.setParam(parameters[i+1]);
 			fitFuncs.add(func);
 		}
+		Individual.registeredFunctions = max;
 	}
 
 	/**
@@ -263,12 +295,11 @@ public class EvolutionTreeClassifier implements Serializable,WekaClassifierExten
 	 * @param param
 	 */
 	private void makeXoverOperatorSet(String param) throws Exception {
-		// TODO - exceptions
 		xoverSet.clear();
 		String[] parameters = param.split(Utils.pDELIM);
 		if (parameters.length % 2 != 0) {
 			// bad format
-			throw new Exception();
+			throw new OperatorStringFormatException(TextResource.getString("eOperFormat"));
 		}
 
 		HashMap<String, Class<Operator<TreeIndividual>>> h = Operator.tXOper;
@@ -276,7 +307,7 @@ public class EvolutionTreeClassifier implements Serializable,WekaClassifierExten
 			if (parameters[i] == "") {
 				xoverSet.clear();
 				// blank alias
-				throw new Exception();
+				throw new OperatorStringFormatException(TextResource.getString("eOperFormat"));
 			}
 
 			// inner error
@@ -285,21 +316,20 @@ public class EvolutionTreeClassifier implements Serializable,WekaClassifierExten
 		}
 	}
 
-	private void makeMutationOperatorSet(String param) throws Exception {
-		// TODO - exceptions
+	private void makeMutationOperatorSet(String param) throws Exception { 
 		mutSet.clear();
 		String[] parameters = param.split(Utils.pDELIM);
 		if (parameters.length % 2 != 0) {
 			// bad format
-			throw new Exception();
+			throw new OperatorStringFormatException(TextResource.getString("eOperFormat"));
 		}
 
-		HashMap<String, Class<Operator<TreeIndividual>>> h = Operator.tMOper;
+		HashMap<String, Class<Operator<TreeIndividual>>> h = Operator.tMOper;		
 		for (int i = 0; i < parameters.length; i += 2) {
 			if (parameters[i] == "") {
 				mutSet.clear();
 				// blank alias
-				throw new Exception();
+				throw new OperatorStringFormatException(TextResource.getString("eOperFormat"));
 			}
 
 			// inner error
@@ -365,23 +395,40 @@ public class EvolutionTreeClassifier implements Serializable,WekaClassifierExten
 		}
 	}
 
-	private TreeGenerator setGenerators(Properties prop) throws Exception {
+	private ArrayList<TreeGenerator> makeGenerators(String param) throws Exception {
 		// TODO - exceptions
-		String key = prop.getProperty("gen", "SSGEN");
-		
-		HashMap<String, Class<? extends TreeGenerator>> h = TreeGenerator.treeGens;
-		
-		TreeGenerator gen = h.get(key).newInstance();
-		
-		if (gen.isWekaCompatible() && !isWeka) {
-			LOG.log(Level.SEVERE,"");
-			// not consistent generators
+		String[] parameters = param.split(Utils.pDELIM);
+		if (parameters.length % 2 != 0) {
+			// bad format
+			//TODO
 			throw new Exception();
 		}
 		
-		gen.setAdditionalOptions(prop.getProperty("param", "-C 0.25 -M 2")
-						.split(" "));		
-		return gen;
+		HashMap<String, Class<? extends TreeGenerator>> h = TreeGenerator.treeGens;
+		ArrayList<TreeGenerator> genList = new ArrayList<>();
+		
+		for (int i = 0; i < parameters.length; i += 2) {
+			if (parameters[i] == "") {	
+				genList.clear();
+				// blank alias
+				//TODO
+				throw new Exception();
+			}
+
+			// inner error
+			TreeGenerator generator = h.get(parameters[i]).newInstance();
+			if (generator.isWekaCompatible() && !isWeka) {
+				LOG.log(Level.SEVERE,"");
+				// not consistent generators
+				//TODO
+				throw new Exception();
+			}
+			generator.setAdditionalOptions(parameters[i+1]
+					.split(","));
+			genList.add(generator);
+		}
+				
+		return genList;
 	}
 
 	private void setPopInitAttributes(final Properties prop) throws Exception {
@@ -391,27 +438,27 @@ public class EvolutionTreeClassifier implements Serializable,WekaClassifierExten
 		boolean recount = Boolean.parseBoolean(prop.getProperty("recount",
 				"false"));
 
-		TreeGenerator treeGen = setGenerators(prop);
+		ArrayList<TreeGenerator> treeGen = makeGenerators(genString);
 
 		boolean resample = Boolean.parseBoolean(prop.getProperty("resample",
 				"true"));
 
-		// Split criteria for our tree generator
-		switch (SplitCriteria.Criterias.valueOf(prop.getProperty("criteria",
-				"INFORATIO"))) {
-		case GAINRATIO:
-			treeGen.setSplitCriteria(new GainCriteria());
-			break;
-		case INFORATIO:
-			treeGen.setSplitCriteria(new InformationGainCriteria());
-			break;
-		// here add more measures for splitting
-		}
+//		// Split criteria for our tree generator
+//		switch (SplitCriteria.Criterias.valueOf(prop.getProperty("criteria",
+//				"INFORATIO"))) {
+//		case GAINRATIO:
+//			treeGen.setSplitCriteria(new GainCriteria());
+//			break;
+//		case INFORATIO:
+//			treeGen.setSplitCriteria(new InformationGainCriteria());
+//			break;
+//		// here add more measures for splitting
+//		}
 
-		treeGen.setPopulationInitializator(popInit);
 		popInit.setResample(resample);
 		popInit.setAutoDepth(recount);
-		popInit.setGenerator(treeGen);
+		// now only one. Can be extended to use more than one generator of population
+		popInit.setGenerator(treeGen.get(0));
 		popInit.setDepth(depth);
 		popInit.setDivideParam(divideParam);
 		popInit.setNumOfThreads(c.getGenNumOfThreads());
@@ -465,6 +512,22 @@ public class EvolutionTreeClassifier implements Serializable,WekaClassifierExten
 		return popInit;
 	}
 
+	public FitnessComparator<TreeIndividual> getFitnessComparator() {
+		return fitComp;
+	}
+	
+	public String getFitnessComparatorString() {
+		return fitCompString;
+	}
+	
+	public ArrayList<FitnessFunction<TreeIndividual>> getFitnessFunctions() {
+		return fitFuncs;
+	}
+	
+	public String getFitnessFunctionsString() {
+		return fitFuncsString;
+	}
+	
 	/**
 	 * Set seed for this run of classifier. Seed is further set from
 	 * buildClassifier function into Random object. It even serves purpose of

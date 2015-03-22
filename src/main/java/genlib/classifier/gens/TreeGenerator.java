@@ -116,10 +116,6 @@ public abstract class TreeGenerator implements PopGenerator<TreeIndividual> {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		synchronized(gatherGen) {
-			gatherGen.notify();
-		}
 	}
 	
 

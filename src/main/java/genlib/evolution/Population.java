@@ -5,15 +5,14 @@ import genlib.evolution.fitness.comparators.FitnessComparator;
 import genlib.evolution.individuals.Individual;
 import genlib.utils.Utils;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Population<T extends Individual> {
 
@@ -40,7 +39,7 @@ public class Population<T extends Individual> {
 		this.popSize = individuals.size();
 		this.randomGen = new Random(Utils.randomGen.nextLong());
 	}
-	
+
 	public Population(ArrayList<T> individuals, int popSize) {
 		this.individuals = individuals;
 		this.popSize = popSize;
@@ -57,12 +56,12 @@ public class Population<T extends Individual> {
 		this.popSize = 0;
 		this.individuals.clear();
 	}
-	
+
 	public void add(T individual) {		
 		individuals.add(individual);
 		popSize++;
 	}
-	
+
 	public void addAll(Population<T> population) {
 		individuals.addAll(population.getIndividuals());
 		popSize = individuals.size();
@@ -106,35 +105,66 @@ public class Population<T extends Individual> {
 		ArrayList<T> sorted = new ArrayList<>(individuals);
 		Collections.sort(sorted, comparator);
 		return sorted;
-	}
-
-	public void computeFitness(int nThreads) {
+	}		
+	
+	public void computeFitness(final int nThreads, final int blockSize) {
 		if (nThreads > 1) {
 			ExecutorService es = Executors.newFixedThreadPool(nThreads);
-			for (final FitnessFunction<T> function : comparator
-					.getFitnessFuncs()) {
-				for (final T individual : individuals) {
-					es.submit(new Runnable() {
-						@Override
-						public void run() {
-							function.computeFitness(individual);
-						}
-					});
+			
+			if (blockSize == 1) {
+				// execution of individual one by one
+				for (final FitnessFunction<T> function : comparator
+						.getFitnessFuncs()) {
+					for (final T individual : individuals) {
+						es.submit(new Runnable() {
+							@Override
+							public void run() {
+								function.computeFitness(individual);
+							}
+						});
+					}
+				}
+			} else {
+				// block execution of individuals
+				for (final FitnessFunction<T> function : comparator
+						.getFitnessFuncs()) {
+					for (int i = 0; i < popSize; i+=blockSize) {
+						final int start = i;
+						es.submit(new Runnable() {
+							@Override
+							public void run() {
+								function.computeFitness(individuals, start, start+blockSize);
+							}
+						});
+					}
 				}
 			}
 
 			es.shutdown();
+
+			try {
+				es.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+			} catch (InterruptedException e) {
+				
+			}
 		} else {
+			// in this case block execution is worthless
 			for (FitnessFunction<T> function : comparator.getFitnessFuncs()) {
 				function.computeFitness(this);
 			}
+		}
+
+		// unchange individuals, because all of the fitness functions has been computed.
+		// next call of this method will be really fast 
+		for (final T individual : individuals) {
+			individual.unchange();
 		}
 	}
 
 	public T getIndividual(int index) {
 		return individuals.get(index);
 	}
-	
+
 	public T getBestIndividual() {
 		return getSortedIndividuals().get(0);
 	}
@@ -154,5 +184,7 @@ public class Population<T extends Individual> {
 	public void setFitnessComparator(FitnessComparator<T> fitComp) {
 		this.comparator = fitComp;
 	}
+
+
 
 }

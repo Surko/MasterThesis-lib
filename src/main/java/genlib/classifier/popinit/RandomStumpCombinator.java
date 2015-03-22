@@ -12,6 +12,7 @@ import genlib.utils.Utils;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import weka.core.Instances;
 
@@ -101,12 +102,10 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 			es.shutdown();
 
 			// Here we should be waiting for generating to stop. it's not done!!
-			// TODO waiting for stopped generators
 			try {
-				while (!es.isTerminated())
-					wait();
-			} catch (Exception e) {
-
+				es.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+			} catch (InterruptedException e) {
+				
 			}
 
 			population = gen.getIndividuals();

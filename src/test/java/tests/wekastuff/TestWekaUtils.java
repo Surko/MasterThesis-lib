@@ -3,6 +3,9 @@ package tests.wekastuff;
 import java.util.HashMap;
 
 import genlib.evolution.fitness.FitnessFunction;
+import genlib.evolution.fitness.TreeAccuracyFitness;
+import genlib.evolution.fitness.FitnessFunction.FitnessIndeces;
+import genlib.evolution.individuals.Individual;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.structures.ArrayInstances;
 import genlib.structures.Node;
@@ -100,9 +103,10 @@ public class TestWekaUtils {
 					+	"N12->N20 [label=\"\'= true\'\"]\n"
 					+	"N20 [label=\"\'c0 (14.0/2.0)\'\" shape=box style=filled ]\n"
 					+	"}";
-				
+		
+		Individual.registeredFunctions = 2;
 		TreeIndividual individual = WekaUtils.constructTreeIndividual(sTree, 21, wekaData.numInstances(), attrIndexMap, attrValueIndexMap, false);						
-		assertTrue(individual.getFitnessValue(FitnessFunction.TREE_ACCURACY) == 0.9299999999999999);
+		assertTrue(individual.getFitnessValue(TreeAccuracyFitness.TREE_ACCURACY) == 0.9299999999999999);
 		
 		Node root = individual.getRootNode();
 		assertTrue(root.getChildCount()==2);
@@ -126,7 +130,7 @@ public class TestWekaUtils {
 		assertTrue(Utils.computeHeight(n) == 2);
 		
 		individual = WekaUtils.constructTreeIndividual(sTree, 21, wekaData.numInstances(), attrIndexMap, attrValueIndexMap, true);
-		assertTrue(individual.getFitnessValue(FitnessFunction.TREE_ACCURACY) == 0.9299999999999999);
+		assertTrue(individual.getFitnessValue(TreeAccuracyFitness.TREE_ACCURACY) == 0.9299999999999999);
 		root = individual.getRootNode();		
 		assertTrue(root.getTreeHeight() == 7);
 	}

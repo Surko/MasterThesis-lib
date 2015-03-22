@@ -34,7 +34,7 @@ public class WekaJ48TreeGenerator extends TreeGenerator  {
 		individuals = new TreeIndividual[1];
 		
 		// TODO ONLY ONE INDIVIDUAL IS HERE. ADD SOME SORT OF ATTRIBUTE REMOVING OR DIFFERENT PRUNING MECHANISMS?
-		j48Tree.buildClassifier(data);
+		j48Tree.buildClassifier(data);		
 		String sTree = j48Tree.graph();
 		individuals[0] = WekaUtils.constructTreeIndividual(sTree, j48Tree.measureTreeSize(), data.numInstances(), treeInit.getAttrIndexMap(),
 				treeInit.getAttrValueIndexMap(), treeInit.getAutoDepth());		

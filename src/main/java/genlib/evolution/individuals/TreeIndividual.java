@@ -14,17 +14,14 @@ public class TreeIndividual extends Individual {
 	protected int numNodes, numLeaves; 
 
 	public TreeIndividual(TreeIndividual toCopy) {
-		if (toCopy.getRootNode() instanceof BinaryNode) {
-			this.root = new BinaryNode((BinaryNode)toCopy.root);
-		} else {
-			this.root = new MultiWayNode((MultiWayNode)toCopy.root);
-		}
+		this.root = toCopy.root.copy();
 		this.fitness = new double[toCopy.fitness.length];
 		System.arraycopy(toCopy.fitness, 0, this.fitness, 0, this.fitness.length);
 	}
 	
 	public TreeIndividual(Node root) {
 		this.root = root;
+		this.fitness = new double[registeredFunctions];
 	}
 	
 	public TreeIndividual(boolean binary, boolean countDepth) {
@@ -41,6 +38,7 @@ public class TreeIndividual extends Individual {
 				this.root = new MultiWayNode();
 			}
 		}
+		this.fitness = new double[registeredFunctions];
 	}
 	
 	/**
