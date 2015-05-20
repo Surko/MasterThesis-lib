@@ -1,11 +1,9 @@
 package genlib.utils;
 
-import genlib.evolution.fitness.FitnessFunction;
-import genlib.evolution.fitness.TreeAccuracyFitness;
 import genlib.evolution.individuals.TreeIndividual;
-import genlib.structures.MultiWayDepthNode;
-import genlib.structures.MultiWayNode;
-import genlib.structures.Node;
+import genlib.structures.trees.MultiWayDepthNode;
+import genlib.structures.trees.MultiWayNode;
+import genlib.structures.trees.Node;
 import genlib.utils.Utils.Sign;
 
 import java.util.Enumeration;
@@ -51,8 +49,8 @@ public class WekaUtils {
 		}
 	}
 
-	public static TreeIndividual constructTreeIndividual(String sTree, double nodeCount,
-			int instCount,
+	public static TreeIndividual constructTreeIndividual(String sTree,
+			double nodeCount, int instCount,
 			HashMap<String, Integer> attrIndexMap,
 			HashMap<String, Integer>[] attrValueIndexMap, boolean autoDepth) {
 		String[] lines = sTree.split("\n");
@@ -66,9 +64,8 @@ public class WekaUtils {
 
 		int classIndex = attrIndexMap.size() - 1;
 		int lastEdge = 0;
-		double incorrClass = 0d;
-		Node[] nodes = new Node[(int)nodeCount];
-		int[][] edges = new int[(int)nodeCount - 1][];
+		Node[] nodes = new Node[(int) nodeCount];
+		int[][] edges = new int[(int) nodeCount - 1][];
 
 		for (String st : lines) {
 			Matcher m = leafPattern.matcher(st);
@@ -83,9 +80,9 @@ public class WekaUtils {
 
 				nodes[Integer.parseInt(m.group(1))] = node;
 				node.setValue(attrValueIndexMap[classIndex].get(m.group(2)));
-				if (!m.group(4).isEmpty()) {					
-					incorrClass += Double.parseDouble(m.group(4));
-				}
+				// if (!m.group(4).isEmpty()) {
+				// incorrClass += Double.parseDouble(m.group(4));
+				// }
 				lastEdge++;
 				continue;
 			}
@@ -101,9 +98,9 @@ public class WekaUtils {
 				}
 				nodes[Integer.parseInt(m.group(1))] = node;
 				int nodeIndex = attrIndexMap.get(m.group(2));
-				if (attrValueIndexMap[nodeIndex]==null) {
+				if (attrValueIndexMap[nodeIndex] == null) {
 					edges[lastEdge++] = new int[2];
-					node.setChildCount(2);					
+					node.setChildCount(2);
 				} else {
 					int childCount = attrValueIndexMap[nodeIndex].size();
 					edges[lastEdge++] = new int[childCount];
@@ -120,19 +117,21 @@ public class WekaUtils {
 				int edgeNodeIndex = 0;
 				if (attrValueIndexMap[nodes[edgeIndex].getAttribute()] == null) {
 					if (nodes[edgeIndex].getValue() == Integer.MIN_VALUE) {
-						nodes[edgeIndex].setValue(Double.parseDouble(m.group(4)));
+						nodes[edgeIndex]
+								.setValue(Double.parseDouble(m.group(4)));
 						edges[edgeIndex][0] = Integer.parseInt(m.group(2));
 						nodes[edgeIndex].setSign(makeSign(m.group(3)));
 					} else {
 						edges[edgeIndex][1] = Integer.parseInt(m.group(2));
-					}			
+					}
 				} else {
 					edgeNodeIndex = attrValueIndexMap[nodes[edgeIndex]
-						.getAttribute()].get(m.group(4));
-					edges[edgeIndex][edgeNodeIndex] = Integer.parseInt(m.group(2));
+							.getAttribute()].get(m.group(4));
+					edges[edgeIndex][edgeNodeIndex] = Integer.parseInt(m
+							.group(2));
 					nodes[edgeIndex].setSign(makeSign(m.group(3)));
-				}				
-				
+				}
+
 			}
 
 		}
@@ -145,7 +144,12 @@ public class WekaUtils {
 		}
 
 		TreeIndividual treeInd = new TreeIndividual(nodes[0]);
-		treeInd.setFitnessValue(TreeAccuracyFitness.TREE_ACCURACY, 1 - incorrClass/instCount);
+		/*
+		 * This is fitness value of this individual on slightly changed data. It
+		 * stays here because some other operators,fitnesses can utilize this
+		 */
+		// treeInd.setFitnessValue(TreeAccuracyFitness.TREE_ACCURACY, 1 -
+		// incorrClass/instCount);
 		return treeInd;
 	}
 

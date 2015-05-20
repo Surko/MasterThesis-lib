@@ -1,7 +1,11 @@
 package genlib.utils;
 
-import genlib.structures.ArrayInstances;
-import genlib.structures.Node;
+import genlib.evolution.Population;
+import genlib.evolution.individuals.Individual;
+import genlib.evolution.individuals.TreeIndividual;
+import genlib.structures.data.GenLibInstances;
+import genlib.structures.trees.MultiWayDepthNode;
+import genlib.structures.trees.Node;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -12,15 +16,19 @@ import java.util.Random;
  * Class that contains a lot of static methods for computing different often
  * used measures.
  * 
- * @author kirrie
+ * @author Lukas Surin
  */
 public class Utils {
-	public static final String pDELIM = "(;|[ ]+)";
+
+	/** delimiter for global use when delimiting different types of object */
+	public static final String oDELIM = "(;|[ ]+)";
+	/** delimiter for global use when delimiting parameters */
+	public static final String pDELIM = ",";
 	/**
 	 * Enum of different signs that can appear in node field sign. This serves
 	 * purpose in classifying data.
 	 * 
-	 * @author kirrie
+	 * @author Lukas Surin
 	 *
 	 */
 	public enum Sign {
@@ -50,7 +58,7 @@ public class Utils {
             return file.getName().matches(".*[.]jar");
         }
     };
-
+    public static boolean DEBUG = false;
 	
 	/**
 	 * Function that is used in entropy computation. It calculates simple
@@ -226,9 +234,9 @@ public class Utils {
 	 * @param data
 	 * @return
 	 */
-	public static HashMap<String, Integer> makeAttrIndexMap(ArrayInstances data) {
+	public static HashMap<String, Integer> makeAttrIndexMap(GenLibInstances data) {
 		HashMap<String, Integer> retHashMap = new HashMap<String, Integer>();
-		return null;
+		return retHashMap;
 	}
 
 	/**
@@ -238,7 +246,7 @@ public class Utils {
 	 * @return
 	 */
 	public static HashMap<String, Integer>[] makeAttrValueIndexMap(
-			ArrayInstances data) {
+			GenLibInstances data) {
 		return null;
 	}
 
@@ -248,10 +256,44 @@ public class Utils {
 	 * @param data
 	 * @return
 	 */
-	public static void makeAttrMap(ArrayInstances data,
+	public static void makeAttrMap(GenLibInstances data,
 			HashMap<String, Integer> attrIndexMap,
 			HashMap<String, Integer>[] attrValueIndexMap) {
 
 	}
 
+	/**
+	 * Debug method to create population from parameter individual 
+	 * @param model individual to create population from 
+	 * @return Population with individuals
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T extends Individual> Population<T> debugPopulationFrom(T individual) {
+		Population<T> individuals = new Population<>();	
+				
+		individuals.add(individual);
+		for (int i = 0; i < 19; i++)
+			individuals.add((T)individual.copy());
+		
+		return individuals;
+	}
+	
+	/**
+	 * Debug method to create population from dummy individual created inside the method.
+	 * @return Population with individuals
+	 */
+	public static Population<TreeIndividual> debugTreePopulation() {
+		Population<TreeIndividual> individuals = new Population<>();	
+		MultiWayDepthNode root = MultiWayDepthNode.makeNode(2, 1, Sign.LESS, 20d);
+		MultiWayDepthNode[] childs = new MultiWayDepthNode[2];
+		childs[0] = MultiWayDepthNode.makeLeaf(1);
+		childs[1] = MultiWayDepthNode.makeLeaf(0);
+		root.setChilds(childs);
+		TreeIndividual testIndividual = new TreeIndividual(root);
+		individuals.add(testIndividual);
+		for (int i = 0; i < 19; i++)
+			individuals.add(new TreeIndividual(testIndividual));
+		return individuals;
+	}
+	
 }

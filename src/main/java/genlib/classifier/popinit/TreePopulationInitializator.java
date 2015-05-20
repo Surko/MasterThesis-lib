@@ -3,24 +3,33 @@ package genlib.classifier.popinit;
 import genlib.classifier.gens.PopGenerator;
 import genlib.classifier.gens.TreeGenerator;
 import genlib.evolution.individuals.TreeIndividual;
+import genlib.structures.Data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
 public abstract class TreePopulationInitializator implements PopulationInitializator<TreeIndividual> {
+	
+	enum PopInitEnum {
+		resample,
+		autoDepth,
+		divideParam,
+		maxDepth,
+	}
 	
 	/** for serialization */
 	private static final long serialVersionUID = 7222530982342870829L;
 	/** loaded population initializators */
 	public static final HashMap<String, Class<? extends TreePopulationInitializator>> treePopInits = new HashMap<>();
 	/** depth of generated trees. */
-	protected int maxDepth;
+	protected int maxDepth = 1;
 	/** number of division of trainin data */
-	protected int divideParam;
+	protected int divideParam = 10;
 	/** only resampling instead of dividing */
-	protected boolean resample;
+	protected boolean resample = true;
 	/** recounting of depth inside trees */
-	protected boolean autoDepth;
+	protected boolean autoDepth = false;
 	/** Individuals that makes this population */
 	protected TreeIndividual[] population;
 	/** Number of threads that will be creating population */
@@ -30,14 +39,10 @@ public abstract class TreePopulationInitializator implements PopulationInitializ
 	protected TreeGenerator gen;
 	/** Random seeded object for this run of algorithm. Default from Utils. Can be changed. */
 	protected Random random;
-	/** Object of all instances */
-	protected Object data;
+	/** Object ({@link Data}) of all instances */
+	protected Data data;
 	/** Final population size */
 	protected int popSize;
-	/** Index of attribute values to access correct array values */
-	protected HashMap<String, Integer>[] attrValueIndexMap;
-	/** Index of attribute to access correct attribute from String */
-	protected HashMap<String,Integer> attrIndexMap;
 	
 	/**
 	 * Method that returns population of generated individuals from
@@ -74,13 +79,13 @@ public abstract class TreePopulationInitializator implements PopulationInitializ
 	}
 
 	public HashMap<String, Integer>[] getAttrValueIndexMap() {
-		return attrValueIndexMap;
+		return data.getAttrValueIndexMap();
 	}
 	
 	public HashMap<String, Integer> getAttrIndexMap() {
-		return attrIndexMap;
+		return data.getAttrIndexMap();
 	}
-	
+
 	public boolean isResampling() {
 		return resample;
 	}
@@ -111,14 +116,14 @@ public abstract class TreePopulationInitializator implements PopulationInitializ
 	}
 	
 	@Override
-	public void setGenerator(PopGenerator<TreeIndividual> gen) {
-		if (gen instanceof TreeGenerator) {
-			this.gen = (TreeGenerator)gen;
+	public void setGenerator(ArrayList<? extends PopGenerator<TreeIndividual>> gen) {
+		if (gen.size() > 0) {
+			this.gen = (TreeGenerator)gen.get(0);
 		}
 	}
 
 	@Override
-	public void setInstances(Object data) {
+	public void setInstances(Data data) {
 		this.data = data;
 	}
 
@@ -131,7 +136,9 @@ public abstract class TreePopulationInitializator implements PopulationInitializ
 		this.nThreads = nThreads;
 	}
 
-	
+	public void setParam(String param) {
+		
+	}
 	
 	
 }

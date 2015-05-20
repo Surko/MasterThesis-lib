@@ -2,7 +2,7 @@ package genlib.classifier.gens;
 
 import genlib.classifier.splitting.SplitCriteria;
 import genlib.evolution.individuals.TreeIndividual;
-import genlib.structures.MultiWayNode;
+import genlib.structures.trees.MultiWayNode;
 import weka.classifiers.trees.j48.Distribution;
 import weka.core.Attribute;
 import weka.core.Instances;
@@ -17,7 +17,7 @@ public class WekaSimpleStumpGenerator extends SimpleStumpGenerator {
 		super();		
 	}
 
-	public WekaSimpleStumpGenerator(SimpleStumpGenerator gen) {
+	public WekaSimpleStumpGenerator(WekaSimpleStumpGenerator gen) {
 		super(gen);
 	}
 
@@ -88,7 +88,7 @@ public class WekaSimpleStumpGenerator extends SimpleStumpGenerator {
 		}
 	}
 
-	public boolean isWekaCompatible() {
+	public boolean isWekaDependent() {
 		return true;
 	}
 	
@@ -100,5 +100,16 @@ public class WekaSimpleStumpGenerator extends SimpleStumpGenerator {
 	public String getGenName() {
 		return initName;
 	}
+
+	@Override
+	public WekaSimpleStumpGenerator copy() {
+		return new WekaSimpleStumpGenerator(this);
+	}
+
+	@Override
+	public void setAdditionalOptions(String[] options) throws Exception {}
+
+	@Override
+	public void setParam(String param) {}
 	
 }

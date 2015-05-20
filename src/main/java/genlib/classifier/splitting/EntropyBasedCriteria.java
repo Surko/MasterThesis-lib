@@ -2,8 +2,8 @@ package genlib.classifier.splitting;
 
 import java.util.Enumeration;
 
-import genlib.structures.ArrayDistribution;
-import genlib.structures.ArrayInstances;
+import genlib.structures.data.GenLibDistribution;
+import genlib.structures.data.GenLibInstances;
 import genlib.utils.Utils;
 import weka.classifiers.trees.j48.Distribution;
 import weka.core.Instance;
@@ -23,12 +23,12 @@ public abstract class EntropyBasedCriteria implements SplitCriteria {
 		if (dataPart instanceof Instances) {
 			return (D)wEnumHandling((Instances)dataPart, attIndex, complexity);
 		}
-		if (dataPart instanceof ArrayInstances) 
-			return (D)enumHandling((ArrayInstances)dataPart, attIndex, complexity);
+		if (dataPart instanceof GenLibInstances) 
+			return (D)enumHandling((GenLibInstances)dataPart, attIndex, complexity);
 		throw new Exception("No proper type of parameter dataPart");
 	}
 	
-	private Distribution wEnumHandling(Instances dataPart, int attIndex, int complexity) 
+	protected Distribution wEnumHandling(Instances dataPart, int attIndex, int complexity) 
 		throws Exception {
 		Instance instance;		
 		Distribution distribution = new Distribution(complexity, dataPart.numClasses());
@@ -44,13 +44,9 @@ public abstract class EntropyBasedCriteria implements SplitCriteria {
 		return distribution;
 	}
 	
-	private ArrayDistribution enumHandling(ArrayInstances dataPart, int attIndex, int complexity) 
+	protected GenLibDistribution enumHandling(GenLibInstances dataPart, int attIndex, int complexity) 
 		throws Exception {
-		
-		ArrayDistribution distribution = new ArrayDistribution();
-		
-		return distribution;
-		
+		throw new UnsupportedOperationException();		
 	}
 	
 	public double getSplitPoint() {

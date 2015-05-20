@@ -1,9 +1,9 @@
 package tests.trees;
 
 
-import genlib.structures.BinaryDepthNode;
-import genlib.structures.MultiWayDepthNode;
 import genlib.structures.extensions.DepthExtension;
+import genlib.structures.trees.BinaryDepthNode;
+import genlib.structures.trees.MultiWayDepthNode;
 import genlib.utils.Utils;
 
 import org.junit.Test;

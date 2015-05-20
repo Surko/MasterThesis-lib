@@ -1,7 +1,7 @@
 package genlib.classifier.splitting;
 
-import genlib.structures.ArrayDistribution;
-import genlib.structures.ArrayInstances;
+import genlib.structures.data.GenLibDistribution;
+import genlib.structures.data.GenLibInstances;
 
 import java.util.Enumeration;
 
@@ -20,8 +20,8 @@ public class GainCriteria extends EntropyBasedCriteria {
 			throws Exception {
 		if (dataPart instanceof Instances) 
 			return (D)wNumHandling((Instances)dataPart, attIndex, complexity);		
-		if (dataPart instanceof ArrayInstances) 
-			return (D)numHandling((ArrayInstances)dataPart, attIndex, complexity);
+		if (dataPart instanceof GenLibInstances) 
+			return (D)numHandling((GenLibInstances)dataPart, attIndex, complexity);
 		throw new Exception("No proper type of parameter dataPart");
 	} 
 	
@@ -53,55 +53,48 @@ public class GainCriteria extends EntropyBasedCriteria {
 		return distribution;
 	}
 
-	private ArrayDistribution numHandling(ArrayInstances dataPart, int attIndex, int complexity) 
+	protected GenLibDistribution numHandling(GenLibInstances dataPart, int attIndex, int complexity) 
 			throws Exception {
-
-		ArrayDistribution distribution = new ArrayDistribution();
-
-		return distribution;
-
+		throw new UnsupportedOperationException();
 	}	
 
 	@Override
 	public <I> double computeCriteria(I data, int classIndex) throws Exception{
 		if (data instanceof Instances) 
 			return computeGain((Instances)data, classIndex); 	
-		if (data instanceof ArrayInstances) 
-			return computeGain((ArrayInstances)data, classIndex);				
+		if (data instanceof GenLibInstances) 
+			return computeGain((GenLibInstances)data, classIndex);				
 		throw new Exception("No proper type of parameter data");
 	}
 	
 	@Override
 	public <D> double computeCriteria(D distribution) {
-		// TODO
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public <D> double computeCriteria(D distribution, double totalIns) {
-		// TODO
-		return 0;
+		throw new UnsupportedOperationException();
 	}	
 	
-	private double computeGain(Instances data, int classIndex) {
-		return 0d;
+	protected double computeGain(Instances data, int classIndex) {
+		throw new UnsupportedOperationException();
 	}
 	
-	private double computeGain(ArrayInstances data, int classIndex) {
-		return 0d;
+	protected double computeGain(GenLibInstances data, int classIndex) {
+		throw new UnsupportedOperationException();
 	}
 
 	// TODO - compute gain pre distribucie
 	
 	@Override
 	public double computeCriteria() {
-		// NOT USED - can be used if this class will be prototype object for each run of generator 
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override
 	public void setInstanceOrDistribution(Object insOrDist) {
-		// NOT USED - can be used if this class will be prototype object for each run of generator 		
+		throw new UnsupportedOperationException();	
 	}
 
 	public GainCriteria copy() {

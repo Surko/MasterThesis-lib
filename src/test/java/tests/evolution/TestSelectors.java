@@ -1,10 +1,7 @@
 package tests.evolution;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Random;
-
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import genlib.evolution.Population;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.fitness.TestFit;
@@ -13,9 +10,12 @@ import genlib.evolution.fitness.comparators.SingleFitnessComparator;
 import genlib.evolution.individuals.Individual;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.selectors.RouletteWheelSelector;
-import genlib.structures.MultiWayDepthNode;
-import genlib.utils.Utils;
+import genlib.evolution.selectors.TournamentSelector;
+import genlib.structures.trees.MultiWayDepthNode;
 import genlib.utils.Utils.Sign;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 import org.junit.Test;
 
@@ -24,13 +24,15 @@ public class TestSelectors {
 	private static Population<TreeIndividual> individuals;
 	
 	static {		
-		Individual.registeredFunctions = 2;
+		FitnessFunction.registeredFunctions = 2;
 		individuals = new Population<>();	
 		FitnessComparator<TreeIndividual> fitComp = new SingleFitnessComparator<TreeIndividual>();
-		ArrayList<FitnessFunction<TreeIndividual>> fitFuncs = new ArrayList<>();		
+		ArrayList<FitnessFunction<TreeIndividual>> fitFuncs = new ArrayList<>();
+		@SuppressWarnings("unchecked")
 		FitnessFunction<TreeIndividual> function = new TestFit();		
 		fitFuncs.add(function);
 		fitComp.setFitFuncs(fitFuncs);
+		fitComp.setParam("0");
 		individuals.setFitnessComparator(fitComp);
 		MultiWayDepthNode root = MultiWayDepthNode.makeNode(2, 1, Sign.LESS, 20d);
 		MultiWayDepthNode[] childs = new MultiWayDepthNode[2];
@@ -44,12 +46,11 @@ public class TestSelectors {
 	}
 	
 	@Test
-	public void testRouletteMethods() {
+	public void testRouletteSelectorUniqueness() {
 		RouletteWheelSelector selector = new RouletteWheelSelector();
 		selector.setRandomGenerator(new Random(0));
 		Population<TreeIndividual> selectedPopulation = selector.select(individuals, 5);
-		assertTrue(selectedPopulation.getPopulationSize() == 5);
-		TreeIndividual compInd = individuals.getIndividual(0);
+		assertTrue(selectedPopulation.getPopulationSize() == 5);		
 		for (int i = 0; i < 5; i++) {
 			TreeIndividual ind = selectedPopulation.getIndividual(i);
 			
@@ -65,12 +66,85 @@ public class TestSelectors {
 		
 		for (int i = 0; i < 5; i++) {
 			TreeIndividual ind = selectedPopulation.getIndividual(i);
-			assertTrue(ind.getComplexFitness() == Double.MIN_VALUE);
+			assertTrue(ind.getComplexFitness() == 0);
+		}
+		
+		for (int j = 0; j < individuals.getPopulationSize(); j++) {
+			individuals.getIndividual(j).setComplexFitness(0);
 		}
 	}
 	
 	@Test
-	public void testTournament() {
+	public void testTournamentSelectorUniqueness() {
+		TournamentSelector selector = new TournamentSelector();
+		selector.setRandomGenerator(new Random(0));
+		Population<TreeIndividual> selectedPopulation = selector.select(individuals, 5);
+		assertTrue(selectedPopulation.getPopulationSize() == 5);
 		
+		for (int i = 0; i < 5; i++) {
+			TreeIndividual ind = selectedPopulation.getIndividual(i);
+			
+			for (int j = 0; j < individuals.getPopulationSize(); j++) {
+				assertFalse(ind == individuals.getIndividual(j));
+				assertFalse(ind.getRootNode() == individuals.getIndividual(j).getRootNode());
+			}
+		}
+		
+		for (int j = 0; j < individuals.getPopulationSize(); j++) {
+			individuals.getIndividual(j).setComplexFitness(20);
+		}
+		
+		for (int i = 0; i < 5; i++) {
+			TreeIndividual ind = selectedPopulation.getIndividual(i);
+			assertTrue(ind.getComplexFitness() == 0);
+		}
+		
+		for (int j = 0; j < individuals.getPopulationSize(); j++) {
+			individuals.getIndividual(j).setComplexFitness(0);
+		}
+	}
+	
+	@Test
+	public void testTournamentSelectorSelection() {
+		TournamentSelector selector = new TournamentSelector();
+		selector.setRandomGenerator(new Random(0));
+		individuals.getIndividual(0).setComplexFitness(50);
+		individuals.getIndividual(0).setFitnessValue(0, 1.234);
+		Population<TreeIndividual> selectedPopulation = selector.select(individuals, 20);
+		assertTrue(selectedPopulation.getPopulationSize() == 20);
+		
+		boolean atLeastOne = false;
+		int total = 0;
+		for (int i = 0; i < selectedPopulation.getPopulationSize(); i++) {		
+			total = selectedPopulation.getIndividual(i).getFitnessValue(0) == 1.234 ? total + 1 : total;
+			atLeastOne = atLeastOne || selectedPopulation.getIndividual(i).getFitnessValue(0) == 1.234;
+		}
+		System.out.println("Choosed by Tournament selector: " + total);
+		assertTrue(atLeastOne);
+		
+		individuals.getIndividual(0).setComplexFitness(0);
+		individuals.getIndividual(0).setFitnessValue(0, 0);
+	}
+	
+	@Test
+	public void testRouletteSelectorSelection() {
+		RouletteWheelSelector selector = new RouletteWheelSelector();
+		selector.setRandomGenerator(new Random(0));
+		individuals.getIndividual(0).setComplexFitness(50);
+		individuals.getIndividual(0).setFitnessValue(0, 1.234);
+		Population<TreeIndividual> selectedPopulation = selector.select(individuals, 20);
+		assertTrue(selectedPopulation.getPopulationSize() == 20);
+		
+		boolean atLeastOne = false;
+		int total = 0;
+		for (int i = 0; i < selectedPopulation.getPopulationSize(); i++) {
+			total = selectedPopulation.getIndividual(i).getFitnessValue(0) == 1.234 ? total + 1 : total;
+			atLeastOne = atLeastOne || selectedPopulation.getIndividual(i).getFitnessValue(0) == 1.234;
+		}
+		System.out.println("Choosed by RoulletteWheelSelector: " + total);
+		assertTrue(atLeastOne);
+		
+		individuals.getIndividual(0).setComplexFitness(0);
+		individuals.getIndividual(0).setFitnessValue(0, 0);
 	}
 }

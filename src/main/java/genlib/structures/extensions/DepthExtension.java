@@ -1,7 +1,7 @@
 package genlib.structures.extensions;
 
-import genlib.structures.BinaryDepthNode;
-import genlib.structures.MultiWayDepthNode;
+import genlib.structures.trees.BinaryDepthNode;
+import genlib.structures.trees.MultiWayDepthNode;
 
 /**
  * Simple, almost blank interface that distincts Nodes from being automatic in depth counting and

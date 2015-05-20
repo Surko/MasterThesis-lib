@@ -1,69 +1,68 @@
 package tests.evolution;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+import genlib.evolution.Population;
+import genlib.evolution.fitness.FitnessFunction;
+import genlib.evolution.fitness.comparators.FitnessComparator;
+import genlib.evolution.fitness.comparators.SingleFitnessComparator;
+import genlib.evolution.fitness.tree.TreeAccuracyFitness;
+import genlib.evolution.individuals.TreeIndividual;
+import genlib.structures.Data;
+import genlib.structures.trees.MultiWayDepthNode;
+import genlib.utils.Utils;
+import genlib.utils.Utils.Sign;
 
 import java.util.ArrayList;
 
-import genlib.evolution.Population;
-import genlib.evolution.fitness.FitnessFunction;
-import genlib.evolution.fitness.TreeAccuracyFitness;
-import genlib.evolution.fitness.comparators.FitnessComparator;
-import genlib.evolution.fitness.comparators.SingleFitnessComparator;
-import genlib.evolution.individuals.Individual;
-import genlib.evolution.individuals.TreeIndividual;
-import genlib.structures.ArrayInstances;
-import genlib.structures.MultiWayDepthNode;
-import genlib.utils.Utils.Sign;
-
 import org.junit.Test;
 
-import weka.core.Instances;
 import weka.datagenerators.classifiers.classification.RDG1;
 
 public class TestPopulation {
 
 	private static Population<TreeIndividual> individuals;
 	private static TreeIndividual testIndividual;
-	public static Instances wekaData;
-	public static ArrayInstances arrayData;
+	public static Data wekaData;
+	public static Data arrayData;
 
 	static {
 		try {
-			String[] options = new String[]{"-r",
+			String[] options = new String[] {
+					"-r",
 					"weka.datagenerators.classifiers.classification.RDG1-S_1_-n_100_-a_10_-c_2_-N_0_-I_0_-M_1_-R_10",
-					"-S","1","-n","100","-a","10","-c","2",
-					"-N","0","-I","0","-M","1","-R","10"};		
+					"-S", "1", "-n", "100", "-a", "10", "-c", "2", "-N", "0",
+					"-I", "0", "-M", "1", "-R", "10" };
 			RDG1 rdg = new RDG1();
-			rdg.setOptions(options);	
+			rdg.setOptions(options);
 			rdg.defineDataFormat();
-			wekaData = rdg.generateExamples();
-		} catch (Exception e) {}
+			wekaData = new Data(rdg.generateExamples());
+		} catch (Exception e) {
+		}
 
-		Individual.registeredFunctions = 2;
-		individuals = new Population<>();	
-		MultiWayDepthNode root = MultiWayDepthNode.makeNode(2, 1, Sign.LESS, 20d);
+		FitnessFunction.registeredFunctions = 2;
+		MultiWayDepthNode root = MultiWayDepthNode.makeNode(2, 1, Sign.LESS,
+				20d);
 		MultiWayDepthNode[] childs = new MultiWayDepthNode[2];
 		childs[0] = MultiWayDepthNode.makeLeaf(1);
 		childs[1] = MultiWayDepthNode.makeLeaf(0);
 		root.setChilds(childs);
 		testIndividual = new TreeIndividual(root);
-		individuals.add(testIndividual);
-		for (int i = 0; i < 19; i++)
-			individuals.add(new TreeIndividual(testIndividual));		
+		individuals = Utils.debugPopulationFrom(testIndividual);
 	}
 
 	@Test
 	public void testPopulationScaling() {
-		assertTrue(individuals.getPopulationSize() == 20);		
+		assertTrue(individuals.getPopulationSize() == 20);
 		individuals.add(new TreeIndividual(testIndividual));
-		assertTrue(individuals.getPopulationSize() == 21);		
+		assertTrue(individuals.getPopulationSize() == 21);
 		individuals.clear();
 		assertTrue(individuals.getPopulationSize() == 0);
 	}
 
-	@Test(timeout = 30)
+	@Test(timeout = 100)
 	public void testPopulationFitComputation() {
 		FitnessFunction<TreeIndividual> function = new TreeAccuracyFitness();
+		function.setIndex(0);
 		function.setData(wekaData);
 		ArrayList<FitnessFunction<TreeIndividual>> fitFuncs = new ArrayList<>();
 		fitFuncs.add(function);
@@ -71,32 +70,17 @@ public class TestPopulation {
 		comparator.setFitFuncs(fitFuncs);
 		comparator.setParam("0");
 
-		individuals.setFitnessComparator(comparator);
-		long start = System.nanoTime();
-		individuals.computeFitness(1,1);
-		System.out.println(System.nanoTime() - start);				
-				
-		start = System.nanoTime();
-		individuals.computeFitness(1,1);
-		System.out.println(System.nanoTime() - start);
-		
+		individuals.setFitnessComparator(comparator);		
+		individuals.computeFitness(1, 1);		
+		individuals.computeFitness(1, 1);
 		for (TreeIndividual individual : individuals.getIndividuals()) {
 			individual.change();
 		}
-		
-		start = System.nanoTime();
-		individuals.computeFitness(1,1);
-		System.out.println(System.nanoTime() - start);
-		
+		individuals.computeFitness(1, 1);	
 		for (TreeIndividual individual : individuals.getIndividuals()) {
 			individual.change();
 		}
-		
-		start = System.nanoTime();
-		individuals.computeFitness(5,10);
-		System.out.println(System.nanoTime() - start);
-
-
+		individuals.computeFitness(5, 10);		
 	}
 
 }

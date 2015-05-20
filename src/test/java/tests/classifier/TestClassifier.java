@@ -23,16 +23,17 @@ public class TestClassifier {
 	static {
 		PluginManager.initPlugins();
 		
-		c = Config.getInstance();		
-		c.changeProperty("fit-eval", "WEIGHT 0.5,0.2,0.1");
-		c.changeProperty("fit-functions", "tAcc x;tDepth x");
+		c = Config.getInstance();
+		c.init();
+		c.changeProperty(Config.FIT_COMPARATOR, "WEIGHT 0.5,0.2,0.1");
+		c.changeProperty(Config.FIT_FUNCTIONS, "tAcc x;tDepth x");
 	}
 	
 	@Test
 	public void testEvolutionTreeClassifier() {
 		try {			
 			EvolutionTreeClassifier etc = new EvolutionTreeClassifier(true);
-			etc.makePropsFromString();
+			etc.makePropsFromString(false);
 			FitnessComparator<TreeIndividual> comp = etc.getFitnessComparator();
 			ArrayList<FitnessFunction<TreeIndividual>> funcs = etc.getFitnessFunctions();
 			

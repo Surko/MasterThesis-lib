@@ -2,8 +2,10 @@ package genlib.classifier.popinit;
 
 import genlib.classifier.gens.PopGenerator;
 import genlib.evolution.individuals.Individual;
+import genlib.structures.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -20,7 +22,7 @@ import java.util.Random;
  * after calling initPopulation (that itself traverse the tree and tests
  * instances) and then copying.
  * 
- * @author kirrie
+ * @author Lukas Surin
  * @param <T>
  *            Type of generator for population (TreeGenerator,...)
  * @see PopGenerator
@@ -32,10 +34,11 @@ public interface PopulationInitializator<T extends Individual> extends
 	public T[] getOriginPopulation();
 	public void initPopulation() throws Exception;
 	
-	public void setInstances(Object data);
+	public void setParam(String param);
+	public void setInstances(Data data);
 	public void setRandomGenerator(Random random);
 	public void setPopulationSize(int popSize);
-	public void setGenerator(PopGenerator<T> generator);
+	public void setGenerator(ArrayList<? extends PopGenerator<T>> generator);
 	
 	public int getPopulationSize();
 	public PopGenerator<T> getGenerator();

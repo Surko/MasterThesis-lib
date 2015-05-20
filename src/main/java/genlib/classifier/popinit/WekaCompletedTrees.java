@@ -32,10 +32,6 @@ public class WekaCompletedTrees extends CompletedTrees {
 			this.gen = new WekaJ48TreeGenerator(new String[] {"-C","0.25","-M","2"});
 			this.gen.setPopulationInitializator(this);
 		}
-		
-		attrIndexMap = new HashMap<>();
-		attrValueIndexMap = new HashMap[data.numAttributes()];		
-		WekaUtils.makeAttrMap(data, attrIndexMap, attrValueIndexMap);
 
 		int multCoef = 1;
 		population = new TreeIndividual[multCoef * divideParam];
@@ -55,6 +51,7 @@ public class WekaCompletedTrees extends CompletedTrees {
 					dataPart = data.resample(random);
 				}
 				TreeGenerator popG = gen.copy();
+				popG.setPopulationInitializator(this);
 				popG.setInstances(dataPart);
 				// Gathering of created individuals into TreeGenerator
 				popG.setGatherGen(gen);
@@ -73,6 +70,7 @@ public class WekaCompletedTrees extends CompletedTrees {
 			
 			population = gen.getIndividuals();
 		} else {
+			gen.setPopulationInitializator(this);
 			for (int i = 0; i < divideParam; i++) {
 				Instances dataPart;
 				if (!resample) {
@@ -98,8 +96,8 @@ public class WekaCompletedTrees extends CompletedTrees {
 	
 	@Override
 	public void initPopulation() throws Exception {
-		if (data instanceof Instances) {
-			initPopulation((Instances) data);
+		if (data.isInstances()) {
+			initPopulation(data.toInstances());
 		} else {
 			throw new Exception(PermMessages._exc_badins);
 		}

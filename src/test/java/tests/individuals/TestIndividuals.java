@@ -3,9 +3,10 @@ package tests.individuals;
 import java.util.HashMap;
 
 import genlib.evolution.Population;
+import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.individuals.TreeIndividual;
-import genlib.structures.ArrayInstances;
-import genlib.structures.MultiWayDepthNode;
+import genlib.structures.data.GenLibInstances;
+import genlib.structures.trees.MultiWayDepthNode;
 import genlib.utils.WekaUtils;
 import genlib.utils.Utils.Sign;
 
@@ -18,7 +19,7 @@ import weka.datagenerators.classifiers.classification.RDG1;
 public class TestIndividuals {
 
 	public static Instances wekaData;
-	public static ArrayInstances arrayData;
+	public static GenLibInstances arrayData;
 	
 	@Test
 	public void testIndividualCreation() {		
@@ -111,7 +112,7 @@ public class TestIndividuals {
 					+	"N20 [label=\"\'c0 (14.0/2.0)\'\" shape=box style=filled ]\n"
 					+	"}";
 		
-		TreeIndividual.registeredFunctions = 2;
+		FitnessFunction.registeredFunctions = 2;
 		TreeIndividual t1 = WekaUtils.constructTreeIndividual(sTree, 21, wekaData.numInstances(), attrIndexMap, attrValueIndexMap, false);
 		TreeIndividual t2 = WekaUtils.constructTreeIndividual(sTree, 21, wekaData.numInstances(), attrIndexMap, attrValueIndexMap, false);
 		

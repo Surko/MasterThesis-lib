@@ -29,312 +29,367 @@ import java.util.logging.Logger;
 
 public class PluginManager {
 	/** logger for this class */
-	private static final Logger LOG = Logger.getLogger(PluginManager.class.getName());
+	private static final Logger LOG = Logger.getLogger(PluginManager.class
+			.getName());
 	private static final String pluginClassTag = "PLUGINCLASS";
-	
+
 	/**
-	 * Static method which is used to initialize all kinds of plugins in this application. </br>
-	 * Every plugin initialization is done by its specific method (population initialization plugins 
-	 * via method initPopInitPlugins).
-	 * This method is static because we don't want to allow all kind of plugins to be callable as we could
-	 * do with object approach and extending this manager. </br>
-	 * Plugin initialization is done from reconfig method in GenLib class because of the 
-	 * precedence of this class (it's usually loaded as first). 
+	 * Static method which is used to initialize all kinds of plugins in this
+	 * application. </br> Every plugin initialization is done by its specific
+	 * method (population initialization plugins via method initPopInitPlugins).
+	 * This method is static because we don't want to allow all kind of plugins
+	 * to be callable as we could do with object approach and extending this
+	 * manager. </br> Plugin initialization is done from reconfig method in
+	 * GenLib class because of the precedence of this class (it's usually loaded
+	 * as first).
 	 */
-	public static void initPlugins() {	
+	public static void initPlugins() {
 		initPopInitPlugins();
 		initGeneratorPlugins();
 		initFitnessPlugins();
 		initOperatorPlugins();
 		initSelectorPlugins();
 	}
-	
+
 	private static void initPopInitPlugins() {
-		LOG.log(Level.INFO, String.format(PermMessages._s_popinit,PopulationInitializator.class.getName()));
+		LOG.log(Level.INFO, String.format(PermMessages._s_popinit,
+				PopulationInitializator.class.getName()));
 		int plugLoaded = 0;
 		int classLoaded = 0;
-						
-		Package p = Package.getPackage("genlib.classifier.popinit");		
+
+		Package p = Package.getPackage("genlib.classifier.popinit");
 		if (p.getAnnotations() == null) {
 			return;
 		}
-		
-		for (Annotation rawAnot : p.getAnnotations()) {			
-			PopInitAnnot popInitAnot = (PopInitAnnot)rawAnot;
-			
-			classLoaded = classLoader(popInitAnot.toInjectClasses(), popInitAnot.toInjectClass(), 
-					popInitAnot.toInjectNames(), popInitAnot.toInjectField(), PermMessages._popclass_loaded);
-			
+
+		for (Annotation rawAnot : p.getAnnotations()) {
+			PopInitAnnot popInitAnot = (PopInitAnnot) rawAnot;
+
+			classLoaded = classLoader(popInitAnot.toInjectClasses(),
+					popInitAnot.toInjectClass(), popInitAnot.toInjectNames(),
+					popInitAnot.toInjectField(), PermMessages._popclass_loaded);
+
 		}
 
 		// loading jar plugins inside plugin directory
-		PathManager pm = PathManager.getInstance();		
+		PathManager pm = PathManager.getInstance();
 		File popInitPluginPath = new File(pm.getPluginPath(), "pop");
-		
-		if (popInitPluginPath.exists() && popInitPluginPath.isDirectory()) {			
-				
+
+		if (popInitPluginPath.exists() && popInitPluginPath.isDirectory()) {
+
 			for (File plugFile : popInitPluginPath.listFiles(Utils.jarFilter)) {
 				try {
-					URLClassLoader authorizedLoader = URLClassLoader.newInstance(new URL[] { plugFile.toURI().toURL() });
-		            URL url = authorizedLoader.findResource("META-INF/MANIFEST.MF"); 
-		            Manifest mf = new Manifest(url.openStream());
-		            Attributes mfAttributes = mf.getMainAttributes();
-		            PopPlugin plugin = (PopPlugin) authorizedLoader.loadClass(
-	                        mfAttributes.getValue(pluginClassTag)).newInstance();
-		            plugin.initPopulators();
+					URLClassLoader authorizedLoader = URLClassLoader
+							.newInstance(new URL[] { plugFile.toURI().toURL() });
+					URL url = authorizedLoader
+							.findResource("META-INF/MANIFEST.MF");
+					Manifest mf = new Manifest(url.openStream());
+					Attributes mfAttributes = mf.getMainAttributes();
+					PopPlugin plugin = (PopPlugin) authorizedLoader.loadClass(
+							mfAttributes.getValue(pluginClassTag))
+							.newInstance();
+					plugin.initPopulators();
 					plugLoaded++;
 				} catch (ClassCastException cce) {
-					LOG.log(Level.WARNING, String.format(PermMessages._plug_type_err,plugFile.getName()));
+					LOG.log(Level.WARNING,
+							String.format(PermMessages._plug_type_err,
+									plugFile.getName()));
 				} catch (Exception e) {
 					LOG.log(Level.SEVERE, e.toString());
 				}
 			}
 		}
-		
+
 		String sPopInit = "population initializator";
-		LOG.log(Level.INFO, String.format(PermMessages._c_class_loaded, sPopInit, classLoaded));
-		LOG.log(Level.INFO, String.format(PermMessages._c_plug_loaded, sPopInit, plugLoaded));
-		
+		LOG.log(Level.INFO, String.format(PermMessages._c_class_loaded,
+				sPopInit, classLoaded));
+		LOG.log(Level.INFO, String.format(PermMessages._c_plug_loaded,
+				sPopInit, plugLoaded));
+
 	}
-	
+
 	private static void initFitnessPlugins() {
-		LOG.log(Level.INFO, String.format(PermMessages._s_fitinit,FitnessFunction.class.getName()));
-		int plugLoaded = 0;	
+		LOG.log(Level.INFO,
+				String.format(PermMessages._s_fitinit,
+						FitnessFunction.class.getName()));
+		int plugLoaded = 0;
 		int classLoaded = 0;
-						
-		Package p = Package.getPackage("genlib.evolution.fitness");		
+
+		Package p = Package.getPackage("genlib.evolution.fitness");
 		if (p.getAnnotations() == null) {
 			return;
 		}
-		
-		for (Annotation rawAnot : p.getAnnotations()) {			
-			FitnessAnnot fitnessAnot = (FitnessAnnot)rawAnot;
-			
-			classLoaded = classLoader(fitnessAnot.toInjectClasses(), fitnessAnot.toInjectClass(), 
-					fitnessAnot.toInjectNames(), fitnessAnot.toInjectField(), PermMessages._fitclass_loaded);
-			
+
+		for (Annotation rawAnot : p.getAnnotations()) {
+			FitnessAnnot fitnessAnot = (FitnessAnnot) rawAnot;
+
+			classLoaded = classLoader(fitnessAnot.toInjectClasses(),
+					fitnessAnot.toInjectClass(), fitnessAnot.toInjectNames(),
+					fitnessAnot.toInjectField(), PermMessages._fitclass_loaded);
+
 		}
 
 		// loading jar plugins inside plugin directory
-		PathManager pm = PathManager.getInstance();		
+		PathManager pm = PathManager.getInstance();
 		File fitnessPluginPath = new File(pm.getPluginPath(), "fit");
-		
-		if (fitnessPluginPath.exists() && fitnessPluginPath.isDirectory()) {			
-				
+
+		if (fitnessPluginPath.exists() && fitnessPluginPath.isDirectory()) {
+
 			for (File plugFile : fitnessPluginPath.listFiles(Utils.jarFilter)) {
 				try {
-					URLClassLoader authorizedLoader = URLClassLoader.newInstance(new URL[] { plugFile.toURI().toURL() });
-		            URL url = authorizedLoader.findResource("META-INF/MANIFEST.MF"); 
-		            Manifest mf = new Manifest(url.openStream());
-		            Attributes mfAttributes = mf.getMainAttributes();
-		            FitnessPlugin plugin = (FitnessPlugin) authorizedLoader.loadClass(
-	                        mfAttributes.getValue(pluginClassTag)).newInstance();
-		            plugin.initFitnesses();
+					URLClassLoader authorizedLoader = URLClassLoader
+							.newInstance(new URL[] { plugFile.toURI().toURL() });
+					URL url = authorizedLoader
+							.findResource("META-INF/MANIFEST.MF");
+					Manifest mf = new Manifest(url.openStream());
+					Attributes mfAttributes = mf.getMainAttributes();
+					FitnessPlugin plugin = (FitnessPlugin) authorizedLoader
+							.loadClass(mfAttributes.getValue(pluginClassTag))
+							.newInstance();
+					plugin.initFitnesses();
 					plugLoaded++;
 				} catch (ClassCastException cce) {
-					LOG.log(Level.WARNING, String.format(PermMessages._plug_type_err,plugFile.getName()));
+					LOG.log(Level.WARNING,
+							String.format(PermMessages._plug_type_err,
+									plugFile.getName()));
 				} catch (Exception e) {
 					LOG.log(Level.SEVERE, e.toString());
 				}
 			}
 		}
-		
+
 		String sPopInit = "fitness function";
-		LOG.log(Level.INFO, String.format(PermMessages._c_class_loaded, sPopInit, classLoaded));
-		LOG.log(Level.INFO, String.format(PermMessages._c_plug_loaded, sPopInit, plugLoaded));
-		
+		LOG.log(Level.INFO, String.format(PermMessages._c_class_loaded,
+				sPopInit, classLoaded));
+		LOG.log(Level.INFO, String.format(PermMessages._c_plug_loaded,
+				sPopInit, plugLoaded));
+
 	}
-	
+
 	private static void initGeneratorPlugins() {
-		LOG.log(Level.INFO, String.format(PermMessages._s_geninit,PopGenerator.class.getName()));
+		LOG.log(Level.INFO,
+				String.format(PermMessages._s_geninit,
+						PopGenerator.class.getName()));
 		int plugLoaded = 0;
 		int classLoaded = 0;
-						
-		Package p = Package.getPackage("genlib.classifier.gens");		
+
+		Package p = Package.getPackage("genlib.classifier.gens");
 		if (p.getAnnotations() == null) {
 			return;
 		}
-		
-		for (Annotation rawAnot : p.getAnnotations()) {			
-			GenAnnot genAnot = (GenAnnot)rawAnot;
-			
-			classLoaded = classLoader(genAnot.toInjectClasses(), genAnot.toInjectClass(), 
-					genAnot.toInjectNames(), genAnot.toInjectField(), PermMessages._genclass_loaded);
-			
+
+		for (Annotation rawAnot : p.getAnnotations()) {
+			GenAnnot genAnot = (GenAnnot) rawAnot;
+
+			classLoaded = classLoader(genAnot.toInjectClasses(),
+					genAnot.toInjectClass(), genAnot.toInjectNames(),
+					genAnot.toInjectField(), PermMessages._genclass_loaded);
+
 		}
 
 		// loading jar plugins inside plugin directory
-		PathManager pm = PathManager.getInstance();		
+		PathManager pm = PathManager.getInstance();
 		File genPluginPath = new File(pm.getPluginPath(), "gen");
-		
-		if (genPluginPath.exists() && genPluginPath.isDirectory()) {			
-				
+
+		if (genPluginPath.exists() && genPluginPath.isDirectory()) {
+
 			for (File plugFile : genPluginPath.listFiles(Utils.jarFilter)) {
 				try {
-					URLClassLoader authorizedLoader = URLClassLoader.newInstance(new URL[] { plugFile.toURI().toURL() });
-		            URL url = authorizedLoader.findResource("META-INF/MANIFEST.MF"); 
-		            Manifest mf = new Manifest(url.openStream());
-		            Attributes mfAttributes = mf.getMainAttributes();
-		            GenPlugin plugin = (GenPlugin) authorizedLoader.loadClass(
-	                        mfAttributes.getValue(pluginClassTag)).newInstance();
-		            plugin.initGenerators();
+					URLClassLoader authorizedLoader = URLClassLoader
+							.newInstance(new URL[] { plugFile.toURI().toURL() });
+					URL url = authorizedLoader
+							.findResource("META-INF/MANIFEST.MF");
+					Manifest mf = new Manifest(url.openStream());
+					Attributes mfAttributes = mf.getMainAttributes();
+					GenPlugin plugin = (GenPlugin) authorizedLoader.loadClass(
+							mfAttributes.getValue(pluginClassTag))
+							.newInstance();
+					plugin.initGenerators();
 					plugLoaded++;
 				} catch (ClassCastException cce) {
-					LOG.log(Level.WARNING, String.format(PermMessages._plug_type_err,plugFile.getName()));
+					LOG.log(Level.WARNING,
+							String.format(PermMessages._plug_type_err,
+									plugFile.getName()));
 				} catch (Exception e) {
 					LOG.log(Level.SEVERE, e.toString());
 				}
 			}
 		}
-		
+
 		String sPopInit = "individual generator";
-		LOG.log(Level.INFO, String.format(PermMessages._c_class_loaded, sPopInit, classLoaded));
-		LOG.log(Level.INFO, String.format(PermMessages._c_plug_loaded, sPopInit, plugLoaded));		
+		LOG.log(Level.INFO, String.format(PermMessages._c_class_loaded,
+				sPopInit, classLoaded));
+		LOG.log(Level.INFO, String.format(PermMessages._c_plug_loaded,
+				sPopInit, plugLoaded));
 	}
-	
+
 	private static void initOperatorPlugins() {
-		LOG.log(Level.INFO, String.format(PermMessages._s_operinit,Operator.class.getName()));
+		LOG.log(Level.INFO,
+				String.format(PermMessages._s_operinit,
+						Operator.class.getName()));
 		int plugLoaded = 0;
 		int classLoaded = 0;
-						
-		Package p = Package.getPackage("genlib.evolution.operators");		
+
+		Package p = Package.getPackage("genlib.evolution.operators");
 		if (p.getAnnotations() == null) {
 			return;
 		}
-		
-		for (Annotation rawAnot : p.getAnnotations()) {	
+
+		for (Annotation rawAnot : p.getAnnotations()) {
 			if (rawAnot instanceof MOperatorAnnot) {
-				MOperatorAnnot mOperAnot = (MOperatorAnnot)rawAnot;
-				
-				classLoaded += classLoader(mOperAnot.toInjectClasses(), mOperAnot.toInjectClass(), 
-						mOperAnot.toInjectNames(), mOperAnot.toInjectField(), PermMessages._operclass_loaded);
-				
+				MOperatorAnnot mOperAnot = (MOperatorAnnot) rawAnot;
+
+				classLoaded += classLoader(mOperAnot.toInjectClasses(),
+						mOperAnot.toInjectClass(), mOperAnot.toInjectNames(),
+						mOperAnot.toInjectField(),
+						PermMessages._operclass_loaded);
+
 			}
 			if (rawAnot instanceof XOperatorAnnot) {
-				XOperatorAnnot xOperAnot = (XOperatorAnnot)rawAnot;
-				
-				classLoaded += classLoader(xOperAnot.toInjectClasses(), xOperAnot.toInjectClass(), 
-						xOperAnot.toInjectNames(), xOperAnot.toInjectField(), PermMessages._operclass_loaded);
-				
-			}						
-			
+				XOperatorAnnot xOperAnot = (XOperatorAnnot) rawAnot;
+
+				classLoaded += classLoader(xOperAnot.toInjectClasses(),
+						xOperAnot.toInjectClass(), xOperAnot.toInjectNames(),
+						xOperAnot.toInjectField(),
+						PermMessages._operclass_loaded);
+
+			}
+
 		}
 
 		// loading jar plugins inside plugin directory
-		PathManager pm = PathManager.getInstance();		
+		PathManager pm = PathManager.getInstance();
 		File operPluginPath = new File(pm.getPluginPath(), "operators");
-		
-		if (operPluginPath.exists() && operPluginPath.isDirectory()) {			
-				
+
+		if (operPluginPath.exists() && operPluginPath.isDirectory()) {
+
 			for (File plugFile : operPluginPath.listFiles(Utils.jarFilter)) {
 				try {
-					URLClassLoader authorizedLoader = URLClassLoader.newInstance(new URL[] { plugFile.toURI().toURL() });
-		            URL url = authorizedLoader.findResource("META-INF/MANIFEST.MF"); 
-		            Manifest mf = new Manifest(url.openStream());
-		            Attributes mfAttributes = mf.getMainAttributes();
-		            OperatorPlugin plugin = (OperatorPlugin) authorizedLoader.loadClass(
-	                        mfAttributes.getValue(pluginClassTag)).newInstance();
-		            plugin.initOperators();
+					URLClassLoader authorizedLoader = URLClassLoader
+							.newInstance(new URL[] { plugFile.toURI().toURL() });
+					URL url = authorizedLoader
+							.findResource("META-INF/MANIFEST.MF");
+					Manifest mf = new Manifest(url.openStream());
+					Attributes mfAttributes = mf.getMainAttributes();
+					OperatorPlugin plugin = (OperatorPlugin) authorizedLoader
+							.loadClass(mfAttributes.getValue(pluginClassTag))
+							.newInstance();
+					plugin.initOperators();
 					plugLoaded++;
 				} catch (ClassCastException cce) {
-					LOG.log(Level.WARNING, String.format(PermMessages._plug_type_err,plugFile.getName()));
+					LOG.log(Level.WARNING,
+							String.format(PermMessages._plug_type_err,
+									plugFile.getName()));
 				} catch (Exception e) {
 					LOG.log(Level.SEVERE, e.toString());
 				}
 			}
 		}
-		
+
 		String sPopInit = "operator";
-		LOG.log(Level.INFO, String.format(PermMessages._c_class_loaded, sPopInit, classLoaded));
-		LOG.log(Level.INFO, String.format(PermMessages._c_plug_loaded, sPopInit, plugLoaded));		
+		LOG.log(Level.INFO, String.format(PermMessages._c_class_loaded,
+				sPopInit, classLoaded));
+		LOG.log(Level.INFO, String.format(PermMessages._c_plug_loaded,
+				sPopInit, plugLoaded));
 	}
-	
+
 	private static void initSelectorPlugins() {
-		LOG.log(Level.INFO, String.format(PermMessages._s_selinit,Selector.class.getName()));
+		LOG.log(Level.INFO, String.format(PermMessages._s_selinit,
+				Selector.class.getName()));
 		int plugLoaded = 0;
 		int classLoaded = 0;
-						
-		Package p = Package.getPackage("genlib.evolution.selectors");		
+
+		Package p = Package.getPackage("genlib.evolution.selectors");
 		if (p.getAnnotations() == null) {
 			return;
 		}
-		
-		for (Annotation rawAnot : p.getAnnotations()) {	
+
+		for (Annotation rawAnot : p.getAnnotations()) {
 			if (rawAnot instanceof EnvSelectAnnot) {
-				EnvSelectAnnot selectAnot = (EnvSelectAnnot)rawAnot;
-				
-				classLoaded += classLoader(selectAnot.toInjectClasses(), selectAnot.toInjectClass(), 
-						selectAnot.toInjectNames(), selectAnot.toInjectField(), PermMessages._selclass_loaded);
-				
+				EnvSelectAnnot selectAnot = (EnvSelectAnnot) rawAnot;
+
+				classLoaded += classLoader(selectAnot.toInjectClasses(),
+						selectAnot.toInjectClass(), selectAnot.toInjectNames(),
+						selectAnot.toInjectField(),
+						PermMessages._selclass_loaded);
+
 			}
 			if (rawAnot instanceof MateSelectAnnot) {
-				MateSelectAnnot selectAnot = (MateSelectAnnot)rawAnot;
-				
-				classLoaded += classLoader(selectAnot.toInjectClasses(), selectAnot.toInjectClass(), 
-						selectAnot.toInjectNames(), selectAnot.toInjectField(), PermMessages._selclass_loaded);
-				
-			}						
-			
+				MateSelectAnnot selectAnot = (MateSelectAnnot) rawAnot;
+
+				classLoaded += classLoader(selectAnot.toInjectClasses(),
+						selectAnot.toInjectClass(), selectAnot.toInjectNames(),
+						selectAnot.toInjectField(),
+						PermMessages._selclass_loaded);
+
+			}
+
 		}
 
 		// loading jar plugins inside plugin directory
-		PathManager pm = PathManager.getInstance();		
+		PathManager pm = PathManager.getInstance();
 		File selPluginPath = new File(pm.getPluginPath(), "selectors");
-		
-		if (selPluginPath.exists() && selPluginPath.isDirectory()) {			
-				
+
+		if (selPluginPath.exists() && selPluginPath.isDirectory()) {
+
 			for (File plugFile : selPluginPath.listFiles(Utils.jarFilter)) {
 				try {
-					URLClassLoader authorizedLoader = URLClassLoader.newInstance(new URL[] { plugFile.toURI().toURL() });
-		            URL url = authorizedLoader.findResource("META-INF/MANIFEST.MF"); 
-		            Manifest mf = new Manifest(url.openStream());
-		            Attributes mfAttributes = mf.getMainAttributes();
-		            SelectorPlugin plugin = (SelectorPlugin) authorizedLoader.loadClass(
-	                        mfAttributes.getValue(pluginClassTag)).newInstance();
-		            plugin.initSelectors();
+					URLClassLoader authorizedLoader = URLClassLoader
+							.newInstance(new URL[] { plugFile.toURI().toURL() });
+					URL url = authorizedLoader
+							.findResource("META-INF/MANIFEST.MF");
+					Manifest mf = new Manifest(url.openStream());
+					Attributes mfAttributes = mf.getMainAttributes();
+					SelectorPlugin plugin = (SelectorPlugin) authorizedLoader
+							.loadClass(mfAttributes.getValue(pluginClassTag))
+							.newInstance();
+					plugin.initSelectors();
 					plugLoaded++;
 				} catch (ClassCastException cce) {
-					LOG.log(Level.WARNING, String.format(PermMessages._plug_type_err,plugFile.getName()));
+					LOG.log(Level.WARNING,
+							String.format(PermMessages._plug_type_err,
+									plugFile.getName()));
 				} catch (Exception e) {
 					LOG.log(Level.SEVERE, e.toString());
 				}
 			}
 		}
-		
+
 		String sPopInit = "selector";
-		LOG.log(Level.INFO, String.format(PermMessages._c_class_loaded, sPopInit, classLoaded));
-		LOG.log(Level.INFO, String.format(PermMessages._c_plug_loaded, sPopInit, plugLoaded));	
+		LOG.log(Level.INFO, String.format(PermMessages._c_class_loaded,
+				sPopInit, classLoaded));
+		LOG.log(Level.INFO, String.format(PermMessages._c_plug_loaded,
+				sPopInit, plugLoaded));
 	}
 
-	private static int classLoader(Class[] toInjectClasses, Class toInjectClass, 
-			String[] toInjectNames, String toInjectField,
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private static int classLoader(Class[] toInjectClasses,
+			Class toInjectClass, String[] toInjectNames, String toInjectField,
 			String loadMsg) {
-		
+
 		if (toInjectClasses.length != toInjectNames.length) {
 			return 0;
 		}
-		
+
 		int classLoaded = 0;
 		try {
 			Field f = toInjectClass.getField(toInjectField);
-			HashMap<String,Class> h = (HashMap<String, Class>) f.get(null);
-			
+			HashMap<String, Class> h = (HashMap<String, Class>) f.get(null);
+
 			for (int i = 0; i < toInjectClasses.length; i++) {
 				String key = toInjectNames[i];
 				if (h.containsKey(key)) {
-					LOG.log(Level.WARNING, String.format(PermMessages._class_duplkey,
-							key,
-							h.get(key).getName(),
-							toInjectClasses[i].getName()));
+					LOG.log(Level.WARNING, String.format(
+							PermMessages._class_duplkey, key, h.get(key)
+									.getName(), toInjectClasses[i].getName()));
 					continue;
 				}
 				h.put(toInjectNames[i], toInjectClasses[i]);
 				classLoaded++;
-				LOG.log(Level.INFO,String.format(loadMsg,
-						toInjectClasses[i].getName(),
-						toInjectNames[i]));
-			}	
-			
+				LOG.log(Level.INFO, String.format(loadMsg,
+						toInjectClasses[i].getName(), toInjectNames[i]));
+			}
+
 		} catch (Exception e) {
 			LOG.log(Level.SEVERE, e.toString());
 		}

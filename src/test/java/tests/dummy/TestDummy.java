@@ -7,8 +7,8 @@ import genlib.annotations.PopInitAnnot;
 import genlib.classifier.popinit.CompletedTrees;
 import genlib.classifier.popinit.PopulationInitializator;
 import genlib.evolution.individuals.TreeIndividual;
-import genlib.structures.MultiWayDepthNode;
-import genlib.structures.MultiWayNode;
+import genlib.structures.trees.MultiWayDepthNode;
+import genlib.structures.trees.MultiWayNode;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

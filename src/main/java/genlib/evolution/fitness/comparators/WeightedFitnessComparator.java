@@ -2,8 +2,14 @@ package genlib.evolution.fitness.comparators;
 
 import genlib.evolution.individuals.Individual;
 
-public class WeightedFitnessComparator<T extends Individual>  extends FitnessComparator<T> {
+import java.util.logging.Logger;
 
+public class WeightedFitnessComparator<T extends Individual>  extends FitnessComparator<T> {
+	/** Logger */
+	@SuppressWarnings("unused")
+	private static final Logger LOG = Logger.getLogger(WeightedFitnessComparator.class.getName());
+	/** for serialization */
+	private static final long serialVersionUID = -5325649645556578971L;
 	protected double[] weights;	
 
 	public WeightedFitnessComparator(int fitCounts) {
@@ -33,7 +39,8 @@ public class WeightedFitnessComparator<T extends Individual>  extends FitnessCom
 			fit2 = o2.getComplexFitness();
 		}
 		
-		return fit1 < fit2 ? -1 : (fit1 == fit2 ? 0 : 1);					
+		// reverted condition for comparison
+		return -Double.compare(fit1, fit2);					
 	}
 
 	@Override

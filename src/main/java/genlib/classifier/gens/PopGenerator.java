@@ -12,6 +12,7 @@ public interface PopGenerator<T extends Individual> extends Runnable, Serializab
 	public void setInstances(Object data);
 	public void setGatherGen(PopGenerator<T> gatherGen);
 	public void setAdditionalOptions(String[] options) throws Exception;
-	public boolean isWekaCompatible();
+	public void setParam(String param) throws Exception;
+	public boolean isWekaDependent();
 	public String getGenName();
 }

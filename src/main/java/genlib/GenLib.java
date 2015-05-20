@@ -15,8 +15,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import tests.individuals.TestIndividuals;
-
 /**
  * If we use GenLib as a standalone application then this class with main static
  * method is used. It typically parses parameters handed to the main method.
@@ -27,7 +25,7 @@ import tests.individuals.TestIndividuals;
  * because GenLib is typically one of the first class that is accessed from
  * project (because of main method).
  * 
- * @author kirrie
+ * @author Lukas Surin
  *
  */
 public class GenLib {

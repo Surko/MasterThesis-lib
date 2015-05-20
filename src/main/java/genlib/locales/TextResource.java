@@ -5,6 +5,7 @@ import genlib.configurations.PathManager;
 
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Enumeration;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,7 +15,7 @@ public class TextResource {
 			.getName());
 
 	private static ResourceBundle rb;
-	private static final String no_value = "#NOT_DEFINED# \n";
+	public static final String no_value = "#NOT_DEFINED# \n";
 
 	public static String getString(String key) {
 		if (rb == null)
@@ -60,5 +61,13 @@ public class TextResource {
 	 */
 	public static void clear() {
 		rb = null;
+	}	
+	
+	public static Enumeration<String> getKeys() {
+		if (rb == null) {
+			reinit();
+		}
+		
+		return rb.getKeys();
 	}
 }

@@ -1,7 +1,6 @@
 package genlib.evolution.selectors;
 
 import genlib.evolution.Population;
-import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.fitness.comparators.FitnessComparator;
 import genlib.evolution.individuals.Individual;
 
@@ -9,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class TournamentSelector implements Selector {
+	/** for serialization */
+	private static final long serialVersionUID = 2541161181988190800L;
+
 	public static final String initName = "Tmt";
 
 	private Random rng;
@@ -51,6 +53,7 @@ public class TournamentSelector implements Selector {
 			Population<T> dest, int count) {
 		if (dest == null) {
 			dest = new Population<T>();
+			dest.setFitnessComparator(origin.getFitnessComparator());
 		}
 		
 		for (int i = 0; i < count; i++) {
@@ -60,7 +63,7 @@ public class TournamentSelector implements Selector {
 			T ind1 = origin.getIndividual(i1);
 			T ind2 = origin.getIndividual(i2);
 			
-			if (origin.getFitnessComparator().compare(ind1, ind2) == 1 
+			if (origin.getFitnessComparator().compare(ind1, ind2) == -1 
 					&& rng.nextDouble() < 0.8) {
 				dest.add((T)ind1.copy());
 			} else {

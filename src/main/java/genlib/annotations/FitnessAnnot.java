@@ -11,7 +11,8 @@ import genlib.evolution.fitness.FitnessFunction;
 @Target(ElementType.PACKAGE)
 public @interface FitnessAnnot {	
 	String[] toInjectNames();
-	Class<? extends FitnessFunction<?>>[] toInjectClasses();
+	@SuppressWarnings("rawtypes")
+	Class<? extends FitnessFunction>[] toInjectClasses();
 	String toInjectField();
 	Class<?> toInjectClass();
 }

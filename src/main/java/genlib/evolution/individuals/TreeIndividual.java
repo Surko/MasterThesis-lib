@@ -1,10 +1,11 @@
 package genlib.evolution.individuals;
 
-import genlib.structures.BinaryDepthNode;
-import genlib.structures.BinaryNode;
-import genlib.structures.MultiWayDepthNode;
-import genlib.structures.MultiWayNode;
-import genlib.structures.Node;
+import genlib.evolution.fitness.FitnessFunction;
+import genlib.structures.trees.BinaryDepthNode;
+import genlib.structures.trees.BinaryNode;
+import genlib.structures.trees.MultiWayDepthNode;
+import genlib.structures.trees.MultiWayNode;
+import genlib.structures.trees.Node;
 
 public class TreeIndividual extends Individual {	
 	
@@ -15,13 +16,14 @@ public class TreeIndividual extends Individual {
 
 	public TreeIndividual(TreeIndividual toCopy) {
 		this.root = toCopy.root.copy();
+		this.complexFitness = toCopy.complexFitness;
 		this.fitness = new double[toCopy.fitness.length];
 		System.arraycopy(toCopy.fitness, 0, this.fitness, 0, this.fitness.length);
 	}
 	
 	public TreeIndividual(Node root) {
 		this.root = root;
-		this.fitness = new double[registeredFunctions];
+		this.fitness = new double[FitnessFunction.registeredFunctions];
 	}
 	
 	public TreeIndividual(boolean binary, boolean countDepth) {
@@ -38,7 +40,7 @@ public class TreeIndividual extends Individual {
 				this.root = new MultiWayNode();
 			}
 		}
-		this.fitness = new double[registeredFunctions];
+		this.fitness = new double[FitnessFunction.registeredFunctions];
 	}
 	
 	/**

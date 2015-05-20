@@ -1,15 +1,16 @@
 package genlib.evolution.operators;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import genlib.evolution.EvolutionAlgorithm;
 import genlib.evolution.Population;
 import genlib.evolution.individuals.Individual;
 import genlib.evolution.individuals.TreeIndividual;
 
-public abstract class Operator<T extends Individual> {
+import java.io.Serializable;
+import java.util.HashMap;
 
+public abstract class Operator<T extends Individual> implements Serializable {
+	/** for serialization */
+	private static final long serialVersionUID = -2281373501886300299L;
 	public static final HashMap<String,Class<Operator<TreeIndividual>>> tXOper = new HashMap<>();
 	public static final HashMap<String,Class<Operator<TreeIndividual>>> tMOper = new HashMap<>();
 	

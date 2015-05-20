@@ -17,7 +17,7 @@ import weka.core.Instances;
  * Class can initialize stump population from weka datatype Instances. Methods
  * and structure of this class work exactly as in {@link RandomStumpCombinator}.
  * 
- * @author kirrie
+ * @author Lukas Surin
  * @see RandomStumpCombinator
  */
 public class WekaRandomStumpCombinator extends RandomStumpCombinator {
@@ -119,8 +119,8 @@ public class WekaRandomStumpCombinator extends RandomStumpCombinator {
 	 */
 	@Override
 	public void initPopulation() throws Exception {
-		if (data instanceof Instances) {
-			initPopulation((Instances) data);
+		if (data.isInstances()) {
+			initPopulation(data.toInstances());
 		} else {
 			throw new Exception(PermMessages._exc_badins);
 		}

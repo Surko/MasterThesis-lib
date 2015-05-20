@@ -1,19 +1,16 @@
 package genlib.classifier.popinit;
 
-import genlib.annotations.PopInitAnnot;
+import genlib.classifier.gens.DummyTreeGenerator;
+import genlib.classifier.gens.SimpleStumpGenerator;
 import genlib.classifier.gens.TreeGenerator;
-import genlib.classifier.gens.WekaJ48TreeGenerator;
-import genlib.evolution.individuals.Individual;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.locales.PermMessages;
-import genlib.structures.ArrayInstances;
+import genlib.structures.data.GenLibInstances;
 import genlib.utils.Utils;
 
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import weka.core.Instances;
 
 public class CompletedTrees extends TreePopulationInitializator {
 
@@ -33,16 +30,11 @@ public class CompletedTrees extends TreePopulationInitializator {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void initPopulation(ArrayInstances data) throws Exception {
+	private void initPopulation(GenLibInstances data) throws Exception {
 		if (gen == null) {
-			this.gen = new WekaJ48TreeGenerator(new String[] { "-C", "0.25",
-					"-M", "2" });
+			this.gen = new DummyTreeGenerator();
 			this.gen.setPopulationInitializator(this);
 		}
-
-		attrIndexMap = new HashMap<>();
-		attrValueIndexMap = new HashMap[data.numAttributes()];
-		Utils.makeAttrMap(data, attrIndexMap, attrValueIndexMap);
 
 		int multCoef = 1;
 		population = new TreeIndividual[multCoef * divideParam];
@@ -52,16 +44,17 @@ public class CompletedTrees extends TreePopulationInitializator {
 			ExecutorService es = Executors.newFixedThreadPool(nThreads);
 
 			for (int i = 0; i < divideParam; i++) {
-				Instances dataPart = null;
+				GenLibInstances dataPart = null;
 				if (!resample) {
 					// size of instances = data.length / divideParam.
-
+					dataPart = data.getPart(divideParam, i);
 				} else {
 					// instances of same length as training data. Sampling with
 					// replacement
-
+					dataPart = data.resample(random);
 				}
 				TreeGenerator popG = gen.copy();
+				popG.setPopulationInitializator(this);
 				popG.setInstances(dataPart);
 				// Gathering of created individuals into TreeGenerator
 				popG.setGatherGen(gen);
@@ -79,15 +72,16 @@ public class CompletedTrees extends TreePopulationInitializator {
 
 			population = gen.getIndividuals();
 		} else {
+			gen.setPopulationInitializator(this);
 			for (int i = 0; i < divideParam; i++) {
-				Instances dataPart = null;
+				GenLibInstances dataPart = null;
 				if (!resample) {
 					// size of instances = data.length / divideParam.
-
+					dataPart = data.getPart(divideParam, i);
 				} else {
 					// instances of same length as training data. Sampling with
 					// replacement
-
+					dataPart = data.resample(random);
 				}
 
 				gen.setInstances(dataPart);
@@ -120,8 +114,8 @@ public class CompletedTrees extends TreePopulationInitializator {
 
 	@Override
 	public void initPopulation() throws Exception {
-		if (data instanceof ArrayInstances) {
-			initPopulation((ArrayInstances) data);
+		if (data.isGenLibInstances()) {
+			initPopulation(data.toGenLibInstances());
 		} else {
 			throw new Exception(PermMessages._exc_badins);
 		}
@@ -136,7 +130,6 @@ public class CompletedTrees extends TreePopulationInitializator {
 	public String getInitName() {
 		return initName;
 	}
-
 
 	@Override
 	public String objectInfo() {

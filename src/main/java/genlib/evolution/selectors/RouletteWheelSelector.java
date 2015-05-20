@@ -9,6 +9,8 @@ import genlib.evolution.fitness.comparators.FitnessComparator;
 import genlib.evolution.individuals.Individual;
 
 public class RouletteWheelSelector implements Selector {
+	/** for serialization */
+	private static final long serialVersionUID = -3268012087543397623L;
 	public static final String initName = "RW";
 	private Random rng;
 	private int fitnessIndex = 0;
@@ -33,6 +35,9 @@ public class RouletteWheelSelector implements Selector {
 		
 		for (int i = 0; i < length; i++) {
 			fitnesses[i] = origin.get(i).getFitnessValue(individualFitIndex);
+			if (fitnesses[i] == 0) {
+				fitnesses[i] = 1;
+			}
 			fitSum += fitnesses[i];
 		}		
 		
@@ -63,6 +68,7 @@ public class RouletteWheelSelector implements Selector {
 	public <T extends Individual> Population<T> select(Population<T> origin, Population<T> dest, int count) {
 		if (dest == null) {
 			dest = new Population<T>();
+			dest.setFitnessComparator(origin.getFitnessComparator());
 		}
 		
 		FitnessFunction<T> function = origin.getFitnessComparator().getFitnessFuncs().get(fitnessIndex);
@@ -74,6 +80,9 @@ public class RouletteWheelSelector implements Selector {
 		
 		for (int i = 0; i < length; i++) {
 			fitnesses[i] = origin.getIndividual(i).getFitnessValue(individualFitIndex);
+			if (fitnesses[i] == 0) {
+				fitnesses[i] = 1;
+			}
 			fitSum += fitnesses[i];
 		}			
 		

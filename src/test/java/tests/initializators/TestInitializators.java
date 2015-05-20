@@ -6,8 +6,10 @@ import genlib.classifier.popinit.RandomStumpCombinator;
 import genlib.classifier.popinit.TreePopulationInitializator;
 import genlib.classifier.popinit.WekaCompletedTrees;
 import genlib.classifier.popinit.WekaRandomStumpCombinator;
+import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.individuals.Individual;
-import genlib.structures.ArrayInstances;
+import genlib.structures.Data;
+import genlib.structures.data.GenLibInstances;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -18,8 +20,8 @@ import weka.datagenerators.classifiers.classification.RDG1;
 
 public class TestInitializators {
 
-	public static Instances wekaData;
-	public static ArrayInstances arrayData;
+	public static Data wekaData;
+	public static Data genLibData;
 	
 	@Test
 	public void testInitProperties() {	
@@ -60,9 +62,9 @@ public class TestInitializators {
 		RDG1 rdg = new RDG1();
 		rdg.setOptions(options);	
 		rdg.defineDataFormat();
-		wekaData = rdg.generateExamples();
+		wekaData = new Data(rdg.generateExamples());
 		
-		Individual.registeredFunctions = 2;
+		FitnessFunction.registeredFunctions = 2;
 		WekaCompletedTrees wct = new WekaCompletedTrees(200,10,false);
 		wct.setInstances(wekaData);
 		wct.initPopulation();
@@ -83,9 +85,9 @@ public class TestInitializators {
 		RDG1 rdg = new RDG1();
 		rdg.setOptions(options);	
 		rdg.defineDataFormat();
-		wekaData = rdg.generateExamples();
+		wekaData = new Data(rdg.generateExamples());
 		
-		Individual.registeredFunctions = 2;
+		FitnessFunction.registeredFunctions = 2;
 		WekaCompletedTrees wct = new WekaCompletedTrees(200,10,false);
 		assertTrue(wct.getDivideParam()==10);
 		assertFalse(wct.isResampling());		

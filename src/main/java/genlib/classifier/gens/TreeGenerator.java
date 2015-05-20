@@ -17,7 +17,7 @@ public abstract class TreeGenerator implements PopGenerator<TreeIndividual> {
 	/**
 	 * Different TreeGenerators introduced up to this date.
 	 * @see PopulationInitializator
-	 * @author kirrie	 
+	 * @author Lukas Surin	 
 	 */
 	public enum TreeGenerators {
 		SSGEN,
@@ -84,10 +84,7 @@ public abstract class TreeGenerator implements PopGenerator<TreeIndividual> {
 
 	public void setIndividuals(TreeIndividual[] individuals) {
 		this.individuals = individuals;
-	}	
-	
-	@Override
-	public void setAdditionalOptions(String[] options) throws Exception {}
+	}
 	
 	protected synchronized int incCountOfIndividuals(int count) {
 		int returnValue = individualCount;
@@ -117,6 +114,6 @@ public abstract class TreeGenerator implements PopGenerator<TreeIndividual> {
 			e.printStackTrace();
 		}
 	}
-	
+
 
 }

@@ -7,50 +7,65 @@ import genlib.evolution.fitness.comparators.FitnessComparator;
 import genlib.evolution.individuals.Individual;
 import genlib.evolution.operators.Operator;
 import genlib.evolution.selectors.Selector;
-import genlib.exceptions.EmptyEnvironmentSelectorException;
+import genlib.exceptions.EmptyConfigParamException;
 import genlib.locales.TextResource;
+import genlib.structures.Data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class EvolutionAlgorithm<T extends Individual> implements Runnable {
+public class EvolutionAlgorithm<T extends Individual> implements Runnable, Serializable {
+	
+	/** for serialization */
+	private static final long serialVersionUID = -8654725926081507012L;
 	private static final Logger LOG = Logger.getLogger(EvolutionAlgorithm.class.getName());
 	private Population<T> actualPopulation;		
 	private int numberOfGenerations;
 	private int fitNumOfThreads;
 	private int fitBlockSize = 1;
+	// it's not used, but can be in future
+	@SuppressWarnings("unused")
 	private int operNumOfThreads;
 	private double elitism;
-
+	
+	private Data data;
 	private PopulationInitializator<T> popInit;
 	private FitnessComparator<T> fitComp;
 	private ArrayList<FitnessFunction<T>> fitFunctions;
 	private ArrayList<Selector> selectors, envSelectors;
 	private ArrayList<Operator<T>> crossOperators, mutationOperators;
 
-	public EvolutionAlgorithm(Population<T> population) {
+	public EvolutionAlgorithm(Data data, Population<T> population) {
 		Config c = Config.getInstance();
+		this.data = data;
 		this.actualPopulation = population;
 		this.fitNumOfThreads = c.getFitNumOfThreads();
 		this.operNumOfThreads = c.getOperNumOfThreads();
 	}
 
-	public EvolutionAlgorithm(int numberOfGenerations) {
+	public EvolutionAlgorithm(Data data, int numberOfGenerations) {
 		Config c = Config.getInstance();
+		this.data = data;
 		this.numberOfGenerations = numberOfGenerations;
 		this.fitNumOfThreads = c.getFitNumOfThreads();
 		this.operNumOfThreads = c.getOperNumOfThreads();
 	}
 
-	public EvolutionAlgorithm(Population<T> population, int numberOfGenerations) {
+	public EvolutionAlgorithm(Data data, Population<T> population, int numberOfGenerations) {
 		Config c = Config.getInstance();
+		this.data = data;
 		this.actualPopulation = population;
 		this.numberOfGenerations = numberOfGenerations;
 		this.fitNumOfThreads = c.getFitNumOfThreads();
 		this.operNumOfThreads = c.getOperNumOfThreads();
 	}
 
+	public Data getData() {
+		return data;
+	}
+	
 	public void setCrossOperators(ArrayList<Operator<T>> crossOperators) {
 		this.crossOperators = crossOperators;
 		for (Operator<T> operator : crossOperators) {
@@ -148,7 +163,7 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable {
 		for (int i = 0; i < numberOfGenerations; i++) {
 			// LOGGING OR OTHER ADDITIONAL METHODS CAN BE ADDED IF WE CARE
 			evolve();
-			// CONTROL OF BEST INDIVIDUAL, ETC...
+			// TODO CONTROL OF BEST INDIVIDUAL, ETC...
 
 		}
 
@@ -183,6 +198,7 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable {
 	 */
 	private Population<T> selectionPhase(Population<T> population) {
 		Population<T> mates = new Population<>();
+		mates.setFitnessComparator(population.getFitnessComparator());
 		if (selectors.size() > 0) {
 			int selSize = selectors.size();
 			int toSel = population.getPopulationSize() / selSize;
@@ -224,7 +240,9 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable {
 		if (offspring == null) {
 			offspring = new Population<>();
 		}		
-
+		
+		offspring.setFitnessComparator(mates.getFitnessComparator());
+		
 		for (Operator<T> o : crossOperators) {			
 			o.execute(mates, offspring);			
 		}
@@ -246,19 +264,20 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable {
 		Population<T> offspring = null;
 		for (Operator<T> o : crossOperators) {
 			offspring = new Population<T>();
+			offspring.setFitnessComparator(mates.getFitnessComparator());
 			o.execute(mates, offspring);
 			mates = offspring;
 		}
 
 		for (Operator<T> o : mutationOperators) {
 			offspring = new Population<T>();
+			offspring.setFitnessComparator(mates.getFitnessComparator());
 			o.execute(mates, offspring);
 			mates = offspring;
 		}
 
 		return offspring;
 	}
-
 
 	/* ELITEPHASE METHODS*/ 
 
@@ -278,6 +297,9 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable {
 		if (elite == null) {
 			elite = new Population<>();
 		}
+		
+		elite.setFitnessComparator(population.getFitnessComparator());
+		
 		for (int i = 0; i < elitism * population.getPopulationSize(); i++) {
 			elite.add(population.getIndividual(i));
 		}
@@ -322,10 +344,12 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable {
 		if (envSelected == null) {
 			envSelected = new Population<>();
 		}
+		
+		envSelected.setFitnessComparator(population.getFitnessComparator());
 
 		if (envSelectors.size() > 0) {
 			int envSize = envSelectors.size();
-			int toSel = actualPopulation.getPopulationSize() / envSize;
+			int toSel = (actualPopulation.getPopulationSize() - envSelected.getPopulationSize()) / envSize;
 
 			for (int i = 0; i < envSize; i++) {				
 				Population<T> toAdd = selectors.get(i).select(
@@ -334,7 +358,7 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable {
 			}
 
 			// consider the case when selectors did not create enough mates => adding the rest.
-			int missing = population.getPopulationSize() - envSelected.getPopulationSize();
+			int missing = actualPopulation.getPopulationSize() - envSelected.getPopulationSize();
 
 			if (missing > 0) {
 				Population<T> toFill = envSelectors.get(envSize - 1).select(
@@ -342,8 +366,8 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable {
 				envSelected.addAll(toFill);
 			}		
 		} else {
-			LOG.log(Level.SEVERE, TextResource.getString("eEmptyEnvSelectors"));
-			throw new EmptyEnvironmentSelectorException(TextResource.getString("eEmptyEnvSelectors"));
+			// should not get in here
+			throw new EmptyConfigParamException();
 		}
 		return envSelected;
 	}

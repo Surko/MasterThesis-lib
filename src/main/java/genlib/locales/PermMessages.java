@@ -1,7 +1,9 @@
 package genlib.locales;
 
-public interface PermMessages {
+public final class PermMessages {
 
+	private PermMessages() {}
+	
 	// Application msgs
 	public static final String _app_started = "Application started";
 	public static final String _app_ending = "Application ending";
@@ -32,6 +34,7 @@ public interface PermMessages {
 	public static final String _s_popinit="Loading of available population initializators";		
 	public static final String _popclass_loaded="Class with population initializator %s is recognized. Usage parameter registered as %s.";
 	// generator init
+	public static final String _gen_dummy="Dummy generator which creates individuals consisting of leaves.";
 	public static final String _s_geninit="Loading of available individual generators.";		
 	public static final String _genclass_loaded="Class with individual generator %s is recognized. Usage parameter registered as %s.";
 	// operator init
@@ -43,8 +46,14 @@ public interface PermMessages {
 	// selector init
 	public static final String _s_selinit="Loading of available selectors";		
 	public static final String _selclass_loaded="Class with selector %s is recognized. Usage parameter registered as %s.";
+	
+	// formats	
+	public static final String _blank_param = "x";
+	public static final String _param_format= "%s,%s";
+	public static final String _fit_format= "%s %s";
+	
 	// Default operator text
-	public static final String _def_mut = "DEFAULT=0";
-	public static final String _def_xover = "DEFAULT=0";
-
+	public static final String _def_mut = "dtM 0";
+	public static final String _def_xover = "dtX 0";
+	public static final String _def_popInit = "dtX 0";
 }

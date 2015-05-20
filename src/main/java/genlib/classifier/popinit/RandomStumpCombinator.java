@@ -1,13 +1,14 @@
 package genlib.classifier.popinit;
 
+import genlib.classifier.gens.DummyTreeGenerator;
 import genlib.classifier.gens.SimpleStumpGenerator;
 import genlib.classifier.gens.TreeGenerator;
 import genlib.classifier.splitting.InformationGainCriteria;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.locales.PermMessages;
 import genlib.locales.TextResource;
-import genlib.structures.ArrayInstances;
-import genlib.structures.Node;
+import genlib.structures.data.GenLibInstances;
+import genlib.structures.trees.Node;
 import genlib.utils.Utils;
 
 import java.util.concurrent.ExecutorService;
@@ -19,7 +20,7 @@ import weka.core.Instances;
 /**
  * Class can initialize
  * {@link <a href="http://en.wikipedia.org/wiki/Decision_stump">stump</a>}
- * population from our datatype ArrayInstances. It implements
+ * population from our datatype GenLibInstances. It implements
  * PopulationInitializator<TreeGenerator> that describes that this object is
  * population initializator. Generic parameter TreeGenerator serves purpose of
  * further defining which generator this initializator use. Initialization is
@@ -29,7 +30,7 @@ import weka.core.Instances;
  * CombStumpInitializator) at leaves for as long as trees does not reach
  * maxDepth in method {@link #combineTrees()}.
  * 
- * @author kirrie
+ * @author Lukas Surin
  * @see PopulationInitializator
  * @see WekaRandomStumpCombinator
  */
@@ -63,9 +64,9 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 		this.random = Utils.randomGen;
 	}
 
-	private void initPopulation(ArrayInstances data) throws Exception {			
+	private void initPopulation(GenLibInstances data) throws Exception {			
 		if (gen == null) {
-			this.gen = new SimpleStumpGenerator(new InformationGainCriteria());
+			this.gen = new DummyTreeGenerator();
 			this.gen.setPopulationInitializator(this);
 		}
 		
@@ -76,7 +77,7 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 					.getString("eConsistencyStumpGen"), gen.getClass().getName()));
 
 
-		int n_attr = data.getNumOfAttributes() - 1;
+		int n_attr = data.numAttributes() - 1;
 		population = new TreeIndividual[n_attr * divideParam];
 
 		if (nThreads > 1) {
@@ -134,12 +135,12 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 	/**
 	 * 
 	 * @throws Exception
-	 *             if data (saved as Object) is not of ArrayInstances type.
+	 *             if data (saved as Object) is not of GenLibInstances type.
 	 */
 	@Override
 	public void initPopulation() throws Exception {
-		if (data instanceof ArrayInstances) {
-			initPopulation((ArrayInstances) data);
+		if (data instanceof GenLibInstances) {
+			initPopulation((GenLibInstances) data);
 		} else {
 			throw new Exception(PermMessages._exc_badins);
 		}

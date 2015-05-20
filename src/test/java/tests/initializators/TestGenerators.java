@@ -1,18 +1,18 @@
 package tests.initializators;
 
 import genlib.classifier.gens.WekaJ48TreeGenerator;
-import genlib.structures.ArrayInstances;
+import genlib.structures.data.GenLibInstances;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
 
+import static org.junit.Assert.*;
 import weka.core.Instances;
 import weka.datagenerators.classifiers.classification.RDG1;
 
 public class TestGenerators {
 
 	public static Instances wekaData;
-	public static ArrayInstances arrayData;
+	public static GenLibInstances arrayData;
 	
 	@Test
 	public void testJ48Generator() throws Exception {

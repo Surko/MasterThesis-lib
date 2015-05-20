@@ -2,8 +2,8 @@ package genlib.classifier.splitting;
 
 import java.util.Enumeration;
 
-import genlib.structures.ArrayDistribution;
-import genlib.structures.ArrayInstances;
+import genlib.structures.data.GenLibDistribution;
+import genlib.structures.data.GenLibInstances;
 import genlib.utils.Utils;
 import weka.classifiers.trees.j48.Distribution;
 import weka.core.Instance;
@@ -29,8 +29,8 @@ public class InformationGainCriteria extends EntropyBasedCriteria {
 			throws Exception {
 		if (dataPart instanceof Instances) 
 			return (D)wNumHandling((Instances)dataPart, attIndex, classComplexity);		
-		if (dataPart instanceof ArrayInstances) 
-			return (D)numHandling((ArrayInstances)dataPart, attIndex, classComplexity);
+		if (dataPart instanceof GenLibInstances) 
+			return (D)numHandling((GenLibInstances)dataPart, attIndex, classComplexity);
 		throw new Exception("No proper type of parameter dataPart");
 	}
 
@@ -100,31 +100,27 @@ public class InformationGainCriteria extends EntropyBasedCriteria {
 		return distribution;
 	}
 
-	private ArrayDistribution numHandling(ArrayInstances dataPart, int attIndex, int complexity) 
+	private GenLibDistribution numHandling(GenLibInstances dataPart, int attIndex, int complexity) 
 			throws Exception {
-
-		ArrayDistribution distribution = new ArrayDistribution();
-
-		return distribution;
+		throw new UnsupportedOperationException();	
 
 	}
 
 	@Override
 	public double computeCriteria() {
-		// NOT USED - can be used if this class will be prototype object for each run of generator 
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override
 	public void setInstanceOrDistribution(Object insOrDist) {
-		// NOT USED - can be used if this class will be prototype object for each run of generator 		
+		throw new UnsupportedOperationException();
 	}
 
 	public <I> double computeCriteria(I data, int classIndex) throws Exception{
 		if (data instanceof Instances) 			
 			return computeInfo(new Distribution((Instances)data));
-		if (data instanceof ArrayInstances) 
-			return computeInfo(new ArrayDistribution());				
+		if (data instanceof GenLibInstances) 
+			return computeInfo(((GenLibInstances)data).getDistribution());			
 		throw new Exception("No proper type of parameter data");
 	}
 
@@ -132,8 +128,8 @@ public class InformationGainCriteria extends EntropyBasedCriteria {
 	public <D> double computeCriteria(D distribution) throws Exception {
 		if (distribution instanceof Distribution) 			
 			return computeInfo((Distribution)distribution);
-		if (distribution instanceof ArrayDistribution) 
-			return computeInfo((ArrayDistribution)distribution);				
+		if (distribution instanceof GenLibDistribution) 
+			return computeInfo((GenLibDistribution)distribution);				
 		throw new Exception("No proper type of parameter data");
 	}
 
@@ -142,8 +138,8 @@ public class InformationGainCriteria extends EntropyBasedCriteria {
 			throws Exception {
 		if (distribution instanceof Distribution) 			
 			return computeInfo((Distribution)distribution,totalIns);
-		if (distribution instanceof ArrayDistribution) 
-			return computeInfo((ArrayDistribution)distribution, totalIns);				
+		if (distribution instanceof GenLibDistribution) 
+			return computeInfo((GenLibDistribution)distribution, totalIns);				
 		throw new Exception("No proper type of parameter data");
 	}
 	
@@ -191,14 +187,12 @@ public class InformationGainCriteria extends EntropyBasedCriteria {
 		return Utils.eq(infoGain,0d) ? 0d : infoGain/distribution.total();
 	}
 	
-	protected final double computeInfo(ArrayDistribution distribution) {
-		double infoGain = 0;
-		return infoGain;
+	protected double computeInfo(GenLibDistribution distribution) {
+		throw new UnsupportedOperationException();
 	}
 	
-	protected final double computeInfo(ArrayDistribution distribution, double totalInst) {
-		double infoGain = 0;
-		return infoGain;
+	protected double computeInfo(GenLibDistribution distribution, double totalInst) {
+		throw new UnsupportedOperationException();
 	}
 
 	public InformationGainCriteria copy() {

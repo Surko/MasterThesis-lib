@@ -1,6 +1,7 @@
 package genlib.classifier.gens;
 
 import genlib.evolution.individuals.TreeIndividual;
+import genlib.utils.Utils;
 import genlib.utils.WekaUtils;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
@@ -64,7 +65,7 @@ public class WekaJ48TreeGenerator extends TreeGenerator  {
 		return "Tree generator which generates C4.5 trees via weka J48 algorithm";
 	}
 
-	public boolean isWekaCompatible() {
+	public boolean isWekaDependent() {
 		return true;
 	}
 	
@@ -72,4 +73,9 @@ public class WekaJ48TreeGenerator extends TreeGenerator  {
 	public void setAdditionalOptions(String[] options) throws Exception {
 		this.j48Tree.setOptions(options);
 	}
+
+	public void setParam(String param) throws Exception {
+		this.j48Tree.setOptions(param.split(Utils.pDELIM));
+	}
+	
 }

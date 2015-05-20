@@ -5,6 +5,7 @@ import genlib.evolution.fitness.comparators.FitnessComparator;
 import genlib.evolution.individuals.Individual;
 import genlib.utils.Utils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,12 +15,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class Population<T extends Individual> {
+public class Population<T extends Individual> implements Serializable {
 
+	/** for serialization */
+	private static final long serialVersionUID = -8405304400658666989L;
 	private FitnessComparator<T> comparator;
 	private ArrayList<T> individuals;
 	private int popSize;
-	private Random randomGen;
+	private Random randomGen;	
 
 	public Population() {
 		this.individuals = new ArrayList<>();
@@ -27,10 +30,14 @@ public class Population<T extends Individual> {
 		this.randomGen = new Random(Utils.randomGen.nextLong());
 	}
 
+	@SuppressWarnings("unchecked")
 	public Population(Population<T> population) {
 		this.comparator = population.comparator;
 		this.popSize = population.popSize;
-		this.individuals = new ArrayList<>(population.individuals);
+		this.individuals = new ArrayList<>();
+		for (T ind : population.getIndividuals()) {
+			individuals.add((T)ind.copy());
+		}
 		this.randomGen = new Random(Utils.randomGen.nextLong());
 	}
 
@@ -52,6 +59,9 @@ public class Population<T extends Individual> {
 		this.randomGen = new Random(Utils.randomGen.nextLong());
 	}
 
+	/**
+	 * Method which clears individuals arraylist.
+	 */
 	public void clear() {
 		this.popSize = 0;
 		this.individuals.clear();
@@ -62,8 +72,24 @@ public class Population<T extends Individual> {
 		popSize++;
 	}
 
+	/**
+	 * 
+	 * @param population
+	 */
 	public void addAll(Population<T> population) {
 		individuals.addAll(population.getIndividuals());
+		popSize = individuals.size();
+	}
+	
+	/**
+	 * Deep copy of population from parameter into this population.
+	 * @param population Population from which we copy individuals
+	 */
+	@SuppressWarnings("unchecked")
+	public void deepCopy(Population<T> population) {
+		for (T ind : population.getIndividuals()) {
+			individuals.add((T)ind.copy());
+		}
 		popSize = individuals.size();
 	}
 
@@ -156,9 +182,9 @@ public class Population<T extends Individual> {
 
 		// unchange individuals, because all of the fitness functions has been computed.
 		// next call of this method will be really fast 
-		for (final T individual : individuals) {
-			individual.unchange();
-		}
+  		// for (final T individual : individuals) {
+  		//	individual.unchange();
+  		// }
 	}
 
 	public T getIndividual(int index) {
@@ -184,7 +210,5 @@ public class Population<T extends Individual> {
 	public void setFitnessComparator(FitnessComparator<T> fitComp) {
 		this.comparator = fitComp;
 	}
-
-
 
 }

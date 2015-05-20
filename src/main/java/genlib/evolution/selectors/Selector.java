@@ -4,11 +4,12 @@ import genlib.evolution.Population;
 import genlib.evolution.fitness.comparators.FitnessComparator;
 import genlib.evolution.individuals.Individual;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-public interface Selector {	
+public interface Selector extends Serializable {	
 	
 	public static final HashMap<String,Class<Selector>> selectors = new HashMap<>();
 	public static final HashMap<String,Class<Selector>> envSelectors = new HashMap<>();
