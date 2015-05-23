@@ -1,6 +1,7 @@
 package genlib.structures.trees;
 
 import genlib.exceptions.NodeCreationException;
+import genlib.exceptions.NotInitializedFieldException;
 import genlib.locales.TextResource;
 import genlib.structures.extensions.HeightExtension;
 import genlib.utils.Utils.Sign;
@@ -49,17 +50,15 @@ public class BinaryDepthNode extends BinaryNode implements HeightExtension {
 		BinaryDepthNode node = new BinaryDepthNode();
 		node.childs = new BinaryDepthNode[2];
 		node.sign = sign;
-		node.attribute = attribute;
-		node.treeHeight = 1;
-		node.treeSize = 3;
+		node.attribute = attribute;	
+		node.value = value;
 		return node;
 	}
 
 	/**
 	 * Parameterless constructor for serialization and static methods
 	 */
-	public BinaryDepthNode() {
-		super();
+	public BinaryDepthNode() {		
 	}
 
 	public BinaryDepthNode(BinaryDepthNode toCopy) {
@@ -90,7 +89,7 @@ public class BinaryDepthNode extends BinaryNode implements HeightExtension {
 	@Override
 	public void setChildAt(int index, Node node) {
 		if (childs == null) {
-			childs = new BinaryDepthNode[2];
+			throw new NotInitializedFieldException("field");
 		}
 
 		int nodeExtendDepth = ((HeightExtension) node).getTreeHeight() + 1;
@@ -116,9 +115,6 @@ public class BinaryDepthNode extends BinaryNode implements HeightExtension {
 			// node depth has to be different
 			if (nodeExtendDepth != treeHeight) {
 				updateTreeHeight(nodeExtendDepth);
-
-				if (parent != null)
-					((HeightExtension)parent).updateTreeHeight(treeHeight + 1);
 			}
 		}
 	}
@@ -130,15 +126,13 @@ public class BinaryDepthNode extends BinaryNode implements HeightExtension {
 		if (possibleMax > treeHeight) {
 			this.treeHeight = possibleMax;
 			if (parent != null) {
-				((HeightExtension) parent).updateTreeHeight(treeHeight);
+				((HeightExtension) parent).updateTreeHeight(treeHeight + 1);
 			}
 			return;
 		}
 		
 		int max = -1;
-		if (childs[0] == null) {
-			max = 0;
-		} else {
+		if (childs[0] != null) {					
 			max = ((BinaryDepthNode)childs[0]).treeHeight;
 		}
 		
@@ -150,7 +144,7 @@ public class BinaryDepthNode extends BinaryNode implements HeightExtension {
 		if (max != this.treeHeight) {
 			this.treeHeight = max;
 			if (parent != null) {
-				((HeightExtension) parent).updateTreeHeight(treeHeight);
+				((HeightExtension) parent).updateTreeHeight(treeHeight + 1);
 			}
 		}
 	}

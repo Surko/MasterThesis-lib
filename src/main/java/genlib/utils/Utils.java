@@ -210,14 +210,14 @@ public class Utils {
 	 */
 	public static int computeHeight(Node root) {
 		if (root == null) {
-			return 0;
+			return -1;
 		}
 
 		if (root.isLeaf()) {
-			return 1;
+			return 0;
 		}
 
-		int height = 0;
+		int height = -1;
 
 		for (Node child : root.getChilds()) {
 			int n = computeHeight(child);

@@ -1,6 +1,7 @@
 package genlib.structures.trees;
 
 import genlib.exceptions.NodeCreationException;
+import genlib.exceptions.NotInitializedFieldException;
 import genlib.locales.TextResource;
 import genlib.structures.extensions.SizeExtension;
 import genlib.utils.Utils.Sign;
@@ -61,6 +62,7 @@ public class MultiWayNode implements Node, SizeExtension {
 		node.childs = new MultiWayNode[childCount];
 		node.sign = sign;
 		node.attribute = attribute;
+		node.value = value;
 		return node;
 	}
 
@@ -84,15 +86,18 @@ public class MultiWayNode implements Node, SizeExtension {
 		}
 	}
 
+	public MultiWayNode(int childCount) {
+		this(childCount, 0, null, Integer.MIN_VALUE);
+	}
+	
 	public MultiWayNode(int childCount, int attribute, Sign sign, double value) {
 		if (childCount > 0 && attribute != -1) {
 			this.childs = new MultiWayNode[childCount];
 			this.sign = sign;
 			this.attribute = attribute;
-		} else {
-			this.value = value;
-			this.treeSize = 1;
 		}
+
+		this.value = value;
 	}
 
 	/**** SETTERS ****/
@@ -108,7 +113,7 @@ public class MultiWayNode implements Node, SizeExtension {
 	@Override
 	public void setChildAt(int index, Node node) {
 		if (childs == null) {
-			return;
+			throw new NotInitializedFieldException("field");
 		}
 
 		int oldTreeSize = 0;
@@ -151,7 +156,7 @@ public class MultiWayNode implements Node, SizeExtension {
 		this.treeSize = 1;
 		for (MultiWayNode node : this.childs) {			
 			treeSize += node.treeSize;
-		}
+		}		
 	}
 
 	public void setParent(Node parent) {

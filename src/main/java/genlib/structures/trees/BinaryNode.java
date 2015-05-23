@@ -1,6 +1,7 @@
 package genlib.structures.trees;
 
 import genlib.exceptions.NodeCreationException;
+import genlib.exceptions.NotInitializedFieldException;
 import genlib.locales.TextResource;
 import genlib.structures.extensions.SizeExtension;
 import genlib.utils.Utils.Sign;
@@ -54,8 +55,8 @@ public class BinaryNode implements Node, SizeExtension {
 		BinaryNode node = new BinaryNode();
 		node.childs = new BinaryNode[2];
 		node.sign = sign;
-		node.attribute = attribute;
-		node.treeSize = 3;
+		node.attribute = attribute;	
+		node.value = value;
 		return node;
 	}
 
@@ -79,13 +80,11 @@ public class BinaryNode implements Node, SizeExtension {
 	}
 
 	public BinaryNode(int attribute, Sign sign, double value) {
-		if (attribute == -1) {
+		if (attribute != -1) {
 			this.attribute = attribute;
-			this.sign = sign;
-			this.value = value;
-		} else {
-
+			this.sign = sign;			
 		}
+		this.value = value;
 	}
 
 	// SETTERS
@@ -108,7 +107,7 @@ public class BinaryNode implements Node, SizeExtension {
 
 	public void setChildAt(int index, Node node) {
 		if (childs == null) {
-			childs = new BinaryNode[2];
+			throw new NotInitializedFieldException("field");
 		}
 
 		int oldTreeSize = 0;

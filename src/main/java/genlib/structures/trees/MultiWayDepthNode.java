@@ -1,6 +1,7 @@
 package genlib.structures.trees;
 
 import genlib.exceptions.NodeCreationException;
+import genlib.exceptions.NotInitializedFieldException;
 import genlib.locales.TextResource;
 import genlib.structures.extensions.HeightExtension;
 import genlib.utils.Utils.Sign;
@@ -54,8 +55,8 @@ public class MultiWayDepthNode extends MultiWayNode implements HeightExtension {
 		MultiWayDepthNode node = new MultiWayDepthNode();
 		node.childs = new MultiWayDepthNode[childCount];
 		node.sign = sign;
-		node.attribute = attribute;		
-		node.treeSize = childCount + 1;
+		node.attribute = attribute;
+		node.value = value;
 		return node;
 	}
 
@@ -81,12 +82,18 @@ public class MultiWayDepthNode extends MultiWayNode implements HeightExtension {
 	}
 
 	public MultiWayDepthNode(int childCount) {
-		this(childCount, -1, null, Integer.MIN_VALUE);
+		this(childCount, 0, null, Integer.MIN_VALUE);
 	}
 	
 	public MultiWayDepthNode(int childCount, int attribute, Sign sign,
 			double value) {
-		super(childCount, attribute, sign, value);
+		if (childCount > 0 && attribute != -1) {
+			this.childs = new MultiWayDepthNode[childCount];
+			this.sign = sign;
+			this.attribute = attribute;
+		}
+
+		this.value = value;
 	}
 
 	// GETTERS
@@ -103,14 +110,14 @@ public class MultiWayDepthNode extends MultiWayNode implements HeightExtension {
 	// SETTERS
 	public void setChildAt(int index, Node node) {
 		if (childs == null) {
-			return;
+			throw new NotInitializedFieldException("field");
 		}
 
 		int nodeExtendDepth = ((HeightExtension) node).getTreeHeight() + 1;
 
 		if (childs[index] == null) {
 			// set the child
-			childs[index] = (MultiWayNode) node;
+			childs[index] = (MultiWayDepthNode) node;
 			// set the parent of a child
 			node.setParent(this);
 			// only if node depth is bigger than up to now
@@ -123,15 +130,12 @@ public class MultiWayDepthNode extends MultiWayNode implements HeightExtension {
 			}
 		} else {
 			// set the child
-			childs[index] = (MultiWayNode) node;
+			childs[index] = (MultiWayDepthNode) node;
 			// set the parent of a child
 			node.setParent(this);
 			// node depth has to be different
 			if (nodeExtendDepth != treeHeight) {
 				updateTreeHeight(nodeExtendDepth);
-
-				if (parent != null)
-					((HeightExtension) parent).updateTreeHeight(treeHeight + 1);
 			}
 		}
 
@@ -156,7 +160,7 @@ public class MultiWayDepthNode extends MultiWayNode implements HeightExtension {
 		if (possibleMax > treeHeight) {
 			this.treeHeight = possibleMax;
 			if (parent != null) {
-				((HeightExtension) parent).updateTreeHeight(treeHeight);
+				((HeightExtension) parent).updateTreeHeight(treeHeight + 1);
 			}
 			return;
 		}
@@ -170,7 +174,7 @@ public class MultiWayDepthNode extends MultiWayNode implements HeightExtension {
 		if (max != this.treeHeight) {
 			this.treeHeight = max;
 			if (parent != null) {
-				((HeightExtension) parent).updateTreeHeight(treeHeight);
+				((HeightExtension) parent).updateTreeHeight(treeHeight + 1);
 			}
 		}
 	}

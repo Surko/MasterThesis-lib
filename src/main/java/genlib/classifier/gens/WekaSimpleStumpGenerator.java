@@ -39,8 +39,6 @@ public class WekaSimpleStumpGenerator extends SimpleStumpGenerator {
 				// configure root node with attribute and count of child nodes
 				rootNode.setAttribute(attrIndex);
 				rootNode.setChildCount(cAttr.numValues());	
-				// setting tree depth with force to skip depth recounting
-				rootNode.setTreeHeightForced(2);
 				MultiWayNode[] childs = rootNode.getChilds();
 				// distribution of classes for each child
 				Distribution distribution = splitCriteria.handleEnumeratedAttribute(data,attrIndex,cAttr.numValues());
@@ -58,9 +56,7 @@ public class WekaSimpleStumpGenerator extends SimpleStumpGenerator {
 				MultiWayNode rootNode = (MultiWayNode)attrIndividual.getRootNode();
 				// configure of root node with attribute and count of child nodes
 				rootNode.setAttribute(attrIndex);
-				rootNode.setChildCount(2);
-				// setting tree depth with force to skip depth recounting
-				rootNode.setTreeHeightForced(2);
+				rootNode.setChildCount(2);				
 				MultiWayNode[] childs = rootNode.getChilds();
 				// distribution of classes for each child
 				Distribution distribution = splitCriteria.handleNumericAttribute(data,attrIndex,data.numClasses());
