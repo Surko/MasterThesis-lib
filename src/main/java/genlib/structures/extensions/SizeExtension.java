@@ -10,8 +10,10 @@ import genlib.structures.trees.MultiWayDepthNode;
  * @see MultiWayDepthNode
  *
  */
-public interface DepthExtension {
+public interface SizeExtension {
 
-	public void recount(int possibleMax);
+	public int getTreeSize();
+	public void setTreeSize(int treeSize);
+	public void updateTreeSize(int treeSizeToUpdate);
 	
 }

@@ -2,7 +2,7 @@
 		toInjectNames = {
 			genlib.evolution.fitness.TestFit.initName,
 			genlib.evolution.fitness.tree.TreeAccuracyFitness.initName,
-			genlib.evolution.fitness.tree.look.TreeDepthFitness.initName,
+			genlib.evolution.fitness.tree.look.TreeSizeFitness.initName,
 			genlib.evolution.fitness.tree.look.TreeHeightFitness.initName,
 			genlib.evolution.fitness.tree.confusion.TreeFNFitness.initName,
 			genlib.evolution.fitness.tree.confusion.TreeFPFitness.initName,
@@ -16,7 +16,7 @@
 		toInjectClasses = {
 			genlib.evolution.fitness.TestFit.class,
 			genlib.evolution.fitness.tree.TreeAccuracyFitness.class,
-			genlib.evolution.fitness.tree.look.TreeDepthFitness.class,
+			genlib.evolution.fitness.tree.look.TreeSizeFitness.class,
 			genlib.evolution.fitness.tree.look.TreeHeightFitness.class,
 			genlib.evolution.fitness.tree.confusion.TreeFNFitness.class,
 			genlib.evolution.fitness.tree.confusion.TreeFPFitness.class,

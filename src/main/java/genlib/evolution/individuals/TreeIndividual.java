@@ -1,18 +1,20 @@
 package genlib.evolution.individuals;
 
 import genlib.evolution.fitness.FitnessFunction;
+import genlib.structures.extensions.HeightExtension;
+import genlib.structures.extensions.SizeExtension;
 import genlib.structures.trees.BinaryDepthNode;
 import genlib.structures.trees.BinaryNode;
 import genlib.structures.trees.MultiWayDepthNode;
 import genlib.structures.trees.MultiWayNode;
 import genlib.structures.trees.Node;
+import genlib.utils.Utils;
 
 public class TreeIndividual extends Individual {	
 	
 	/** for serialization */
 	private static final long serialVersionUID = -3453723130233326900L;
-	protected Node root;
-	protected int numNodes, numLeaves; 
+	protected Node root;	
 
 	public TreeIndividual(TreeIndividual toCopy) {
 		this.root = toCopy.root.copy();
@@ -55,16 +57,28 @@ public class TreeIndividual extends Individual {
 	 * Get size of a created tree individual.
 	 * @return Size of tree in this individual
 	 */
-	public double getTreeSize() {
-		return root.getTreeHeight();		
+	public double getTreeHeight() {
+		if (root instanceof HeightExtension) {
+			return ((HeightExtension) root).getTreeHeight();
+		} else {			
+			return Utils.computeHeight(root);
+		}
+	}
+	
+	public int getTreeSize() {
+		if (root instanceof SizeExtension) {
+			return ((SizeExtension) root).getTreeSize();
+		} else {			
+			return Utils.computeSize(root);
+		}
 	}
 	
 	public int getNumNodes() {
-		return numNodes;
+		return 0;
 	}
 	
 	public int getNumLeaves() {
-		return numLeaves;
+		return 0;
 	}
 
 	@Override

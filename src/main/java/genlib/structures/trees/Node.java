@@ -23,9 +23,6 @@ public interface Node extends Serializable {
 	public void setParent(Node parent);
 	public boolean isLeaf();
 	public void makeLeaf();
-	public double getCriteriaValue();
-	public void setTreeHeightForced(int depth);
-	public int getTreeHeight();	
 	public Node copy();
 	
 	

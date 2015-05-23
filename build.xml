@@ -18,6 +18,7 @@
 	</macrodef>
 
 	<target name="do-deploy">
+		<delete dir="${weka.genlib.path}" />
 		<copydir src="./src/main/java/genlib" dest="${weka.genlib.path}" />
 		<delete dir="./build/libs" />
 		<delete file="./build/classes/main/GenLib.log" />

@@ -9,7 +9,7 @@ import genlib.evolution.fitness.comparators.PriorityFitnessComparator;
 import genlib.evolution.fitness.comparators.SingleFitnessComparator;
 import genlib.evolution.fitness.comparators.WeightedFitnessComparator;
 import genlib.evolution.fitness.tree.TreeAccuracyFitness;
-import genlib.evolution.fitness.tree.look.TreeDepthFitness;
+import genlib.evolution.fitness.tree.look.TreeSizeFitness;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.structures.Data;
 import genlib.structures.trees.MultiWayDepthNode;
@@ -125,7 +125,7 @@ public class TestComparators {
 		FitnessFunction<TreeIndividual> accFunction = new TreeAccuracyFitness();
 		accFunction.setIndex(0);
 		accFunction.setData(wekaData);
-		FitnessFunction<TreeIndividual> depthFunction = new TreeDepthFitness();
+		FitnessFunction<TreeIndividual> depthFunction = new TreeSizeFitness();
 		depthFunction.setIndex(1);
 
 		ArrayList<FitnessFunction<TreeIndividual>> fitFuncs = new ArrayList<>();
@@ -207,7 +207,7 @@ public class TestComparators {
 		FitnessFunction<TreeIndividual> accFunction = new TreeAccuracyFitness();
 		accFunction.setIndex(0);
 		accFunction.setData(wekaData);
-		FitnessFunction<TreeIndividual> depthFunction = new TreeDepthFitness();
+		FitnessFunction<TreeIndividual> depthFunction = new TreeSizeFitness();
 		depthFunction.setIndex(1);
 
 		ArrayList<FitnessFunction<TreeIndividual>> fitFuncs = new ArrayList<>();
@@ -234,7 +234,7 @@ public class TestComparators {
 		FitnessFunction<TreeIndividual> accFunction = new TreeAccuracyFitness();
 		accFunction.setIndex(0);
 		accFunction.setData(wekaData);
-		FitnessFunction<TreeIndividual> depthFunction = new TreeDepthFitness();
+		FitnessFunction<TreeIndividual> depthFunction = new TreeSizeFitness();
 		depthFunction.setIndex(1);
 
 		ArrayList<FitnessFunction<TreeIndividual>> fitFuncs = new ArrayList<>();
@@ -277,7 +277,7 @@ public class TestComparators {
 		FitnessFunction<TreeIndividual> accFunction = new TreeAccuracyFitness();
 		accFunction.setIndex(0);
 		accFunction.setData(wekaData);
-		FitnessFunction<TreeIndividual> depthFunction = new TreeDepthFitness();
+		FitnessFunction<TreeIndividual> depthFunction = new TreeSizeFitness();
 		depthFunction.setIndex(1);
 
 		ArrayList<FitnessFunction<TreeIndividual>> fitFuncs = new ArrayList<>();

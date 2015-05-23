@@ -229,6 +229,33 @@ public class Utils {
 	}
 
 	/**
+	 * Method which computes size of a tree given by parameter root. Root must
+	 * be of type Node.
+	 * 
+	 * @param root
+	 *            Root node of a tree
+	 * @return Size of given tree
+	 */
+	public static int computeSize(Node root) {
+		if (root == null) {
+			return 0;
+		}
+		
+		if (root.isLeaf()) {
+			return 1;
+		}
+		
+		int size = 1;
+		
+		for (Node child : root.getChilds()) {
+			int n = computeSize(child);
+			size += n;
+		}
+		
+		return size;
+	}
+	
+	/**
 	 * NOT IMPLEMENTED YET
 	 * 
 	 * @param data

@@ -4,9 +4,6 @@ import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.locales.PermMessages;
 import genlib.structures.Data;
-import genlib.structures.extensions.DepthExtension;
-import genlib.structures.trees.Node;
-import genlib.utils.Utils;
 
 public class TreeHeightFitness extends FitnessFunction<TreeIndividual> {
 	/** for serialization */
@@ -28,14 +25,7 @@ public class TreeHeightFitness extends FitnessFunction<TreeIndividual> {
 			return individual.getFitnessValue(index);
 		}
 
-		double height = 0;
-
-		if (individual.getRootNode() instanceof DepthExtension) {
-			height = individual.getRootNode().getTreeHeight();
-		} else {
-			Node root = individual.getRootNode();
-			height = Utils.computeHeight(root);
-		}
+		double height = individual.getTreeHeight();
 		individual.setFitnessValue(index, height == 0 ? 2 : 1 / height);
 		return individual.getFitnessValue(index);
 	}
@@ -55,12 +45,12 @@ public class TreeHeightFitness extends FitnessFunction<TreeIndividual> {
 
 	@Override
 	public String objectInfo() {
-		return String.format(PermMessages._fit_format, initName, PermMessages._blank_param);
+		return String.format(PermMessages._fit_format, initName,
+				PermMessages._blank_param);
 	}
 
-	
 	@Override
-	public boolean canHandleNumeric() { 
+	public boolean canHandleNumeric() {
 		return true;
 	}
 }

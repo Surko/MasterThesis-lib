@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.structures.data.GenLibInstances;
+import genlib.structures.extensions.HeightExtension;
 import genlib.structures.trees.Node;
 import genlib.utils.Utils;
 import genlib.utils.Utils.Sign;
@@ -130,7 +131,7 @@ public class TestWekaUtils {
 		individual = WekaUtils.constructTreeIndividual(sTree, 21,
 				wekaData.numInstances(), attrIndexMap, attrValueIndexMap, true);
 		root = individual.getRootNode();
-		assertTrue(root.getTreeHeight() == 7);
+		assertTrue(((HeightExtension)root).getTreeHeight() == 7);
 	}
 
 }

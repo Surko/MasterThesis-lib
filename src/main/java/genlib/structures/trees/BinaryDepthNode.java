@@ -1,25 +1,77 @@
 package genlib.structures.trees;
 
-import genlib.structures.extensions.DepthExtension;
+import genlib.exceptions.NodeCreationException;
+import genlib.locales.TextResource;
+import genlib.structures.extensions.HeightExtension;
 import genlib.utils.Utils.Sign;
 
-public class BinaryDepthNode extends BinaryNode implements DepthExtension {
+public class BinaryDepthNode extends BinaryNode implements HeightExtension {
 
 	/** for serialization */
 	private static final long serialVersionUID = -5699769468571434662L;
+	protected int treeHeight = 0;
 
+	/**
+	 * Static factory that creates leaf with value of classification. It only
+	 * sets this values because all other fields are defaultly set.
+	 * 
+	 * @param value
+	 *            value of classification
+	 * @return node leaf
+	 */
+	public static BinaryDepthNode makeLeaf(double value) {
+		BinaryDepthNode leaf = new BinaryDepthNode();
+		leaf.value = value;
+		return leaf;
+	}
+
+	/**
+	 * Static factory that creates node with two childs, attribute on which to
+	 * split sign of split and value of attribute on which to split
+	 * 
+	 * @param childCount
+	 *            number of childs
+	 * @param attribute
+	 *            split attribute
+	 * @param sign
+	 *            split sign
+	 * @param value
+	 *            split value of attribute
+	 * @return node
+	 */
+	public static BinaryDepthNode makeNode(int attribute, Sign sign,
+			double value) {
+		if (attribute == -1) {
+			throw new NodeCreationException(String.format(
+					TextResource.getString("eNodeCreation"), "attribute"));
+		}
+
+		BinaryDepthNode node = new BinaryDepthNode();
+		node.childs = new BinaryDepthNode[2];
+		node.sign = sign;
+		node.attribute = attribute;
+		node.treeHeight = 1;
+		node.treeSize = 3;
+		return node;
+	}
+
+	/**
+	 * Parameterless constructor for serialization and static methods
+	 */
 	public BinaryDepthNode() {
 		super();
 	}
 
-	public BinaryDepthNode(BinaryNode toCopy) {
+	public BinaryDepthNode(BinaryDepthNode toCopy) {
 		this.attribute = toCopy.attribute;
 		this.value = toCopy.value;
 		this.treeHeight = toCopy.treeHeight;
 		if (!toCopy.isLeaf()) {
 			this.childs = new BinaryDepthNode[2];
-			this.childs[0] = new BinaryDepthNode(toCopy.childs[0]);
-			this.childs[1] = new BinaryDepthNode(toCopy.childs[1]);
+			this.childs[0] = new BinaryDepthNode(
+					(BinaryDepthNode) toCopy.childs[0]);
+			this.childs[1] = new BinaryDepthNode(
+					(BinaryDepthNode) toCopy.childs[1]);
 			this.childs[0].parent = this;
 			this.childs[1].parent = this;
 		}
@@ -29,13 +81,19 @@ public class BinaryDepthNode extends BinaryNode implements DepthExtension {
 		super(attribute, sign, value);
 	}
 
+	// GETTERS
+	public int getTreeHeight() {
+		return treeHeight;
+	}
+	
+	// SETTERS
 	@Override
 	public void setChildAt(int index, Node node) {
 		if (childs == null) {
-			childs = new BinaryNode[2];
+			childs = new BinaryDepthNode[2];
 		}
-		
-		int nodeExtendDepth = node.getTreeHeight() + 1;
+
+		int nodeExtendDepth = ((HeightExtension) node).getTreeHeight() + 1;
 		if (childs[index] == null) {
 			// set the child
 			childs[index] = (BinaryNode) node;
@@ -47,7 +105,7 @@ public class BinaryDepthNode extends BinaryNode implements DepthExtension {
 				this.treeHeight = nodeExtendDepth;
 				// if parent not null => propagate to parent
 				if (parent != null)
-					parent.recount(treeHeight + 1);
+					((HeightExtension)parent).updateTreeHeight(treeHeight + 1);
 			}
 		} else {
 			// set the child
@@ -57,10 +115,42 @@ public class BinaryDepthNode extends BinaryNode implements DepthExtension {
 
 			// node depth has to be different
 			if (nodeExtendDepth != treeHeight) {
-				recount(nodeExtendDepth);
+				updateTreeHeight(nodeExtendDepth);
 
 				if (parent != null)
-					parent.recount(treeHeight + 1);
+					((HeightExtension)parent).updateTreeHeight(treeHeight + 1);
+			}
+		}
+	}
+	
+	/**
+	 * Reconfigure/recounts actual depth of a tree from its childs.
+	 */
+	public void updateTreeHeight(int possibleMax) {				
+		if (possibleMax > treeHeight) {
+			this.treeHeight = possibleMax;
+			if (parent != null) {
+				((HeightExtension) parent).updateTreeHeight(treeHeight);
+			}
+			return;
+		}
+		
+		int max = -1;
+		if (childs[0] == null) {
+			max = 0;
+		} else {
+			max = ((BinaryDepthNode)childs[0]).treeHeight;
+		}
+		
+		if (childs[1] != null) {					
+			max = Math.max(max, ((BinaryDepthNode)childs[0]).treeHeight);
+		}		
+
+		max++;
+		if (max != this.treeHeight) {
+			this.treeHeight = max;
+			if (parent != null) {
+				((HeightExtension) parent).updateTreeHeight(treeHeight);
 			}
 		}
 	}
@@ -68,27 +158,42 @@ public class BinaryDepthNode extends BinaryNode implements DepthExtension {
 	@Override
 	public void setChilds(Node[] childs) {
 		super.setChilds(childs);
-		recount(0);
-		if (parent != null) {
-			parent.recount(treeHeight);
-		}
+		updateTreeHeight(0);	
 	}
 
+	// OTHER METHODS
+	
+	/**
+	 * {@inheritDoc}. Calling method {@link BinaryNode#makeLeaf()}
+	 */
+	public void makeLeaf() {
+		super.makeLeaf();
+		this.treeHeight = 0;
+	}
+	
+	/**
+	 * Method which will clear the childs in this node. Treeheight of this node
+	 * will be reseted to zero (it behaves as normal leaf). UpdateTreeHeight for
+	 * this parent will be called.
+	 * 
+	 */
 	@Override
 	public void clearChilds() {
 		super.clearChilds();
+		treeHeight = 0;
 		if (parent != null)
-			parent.recount(0);
+			((HeightExtension) parent).updateTreeHeight(1);
 	}
 
 	public BinaryDepthNode copy() {
 		return new BinaryDepthNode(this);
 	}
-	
+
 	@Override
-	public boolean equals(Object obj) {		
+	public boolean equals(Object obj) {
 		// NO HASH COMPUTING
-		return (((BinaryDepthNode)obj).treeHeight == this.treeHeight) && super.equals(obj);
+		return (((BinaryDepthNode) obj).treeHeight == this.treeHeight)
+				&& super.equals(obj);
 	}
 
 }

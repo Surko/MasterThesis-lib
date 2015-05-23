@@ -4,15 +4,12 @@ import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.locales.PermMessages;
 import genlib.structures.Data;
-import genlib.structures.extensions.DepthExtension;
-import genlib.structures.trees.Node;
-import genlib.utils.Utils;
 
-public class TreeDepthFitness extends FitnessFunction<TreeIndividual> {
+public class TreeSizeFitness extends FitnessFunction<TreeIndividual> {
 
 	/** for serialization */
 	private static final long serialVersionUID = -3857040653870276306L;
-	public static final String initName = "tDepth";
+	public static final String initName = "tSize";
 
 	/**
 	 * This method that overrides computeFitness from FitnessFunction class
@@ -29,15 +26,9 @@ public class TreeDepthFitness extends FitnessFunction<TreeIndividual> {
 			return individual.getFitnessValue(index);
 		}
 
-		double height = 0;
+		double size = individual.getTreeSize();
 
-		if (individual.getRootNode() instanceof DepthExtension) {
-			height = individual.getRootNode().getTreeHeight() - 1;
-		} else {
-			Node root = individual.getRootNode();
-			height = Utils.computeHeight(root) - 1;
-		}
-		individual.setFitnessValue(index, height == 0 ? 2 : 1 / height);
+		individual.setFitnessValue(index, 1d / size);
 		return individual.getFitnessValue(index);
 	}
 
@@ -56,9 +47,10 @@ public class TreeDepthFitness extends FitnessFunction<TreeIndividual> {
 
 	@Override
 	public String objectInfo() {
-		return String.format(PermMessages._fit_format, initName, PermMessages._blank_param);
+		return String.format(PermMessages._fit_format, initName,
+				PermMessages._blank_param);
 	}
-	
+
 	@Override
 	public boolean canHandleNumeric() {
 		return true;

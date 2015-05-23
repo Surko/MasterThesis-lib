@@ -1,7 +1,7 @@
 package tests.trees;
 
 
-import genlib.structures.extensions.DepthExtension;
+import genlib.structures.extensions.HeightExtension;
 import genlib.structures.trees.BinaryDepthNode;
 import genlib.structures.trees.MultiWayDepthNode;
 import genlib.utils.Utils;
@@ -15,7 +15,7 @@ public class TestTrees {
 	@Test
 	public void testNodeCreation() {
 		BinaryDepthNode bn = new BinaryDepthNode();
-		assertTrue(bn instanceof DepthExtension);
+		assertTrue(bn instanceof HeightExtension);
 		assertTrue(bn.getTreeHeight() == 1);
 		assertTrue(bn.getAttribute() == -1);
 		assertTrue(bn.getChildCount() == 2);
@@ -23,7 +23,7 @@ public class TestTrees {
 		assertTrue(bn.isLeaf());
 		assertTrue(bn.getParent() == null);
 		MultiWayDepthNode mn = new MultiWayDepthNode(5);
-		assertTrue(mn instanceof DepthExtension);
+		assertTrue(mn instanceof HeightExtension);
 		assertTrue(mn.getTreeHeight() == 1);
 		assertTrue(mn.getAttribute() == -1);
 		assertTrue(mn.getChildCount() == 5);

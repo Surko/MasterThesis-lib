@@ -1,43 +1,79 @@
 package genlib.structures.trees;
 
+import genlib.exceptions.NodeCreationException;
+import genlib.locales.TextResource;
+import genlib.structures.extensions.SizeExtension;
 import genlib.utils.Utils.Sign;
 
-public class MultiWayNode implements Node {
+public class MultiWayNode implements Node, SizeExtension {
 
 	/** for serialization */
 	private static final long serialVersionUID = -6016127157752225320L;
 	protected MultiWayNode parent;
 	protected MultiWayNode[] childs;
-	protected int treeHeight = 0;
+	protected int treeSize = 1;
 	protected int attribute = -1;
 	protected double value = Integer.MIN_VALUE;
 	protected double criteriaValue = 0;
 	protected Sign sign;
 
+	/**
+	 * Static factory that creates leaf with value of classification. It only
+	 * sets this values because all other fields are defaultly set.
+	 * 
+	 * @param value
+	 *            value of classification
+	 * @return node leaf
+	 */
 	public static MultiWayNode makeLeaf(double value) {
 		MultiWayNode leaf = new MultiWayNode();
-		leaf.setAttribute(-1);
-		leaf.setValue(value);
-		return leaf;		
+		leaf.value = value;
+		return leaf;
 	}
-	
-	public static MultiWayNode makeNode(int childCount, int attribute, Sign sign, double value) {
+
+	/**
+	 * Static factory that creates node with childs, attribute on which to split
+	 * sign of split and value of attribute on which to split
+	 * 
+	 * @param childCount
+	 *            number of childs
+	 * @param attribute
+	 *            split attribute
+	 * @param sign
+	 *            split sign
+	 * @param value
+	 *            split value of attribute
+	 * @return node
+	 */
+	public static MultiWayNode makeNode(int childCount, int attribute,
+			Sign sign, double value) {
+		if (attribute == -1) {
+			throw new NodeCreationException(String.format(
+					TextResource.getString("eNodeCreation"), "attribute"));
+		}
+
+		if (childCount <= 0) {
+			throw new NodeCreationException(String.format(
+					TextResource.getString("eNodeCreation"), "childCount"));
+		}
+
 		MultiWayNode node = new MultiWayNode();
-		node.setChildCount(childCount);
-		node.setAttribute(-1);
-		node.setSign(sign);
-		node.setValue(value);
-		return node;		
+		node.childs = new MultiWayNode[childCount];
+		node.sign = sign;
+		node.attribute = attribute;
+		return node;
 	}
-	
+
+	/**
+	 * Parameterless constructor for serialization and static methods
+	 */
 	public MultiWayNode() {
-		this.treeHeight = 1;
 	}
 
 	public MultiWayNode(MultiWayNode toCopy) {
 		this.attribute = toCopy.attribute;
 		this.value = toCopy.value;
-		this.treeHeight = toCopy.treeHeight;
+		this.treeSize = toCopy.treeSize;
 		this.sign = toCopy.sign;
 		if (!toCopy.isLeaf()) {
 			this.childs = new MultiWayNode[toCopy.childs.length];
@@ -48,39 +84,55 @@ public class MultiWayNode implements Node {
 		}
 	}
 
-	public MultiWayNode(int childLength) {
-		this.childs = new MultiWayNode[childLength];
-		this.treeHeight = 1;
+	public MultiWayNode(int childCount, int attribute, Sign sign, double value) {
+		if (childCount > 0 && attribute != -1) {
+			this.childs = new MultiWayNode[childCount];
+			this.sign = sign;
+			this.attribute = attribute;
+		} else {
+			this.value = value;
+			this.treeSize = 1;
+		}
 	}
-	
-	public MultiWayNode(int attribute, Sign sign, double value) {
-		this.sign = sign;
-		this.attribute = attribute;
-		this.value = value;
-		this.treeHeight = 1;
-	}
-	
+
 	/**** SETTERS ****/
-	
+
 	/**
 	 * Set node as child at index.
-	 * @param index Index in an array of a new child
-	 * @param node Child to add 
+	 * 
+	 * @param index
+	 *            Index in an array of a new child
+	 * @param node
+	 *            Child to add
 	 */
 	@Override
 	public void setChildAt(int index, Node node) {
 		if (childs == null) {
 			return;
 		}
-		
-		childs[index] = (MultiWayNode)node;	
+
+		int oldTreeSize = 0;
+		int newTreeSize = 0;
+
+		if (childs[index] != null) {
+			oldTreeSize = childs[index].getTreeSize();
+		}
+
+		childs[index] = (MultiWayNode) node;
+		newTreeSize = childs[index].getTreeSize();
 		node.setParent(this);
+
+		// it will serve the purpose of diff
+		newTreeSize = newTreeSize - oldTreeSize;
+		if (newTreeSize != 0) {
+			updateTreeSize(newTreeSize);
+		}
 	}
 
 	public void setAttribute(int attribute) {
 		this.attribute = attribute;
 	}
-	
+
 	public void setValue(double value) {
 		this.value = value;
 	}
@@ -88,39 +140,48 @@ public class MultiWayNode implements Node {
 	public void setSign(Sign sign) {
 		this.sign = sign;
 	}
-	
+
 	public void setChildCount(int count) {
 		if (count > 0)
 			this.childs = new MultiWayNode[count];
-	}	
+	}
 
 	public void setChilds(Node[] childs) {
-		this.childs = (MultiWayNode[]) childs;		
+		this.childs = (MultiWayNode[]) childs;
+		this.treeSize = 1;
+		for (MultiWayNode node : this.childs) {			
+			treeSize += node.treeSize;
+		}
 	}
 
 	public void setParent(Node parent) {
 		this.parent = (MultiWayNode) parent;
-	}	
-
-	public void setTreeHeightForced(int treeDepth) {
-		this.treeHeight = treeDepth;
 	}
 
-	
+	@Override
+	public void setTreeSize(int treeSize) {
+		if (parent != null) {
+			// TODO
+		}
+		this.treeSize = treeSize;
+	}
+
 	/**** GETTERS ****/
-	
+
 	/**
 	 * Getter for a specific child at index
+	 * 
 	 * @return Child (MultiWayNode) at index
 	 */
 	public MultiWayNode getChildAt(int index) {
-		return childs[index];		
+		return childs[index];
 	}
 
 	/**
-	 * Method which will return childs at this node. Child amount is two if the attribute
-	 * at this node is numeric or this amount depends on different values of this attribute if 
-	 * it's nominal.
+	 * Method which will return childs at this node. Child amount is two if the
+	 * attribute at this node is numeric or this amount depends on different
+	 * values of this attribute if it's nominal.
+	 * 
 	 * @return childs at this node
 	 */
 	public MultiWayNode[] getChilds() {
@@ -129,6 +190,7 @@ public class MultiWayNode implements Node {
 
 	/**
 	 * Gets attributes index at this node.
+	 * 
 	 * @return attribute index
 	 */
 	public int getAttribute() {
@@ -137,7 +199,8 @@ public class MultiWayNode implements Node {
 
 	/**
 	 * Gets values at this node. Value is class index if it's leaf or decision
-	 * boundary if attribute at this node is numeric. 
+	 * boundary if attribute at this node is numeric.
+	 * 
 	 * @return value at this node.
 	 */
 	public double getValue() {
@@ -146,15 +209,17 @@ public class MultiWayNode implements Node {
 
 	/**
 	 * Gets sign at this node. It's used in conjuction with value field.
+	 * 
 	 * @see Sign
 	 * @return sign at this node
 	 */
 	public Sign getSign() {
 		return sign;
 	}
-	
+
 	/**
 	 * Gets the parent of this node. For root it's null.
+	 * 
 	 * @return parent(node) of this node
 	 */
 	public Node getParent() {
@@ -163,6 +228,7 @@ public class MultiWayNode implements Node {
 
 	/**
 	 * Method which returns if this node is considered a leaf.
+	 * 
 	 * @return true/false == leaf/not-leaf
 	 */
 	public boolean isLeaf() {
@@ -175,7 +241,6 @@ public class MultiWayNode implements Node {
 	public void makeLeaf() {
 		this.attribute = -1;
 		this.childs = null;
-		this.treeHeight = 1;
 	}
 
 	/**
@@ -192,6 +257,7 @@ public class MultiWayNode implements Node {
 
 	/**
 	 * Gets the criteria value computed at this node
+	 * 
 	 * @return criteria value at this node
 	 */
 	public double getCriteriaValue() {
@@ -200,6 +266,7 @@ public class MultiWayNode implements Node {
 
 	/**
 	 * Gets the amount of children at this node.
+	 * 
 	 * @return amount of children nodes
 	 */
 	public int getChildCount() {
@@ -207,17 +274,22 @@ public class MultiWayNode implements Node {
 	}
 
 	/**
-	 * Getter which provides treeHeight of this tree.
-	 * @return height of tree 
+	 * Getter which provides treeSize of this tree.
+	 * 
+	 * @return size of tree
 	 */
-	@Override
-	public int getTreeHeight() {
-		return treeHeight;
+	public int getTreeSize() {
+		return treeSize;
 	}
 
+/**** OTHER METHODS ****/
 
-	/**** OTHER METHODS ****/
-	
+	@Override
+	public void updateTreeSize(int treeSizeToUpdate) {
+		this.treeSize += treeSizeToUpdate;
+		parent.updateTreeSize(treeSizeToUpdate);
+	}
+
 	/**
 	 * Clear/Reset all the childs to null. Changes depth and parent depth
 	 * because of this reset.
@@ -225,78 +297,53 @@ public class MultiWayNode implements Node {
 	@Override
 	public void clearChilds() {
 		childs = new MultiWayNode[childs.length];
-		treeHeight = 1;		
 	}
 
 	/**
-	 * Reconfigure/recounts actual depth of a tree from its childs.
-	 */
-	public void recount(int possibleMax) {
-		if (possibleMax > treeHeight) {
-			this.treeHeight = possibleMax;
-			if (parent != null) {
-				parent.recount(treeHeight);
-			}
-			return;
-		}
-		int max = -1;
-		for (MultiWayNode node : childs) {
-			if (node == null)
-				continue;
-			max = node.getTreeHeight() > max ? node.getTreeHeight() : max;
-		}
-		max++;
-		if (max != this.treeHeight) {
-			this.treeHeight = max;
-			if (parent != null) {
-				parent.recount(treeHeight);
-			}
-		}
-	}
-
-	/**
-	 * Making copy of this object via calling copy constructor and returning 
-	 * new instance.
+	 * Making copy of this object via calling copy constructor and returning new
+	 * instance.
+	 * 
 	 * @return new, copied instance of this object
 	 */
 	public MultiWayNode copy() {
 		return new MultiWayNode(this);
 	}
 
-	
 	/**
-	 * Equal method for this type of instances which provide correct comparison 
-	 * which was intended for it. There is the comparison of main fields such as attribute, 
-	 * value, sign, criteria value and childs of this node. Equal method is called for each child
-	 * respectively. 
+	 * Equal method for this type of instances which provide correct comparison
+	 * which was intended for it. There is the comparison of main fields such as
+	 * attribute, value, sign, criteria value and childs of this node. Equal
+	 * method is called for each child respectively.
 	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
 		}
-		
-		MultiWayNode node = ((MultiWayNode)obj);
-		
-		if (this.attribute != node.attribute || this.value != node.value ||
-				this.sign != node.sign || this.criteriaValue != node.criteriaValue) {									
+
+		MultiWayNode node = ((MultiWayNode) obj);
+
+		if (this.attribute != node.attribute || this.value != node.value
+				|| this.sign != node.sign
+				|| this.criteriaValue != node.criteriaValue) {
 			return false;
 		}
-		
-		if ((this.childs == null && node.childs != null) || (this.childs != null && node.childs == null)) {
+
+		if ((this.childs == null && node.childs != null)
+				|| (this.childs != null && node.childs == null)) {
 			return false;
 		}
-		
-		if (this.childs != null && node.childs != null && this.childs.length == node.childs.length) {
-			for (int i = 0; i < this.childs.length; i++) {								
+
+		if (this.childs != null && node.childs != null
+				&& this.childs.length == node.childs.length) {
+			for (int i = 0; i < this.childs.length; i++) {
 				if (!this.childs[i].equals(node.childs[i]))
 					return false;
 			}
-		}			
-		
+		}
+
 		return true;
-		
+
 	}
 
-	
 }

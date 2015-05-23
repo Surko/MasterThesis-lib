@@ -10,7 +10,7 @@ import genlib.evolution.fitness.tree.confusion.TreePrevalenceFitness;
 import genlib.evolution.fitness.tree.confusion.TreeRecallFitness;
 import genlib.evolution.fitness.tree.confusion.TreeTNFitness;
 import genlib.evolution.fitness.tree.confusion.TreeTPFitness;
-import genlib.evolution.fitness.tree.look.TreeDepthFitness;
+import genlib.evolution.fitness.tree.look.TreeSizeFitness;
 import genlib.evolution.fitness.tree.look.TreeHeightFitness;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.structures.Data;
@@ -121,7 +121,7 @@ public class TestFitness {
 		function.setParam("INDEX,0,AVERAGE,WEIGHTED");
 		assertTrue(function.objectInfo().equals("tAcc INDEX,0"));
 
-		function = new TreeDepthFitness();
+		function = new TreeSizeFitness();
 		assertTrue(function.objectInfo().equals("tDepth x"));
 		
 		function = new TreeHeightFitness();
@@ -226,7 +226,7 @@ public class TestFitness {
 
 	@Test
 	public void testDepthFitness() {
-		FitnessFunction<TreeIndividual> function = new TreeDepthFitness();
+		FitnessFunction<TreeIndividual> function = new TreeSizeFitness();
 		function.setIndex(1);
 		function.setData(wekaData);
 		int fIndex = function.getIndex();

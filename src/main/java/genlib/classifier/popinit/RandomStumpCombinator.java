@@ -184,8 +184,7 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 			childs[childIndex].setParent(node);
 		}
 		// Can do because we know that we are combining stumps with depth = 1
-		combineNodes(childs, maxDepth - 2);
-		node.setTreeHeightForced(maxDepth);
+		combineNodes(childs, maxDepth - 2);		
 	}
 
 	private void combineNodes(Node[] nodes, int d) {
@@ -201,9 +200,7 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 				childs[childIndex] = chosen.getRootNode().copy();
 				childs[childIndex].setParent(nodes[k]);
 			}
-			combineNodes(childs, d - 1);
-			nodes[k].setTreeHeightForced(d);
-
+			combineNodes(childs, d - 1);			
 		}
 
 	}
