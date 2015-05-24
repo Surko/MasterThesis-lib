@@ -89,7 +89,7 @@ public class MultiWayNode implements Node, SizeExtension {
 	public MultiWayNode(int childCount) {
 		this(childCount, 0, null, Integer.MIN_VALUE);
 	}
-	
+
 	public MultiWayNode(int childCount, int attribute, Sign sign, double value) {
 		if (childCount > 0 && attribute != -1) {
 			this.childs = new MultiWayNode[childCount];
@@ -154,9 +154,9 @@ public class MultiWayNode implements Node, SizeExtension {
 	public void setChilds(Node[] childs) {
 		this.childs = (MultiWayNode[]) childs;
 		this.treeSize = 1;
-		for (MultiWayNode node : this.childs) {			
+		for (MultiWayNode node : this.childs) {
 			treeSize += node.treeSize;
-		}		
+		}
 	}
 
 	public void setParent(Node parent) {
@@ -287,7 +287,7 @@ public class MultiWayNode implements Node, SizeExtension {
 		return treeSize;
 	}
 
-/**** OTHER METHODS ****/
+	/**** OTHER METHODS ****/
 
 	@Override
 	public void updateTreeSize(int treeSizeToUpdate) {
@@ -298,12 +298,14 @@ public class MultiWayNode implements Node, SizeExtension {
 	}
 
 	/**
-	 * Clear/Reset all the childs to null. Changes depth and parent depth
+	 * Clear/Reset all the childs to null. Changes treeSize and parents treeSize
 	 * because of this reset.
 	 */
 	@Override
 	public void clearChilds() {
 		childs = new MultiWayNode[childs.length];
+		int treeSizeToUpdate = 1 - treeSize;
+		updateTreeSize(treeSizeToUpdate);
 	}
 
 	/**

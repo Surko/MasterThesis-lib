@@ -12,7 +12,7 @@ public class BinaryNode implements Node, SizeExtension {
 	private static final long serialVersionUID = -5557876005762565687L;
 	protected BinaryNode parent;
 	protected BinaryNode[] childs;
-	protected int treeSize;
+	protected int treeSize = 1;
 	protected int attribute = -1;
 	protected double value = Integer.MIN_VALUE;
 	protected double criteriaValue;
@@ -55,7 +55,7 @@ public class BinaryNode implements Node, SizeExtension {
 		BinaryNode node = new BinaryNode();
 		node.childs = new BinaryNode[2];
 		node.sign = sign;
-		node.attribute = attribute;	
+		node.attribute = attribute;
 		node.value = value;
 		return node;
 	}
@@ -82,7 +82,7 @@ public class BinaryNode implements Node, SizeExtension {
 	public BinaryNode(int attribute, Sign sign, double value) {
 		if (attribute != -1) {
 			this.attribute = attribute;
-			this.sign = sign;			
+			this.sign = sign;
 		}
 		this.value = value;
 	}
@@ -202,12 +202,14 @@ public class BinaryNode implements Node, SizeExtension {
 	}
 
 	/**
-	 * Clear/Reset all the childs to null. Changes depth and parent depth
+	 * Clear/Reset all the childs to null. Changes treeSize and parents treeSize
 	 * because of this reset.
 	 */
 	@Override
 	public void clearChilds() {
 		childs = new BinaryNode[childs.length];
+		int treeSizeToUpdate = 1 - treeSize;
+		updateTreeSize(treeSizeToUpdate);
 	}
 
 	public BinaryNode copy() {

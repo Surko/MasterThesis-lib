@@ -88,14 +88,10 @@ public class BinaryDepthNode extends BinaryNode implements HeightExtension {
 	// SETTERS
 	@Override
 	public void setChildAt(int index, Node node) {
-		if (childs == null) {
-			throw new NotInitializedFieldException("field");
-		}
+		super.setChildAt(index, node);
 
 		int nodeExtendDepth = ((HeightExtension) node).getTreeHeight() + 1;
 		if (childs[index] == null) {
-			// set the child
-			childs[index] = (BinaryNode) node;
 			// set the parent of a child
 			node.setParent(this);
 			// only if node depth is bigger than up to now
@@ -107,8 +103,6 @@ public class BinaryDepthNode extends BinaryNode implements HeightExtension {
 					((HeightExtension)parent).updateTreeHeight(treeHeight + 1);
 			}
 		} else {
-			// set the child
-			childs[index] = (BinaryNode) node;
 			// set the parent of a child
 			node.setParent(this);
 

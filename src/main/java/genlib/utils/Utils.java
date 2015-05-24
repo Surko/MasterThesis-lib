@@ -201,6 +201,43 @@ public class Utils {
 	}
 
 	/**
+	 * Method which gets number of nodes of a given tree. Root must
+	 * be of type Node.
+	 * 
+	 * @param root
+	 *            Root node of a tree
+	 * @return Num nodes of given tree
+	 */
+	public static int computeNumNodes(Node root) {
+		if (root == null) {
+			return -1;
+		}
+
+		if (root.isLeaf()) {
+			return 0;
+		}
+
+		int numNodes = 0;
+		boolean node = false;
+
+		for (Node child : root.getChilds()) {
+			int n = computeNumNodes(child);
+			if (n == -1) {
+				continue;
+			}
+			node = true;
+			numNodes += n;			
+		}
+
+		if (node) {
+			return numNodes + 1;
+		}
+		
+		return 0;
+
+	}
+	
+	/**
 	 * Method which computes height of a tree given by parameter root. Root must
 	 * be of type Node.
 	 * 

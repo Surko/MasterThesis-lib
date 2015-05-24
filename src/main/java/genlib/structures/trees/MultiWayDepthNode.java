@@ -109,9 +109,7 @@ public class MultiWayDepthNode extends MultiWayNode implements HeightExtension {
 
 	// SETTERS
 	public void setChildAt(int index, Node node) {
-		if (childs == null) {
-			throw new NotInitializedFieldException("field");
-		}
+		super.setChildAt(index, node);
 
 		int nodeExtendDepth = ((HeightExtension) node).getTreeHeight() + 1;
 
