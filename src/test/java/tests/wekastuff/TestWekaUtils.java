@@ -118,7 +118,7 @@ public class TestWekaUtils {
 		assertTrue(root.getChildAt(1).getChildCount() == 2);
 		assertTrue(root.getChildAt(1).getAttribute() == 8);
 		assertEquals(root.getChildAt(1).getSign(), Sign.EQUALS);
-		assertTrue(Utils.computeHeight(root) == 7);
+		assertTrue(Utils.computeHeight(root) == 6);
 
 		Node n = root.getChildAt(1).getChildAt(1).getChildAt(0).getChildAt(1);
 		assertTrue(n.getAttribute() == 4);
@@ -126,12 +126,30 @@ public class TestWekaUtils {
 		assertTrue(n.getChildAt(0).isLeaf());
 		assertNull(n.getChildAt(0).getChilds());
 		assertTrue(n.getChildAt(0).getValue() == 1);
-		assertTrue(Utils.computeHeight(n) == 2);
+		assertTrue(Utils.computeHeight(n) == 1);
+		
+		n = root.getChildAt(1).getChildAt(0);
+		assertTrue(n.getAttribute() == 9);
+		assertTrue(n.getChildCount() == 2);
+		assertTrue(n.getChildAt(1).isLeaf());
+		assertNull(n.getChildAt(1).getChilds());
+		assertTrue(n.getChildAt(1).getValue() == 1);
+		assertTrue(Utils.computeHeight(n) == 4);
+		
+		n = root.getChildAt(1).getChildAt(1);
+		assertTrue(n.getAttribute() == 1);
+		assertTrue(n.getChildCount() == 2);
+		assertTrue(n.getChildAt(1).isLeaf());
+		assertNull(n.getChildAt(1).getChilds());
+		assertTrue(n.getChildAt(1).getValue() == 0);
+		assertTrue(Utils.computeHeight(n) == 3);
 
 		individual = WekaUtils.constructTreeIndividual(sTree, 21,
 				wekaData.numInstances(), attrIndexMap, attrValueIndexMap, true);
 		root = individual.getRootNode();
-		assertTrue(((HeightExtension)root).getTreeHeight() == 7);
+		assertTrue(((HeightExtension)root).getTreeHeight() == 6);
+		assertTrue(((HeightExtension)root.getChildAt(1).getChildAt(0)).getTreeHeight() == 4);
+		assertTrue(((HeightExtension)root.getChildAt(1).getChildAt(1)).getTreeHeight() == 3);
 	}
 
 }

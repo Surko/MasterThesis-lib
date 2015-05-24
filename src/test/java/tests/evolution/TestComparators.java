@@ -234,12 +234,12 @@ public class TestComparators {
 		FitnessFunction<TreeIndividual> accFunction = new TreeAccuracyFitness();
 		accFunction.setIndex(0);
 		accFunction.setData(wekaData);
-		FitnessFunction<TreeIndividual> depthFunction = new TreeSizeFitness();
-		depthFunction.setIndex(1);
+		FitnessFunction<TreeIndividual> sizeFunction = new TreeSizeFitness();
+		sizeFunction.setIndex(1);
 
 		ArrayList<FitnessFunction<TreeIndividual>> fitFuncs = new ArrayList<>();
 		fitFuncs.add(accFunction);
-		fitFuncs.add(depthFunction);
+		fitFuncs.add(sizeFunction);
 		FitnessFunction.registeredFunctions = fitFuncs.size();
 
 		comp.setFitFuncs(fitFuncs);
@@ -251,17 +251,24 @@ public class TestComparators {
 		assertTrue(comp.compare(testIndividual, testIndividual) == 0);
 		assertTrue(comp.compare(wekaIndividual, wekaIndividual) == 0);
 		// consistency
-		assertTrue(comp.compare(testIndividual, wekaIndividual) < 0);
-		assertTrue(comp.compare(wekaIndividual, testIndividual) > 0);
-		// transitivity
+		assertTrue(comp.compare(wekaIndividual, transIndividual) < 0);
+		assertTrue(comp.compare(transIndividual, wekaIndividual) > 0);
+		// transitivity, correct positions (descending) 
+		// wekaIndividual 0.9538095238095239
+		// transIndividual 0.8400000000000001
+		// testIndividual 0.6966666666666667		
+		assertTrue(comp.compare(wekaIndividual, transIndividual) < 0);
 		assertTrue(comp.compare(transIndividual, testIndividual) < 0);
-		assertTrue(comp.compare(testIndividual, wekaIndividual) < 0);
-		assertTrue(comp.compare(transIndividual, wekaIndividual) < 0);
+		assertTrue(comp.compare(wekaIndividual, testIndividual) < 0);
 
 		assertFalse(transIndividual.hasChanged());
 		assertFalse(testIndividual.hasChanged());
 		assertFalse(wekaIndividual.hasChanged());
 
+		System.out.println(wekaIndividual.getComplexFitness());
+		System.out.println(testIndividual.getComplexFitness());
+		System.out.println(transIndividual.getComplexFitness());
+		
 		assertTrue(Double.compare(1 * testIndividual.getFitnessValue(0) + 0.5
 				* testIndividual.getFitnessValue(1),
 				testIndividual.getComplexFitness()) == 0);

@@ -122,7 +122,7 @@ public class TestFitness {
 		assertTrue(function.objectInfo().equals("tAcc INDEX,0"));
 
 		function = new TreeSizeFitness();
-		assertTrue(function.objectInfo().equals("tDepth x"));
+		assertTrue(function.objectInfo().equals("tSize x"));
 		
 		function = new TreeHeightFitness();
 		assertTrue(function.objectInfo().equals("tHeight x"));
@@ -225,7 +225,7 @@ public class TestFitness {
 	}
 
 	@Test
-	public void testDepthFitness() {
+	public void testSizeFitness() {
 		FitnessFunction<TreeIndividual> function = new TreeSizeFitness();
 		function.setIndex(1);
 		function.setData(wekaData);
@@ -240,16 +240,15 @@ public class TestFitness {
 
 		assertTrue(f1 != 0);
 		assertTrue(f2 != 0);
-		assertTrue(Double.compare(f1, 1 / 1d) == 0);
-		assertTrue(Double.compare(f2, 1 / 6d) == 0);
+		assertTrue(Double.compare(f1, 1 / 3d) == 0);
+		assertTrue(Double.compare(f2, 1 / 21d) == 0);
 		assertTrue(testIndividual.getFitnessValue(fIndex) != 0);
 		assertTrue(wekaIndividual.getFitnessValue(fIndex) != 0);
 		assertTrue(testIndividual.getFitnessValue(fIndex) == f1);
 		assertTrue(wekaIndividual.getFitnessValue(fIndex) == f2);
 
 		assertTrue(testIndividual.hasChanged());
-		assertTrue(wekaIndividual.hasChanged());
-		assertTrue(function.objectInfo().equals("tDepth x"));
+		assertTrue(wekaIndividual.hasChanged());		
 	}
 
 	@Test
@@ -268,16 +267,15 @@ public class TestFitness {
 
 		assertTrue(f1 != 0);
 		assertTrue(f2 != 0);
-		assertTrue(Double.compare(f1, 1 / 2d) == 0);
-		assertTrue(Double.compare(f2, 1 / 7d) == 0);
+		assertTrue(Double.compare(f1, 1d) == 0);
+		assertTrue(Double.compare(f2, 1 / 6d) == 0);
 		assertTrue(testIndividual.getFitnessValue(fIndex) != 0);
 		assertTrue(wekaIndividual.getFitnessValue(fIndex) != 0);
 		assertTrue(testIndividual.getFitnessValue(fIndex) == f1);
 		assertTrue(wekaIndividual.getFitnessValue(fIndex) == f2);
 
 		assertTrue(testIndividual.hasChanged());
-		assertTrue(wekaIndividual.hasChanged());
-		assertTrue(function.objectInfo().equals("tHeight x"));
+		assertTrue(wekaIndividual.hasChanged());		
 	}
 
 	@Test

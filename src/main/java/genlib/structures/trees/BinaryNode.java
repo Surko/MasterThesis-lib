@@ -246,7 +246,9 @@ public class BinaryNode implements Node, SizeExtension {
 	@Override
 	public void updateTreeSize(int treeSizeToUpdate) {
 		this.treeSize += treeSizeToUpdate;
-		parent.updateTreeSize(treeSizeToUpdate);
+		if (parent != null) {
+			parent.updateTreeSize(treeSizeToUpdate);
+		}
 	}
 
 }

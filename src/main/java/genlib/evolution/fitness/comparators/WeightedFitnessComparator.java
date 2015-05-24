@@ -39,7 +39,9 @@ public class WeightedFitnessComparator<T extends Individual>  extends FitnessCom
 			fit2 = o2.getComplexFitness();
 		}
 		
-		// reverted condition for comparison
+		// reverted condition for comparison, so the 
+		// individual with greatest value will be first
+		// descending order
 		return -Double.compare(fit1, fit2);					
 	}
 
