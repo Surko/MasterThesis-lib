@@ -53,6 +53,7 @@ public class TreeFNFitness extends TreeConfusionFitness {
 			if (tClass == attrIndex && pClass != attrIndex) {
 				fnValue += 1;
 			}
+			
 			root = individual.getRootNode();
 		}
 
@@ -60,10 +61,10 @@ public class TreeFNFitness extends TreeConfusionFitness {
 	}
 
 	@Override
-	protected double[][] totalConfusionValues(GenLibInstances instances,
+	protected double[] totalConfusionValues(GenLibInstances instances,
 			TreeIndividual individual) {
 		Node root = individual.getRootNode();
-		double[][] fnArray = new double[2][instances.numClasses()];
+		double[] fnArray = new double[instances.numClasses()];
 
 		Enumeration<GenLibInstance> eInstances = instances.getInstances();
 		while (eInstances.hasMoreElements()) {
@@ -84,12 +85,12 @@ public class TreeFNFitness extends TreeConfusionFitness {
 			int tClass = (int) instance.getValueOfClass();
 			int pClass = (int) root.getValue();
 			if (tClass != pClass) {
-				fnArray[0][tClass] += 1;
+				fnArray[tClass] += 1;
 			}
+			
 			root = individual.getRootNode();
 		}
-
-		fnArray[1] = fnArray[0];
+		
 		return fnArray;
 	}
 
@@ -120,6 +121,7 @@ public class TreeFNFitness extends TreeConfusionFitness {
 			if (tClass == attrIndex && pClass != attrIndex) {
 				fnValue += 1;
 			}
+			
 			root = individual.getRootNode();
 		}
 
@@ -128,10 +130,10 @@ public class TreeFNFitness extends TreeConfusionFitness {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected double[][] totalConfusionValues(Instances instances,
+	protected double[] totalConfusionValues(Instances instances,
 			TreeIndividual individual) {
 		Node root = individual.getRootNode();
-		double[][] fnArray = new double[2][instances.numClasses()];
+		double[] fnArray = new double[instances.numClasses()];
 
 		Enumeration<Instance> eInstances = instances.enumerateInstances();
 		while (eInstances.hasMoreElements()) {
@@ -152,12 +154,12 @@ public class TreeFNFitness extends TreeConfusionFitness {
 			int tClass = (int) instance.classValue();
 			int pClass = (int) root.getValue();
 			if (tClass != pClass) {
-				fnArray[0][tClass] += 1;
+				fnArray[tClass] += 1;
 			}
+			
 			root = individual.getRootNode();
 		}
-
-		fnArray[1] = fnArray[0];
+		
 		return fnArray;
 	}
 

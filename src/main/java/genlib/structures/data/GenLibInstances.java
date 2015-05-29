@@ -29,11 +29,13 @@ public interface GenLibInstances extends Serializable {
 	public int numAttributes();
 
 	/**
-	 * Number of classes for class attribute.
-	 * @return
+	 * Number of classes for class attribute. If the class attribute is numeric
+	 * than -1.
+	 * 
+	 * @return number of class values
 	 */
 	public int numClasses();
-	
+
 	/**
 	 * Method which will return testData. We take inspiration in weka lib.
 	 * 
@@ -52,7 +54,7 @@ public interface GenLibInstances extends Serializable {
 	public GenLibInstances resample(Random random);
 
 	public Enumeration<GenLibInstance> getInstances();
-	
+
 	public GenLibDistribution getDistribution();
-	
+
 }

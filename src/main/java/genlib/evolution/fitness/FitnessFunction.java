@@ -22,13 +22,7 @@ import java.util.HashMap;
  * @see TreeHeightFitness
  *
  */
-public abstract class FitnessFunction<T extends Individual> implements Serializable {
-	
-	protected enum AverageEnum {
-		UNWEIGHTED,
-		WEIGHTED,
-		TOTAL
-	}
+public abstract class FitnessFunction<T extends Individual> implements Serializable {		
 	
 	/** for serialization */
 	private static final long serialVersionUID = -90043146335682343L;

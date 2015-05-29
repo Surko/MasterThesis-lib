@@ -51,6 +51,7 @@ public class TreeTNFitness extends TreeConfusionFitness {
 			if (tClass != attrIndex && pClass != attrIndex) {
 				tnValue += 1;
 			}
+			
 			root = individual.getRootNode();
 		}
 
@@ -58,10 +59,10 @@ public class TreeTNFitness extends TreeConfusionFitness {
 	}
 
 	@Override
-	protected double[][] totalConfusionValues(GenLibInstances instances,
+	protected double[] totalConfusionValues(GenLibInstances instances,
 			TreeIndividual individual) {
 		Node root = individual.getRootNode();
-		double[][] tnArray = new double[2][instances.numClasses()];
+		double[] tnArray = new double[instances.numClasses()];
 
 		Enumeration<GenLibInstance> eInstances = instances.getInstances();
 		while (eInstances.hasMoreElements()) {
@@ -84,14 +85,14 @@ public class TreeTNFitness extends TreeConfusionFitness {
 			if (tClass != pClass) {
 				for (int i = 0; i < instances.numClasses(); i++) {
 					if (i != tClass && i != pClass) {
-						tnArray[0][i] += 1;
+						tnArray[i] += 1;
 					}
 				}
 			}
+			
 			root = individual.getRootNode();
 		}
 		
-		tnArray[1] = tnArray[0];
 		return tnArray;
 	}
 
@@ -122,6 +123,7 @@ public class TreeTNFitness extends TreeConfusionFitness {
 			if (tClass != attrIndex && pClass != attrIndex) {
 				tnValue += 1;
 			}
+			
 			root = individual.getRootNode();
 		}
 
@@ -130,10 +132,10 @@ public class TreeTNFitness extends TreeConfusionFitness {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected double[][] totalConfusionValues(Instances instances,
+	protected double[] totalConfusionValues(Instances instances,
 			TreeIndividual individual) {
 		Node root = individual.getRootNode();
-		double[][] tnArray = new double[2][instances.numClasses()];
+		double[] tnArray = new double[instances.numClasses()];
 
 		Enumeration<Instance> eInstances = instances.enumerateInstances();
 		while (eInstances.hasMoreElements()) {
@@ -156,14 +158,14 @@ public class TreeTNFitness extends TreeConfusionFitness {
 			if (tClass != pClass) {
 				for (int i = 0; i < instances.numClasses(); i++) {
 					if (i != tClass && i != pClass) {
-						tnArray[0][i] += 1;
+						tnArray[i] += 1;						
 					}
 				}
 			}
+			
 			root = individual.getRootNode();
 		}
-		
-		tnArray[1] = tnArray[0];
+				
 		return tnArray;
 	}
 

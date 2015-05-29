@@ -36,15 +36,14 @@ public class TreePrevalenceFitness extends TreeConfusionFitness {
 	}
 
 	@Override
-	protected double[][] totalConfusionValues(GenLibInstances instances,
+	protected double[] totalConfusionValues(GenLibInstances instances,
 			TreeIndividual individual) {
 		int numInstances = instances.numInstances();
-		double[][] prevalArray = new double[2][numInstances];
-		prevalArray[0] = instances.getDistribution().getClassCounts();
+		double[] prevalArray = new double[numInstances];
+		prevalArray = instances.getDistribution().getClassCounts();
 
 		for (int i = 0; i < prevalArray.length; i++) {
-			prevalArray[0][i] /= numInstances;
-			prevalArray[1][i] = numInstances;
+			prevalArray[i] /= numInstances;			
 		}
 
 		return prevalArray;
@@ -72,22 +71,21 @@ public class TreePrevalenceFitness extends TreeConfusionFitness {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected double[][] totalConfusionValues(Instances instances,
+	protected double[] totalConfusionValues(Instances instances,
 			TreeIndividual individual) {
 		int numInstances = instances.numInstances();
-		double[][] prevalArray = new double[2][instances.numClasses()];
+		double[] prevalArray = new double[instances.numClasses()];
 
 		Enumeration<Instance> eInstances = instances.enumerateInstances();
 		while (eInstances.hasMoreElements()) {
 			Instance instance = eInstances.nextElement();
 
 			int tClass = (int) instance.classValue();
-			prevalArray[0][tClass]++;
+			prevalArray[tClass]++;
 		}
 
 		for (int i = 0; i < prevalArray.length; i++) {
-			prevalArray[0][i] /= numInstances;
-			prevalArray[1][i] = numInstances;
+			prevalArray[i] /= numInstances;
 		}
 
 		return prevalArray;

@@ -6,6 +6,7 @@ import genlib.structures.trees.MultiWayNode;
 import genlib.structures.trees.Node;
 import genlib.utils.Utils.Sign;
 
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -30,23 +31,46 @@ public class WekaUtils {
 		return insArray;
 	}
 
-	public static Sign makeSign(String sSign) {
-		switch (sSign) {
-		case "<":
-			return Sign.LESS;
-		case ">":
-			return Sign.GREATER;
-		case "<=":
-			return Sign.LESSEQ;
-		case ">=":
-			return Sign.GREATEQ;
-		case "!=":
-			return Sign.NEQUALS;
-		case "=":
-			return Sign.EQUALS;
-		default:
-			return null;
+	@SuppressWarnings("unchecked")
+	public static double[][] makeConfusionMatrix(TreeIndividual individual,
+			Instances instances) {
+		if (instances.numClasses() <= 0) {
+			return (double[][]) Collections.EMPTY_LIST.toArray();
 		}
+
+		Node root = individual.getRootNode();
+		double[][] confusion = new double[instances.numClasses()][instances
+				.numClasses()];
+
+		Enumeration<Instance> eInstances = instances.enumerateInstances();
+		while (eInstances.hasMoreElements()) {
+			Instance instance = eInstances.nextElement();
+			while (!root.isLeaf()) {
+				if (instance.attribute(root.getAttribute()).isNumeric()) {
+					if (instance.value(root.getAttribute()) < root.getValue()) {
+						root = root.getChildAt(0);
+					} else {
+						root = root.getChildAt(1);
+					}
+				} else {
+					root = root.getChildAt((int) instance.value(root
+							.getAttribute()));
+				}
+			}
+
+			int pClass = (int) root.getValue();
+			int tClass = (int) instance.classValue();
+
+			confusion[pClass][tClass] += 1;
+
+			root = individual.getRootNode();
+		}
+
+		return confusion;
+	}
+
+	public static Sign makeSign(String sSign) {
+		return Utils.makeSign(sSign);
 	}
 
 	public static TreeIndividual constructTreeIndividual(String sTree,

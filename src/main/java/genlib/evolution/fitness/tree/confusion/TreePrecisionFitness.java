@@ -51,11 +51,11 @@ public class TreePrecisionFitness extends TreeConfusionFitness {
 					root = root.getChildAt((int) instance
 							.getValueOfAttribute(root.getAttribute()));
 				}
-			}
-			root = individual.getRootNode();
+			}			
 
 			int pClass = (int) root.getValue();
 			if (pClass != attrIndex) {
+				root = individual.getRootNode();
 				continue;
 			}
 
@@ -66,16 +66,17 @@ public class TreePrecisionFitness extends TreeConfusionFitness {
 			}
 			top += 1;
 
+			root = individual.getRootNode();
 		}
 
 		return tp / top;
 	}
 
 	@Override
-	protected double[][] totalConfusionValues(GenLibInstances instances,
+	protected double[] totalConfusionValues(GenLibInstances instances,
 			TreeIndividual individual) {
 		Node root = individual.getRootNode();
-		double[][] precisionArray = new double[2][instances.numClasses()];
+		double[] precisionArray = new double[instances.numClasses()];
 
 		Enumeration<GenLibInstance> eInstances = instances.getInstances();
 		while (eInstances.hasMoreElements()) {
@@ -92,21 +93,16 @@ public class TreePrecisionFitness extends TreeConfusionFitness {
 					root = root.getChildAt((int) instance
 							.getValueOfAttribute(root.getAttribute()));
 				}
-			}
-			root = individual.getRootNode();
+			}			
 
 			int tClass = (int) instance.getValueOfClass();
 			int pClass = (int) root.getValue();
 			if (tClass == pClass) {
 				// add true positives for attribute
-				precisionArray[0][tClass] += 1;
+				precisionArray[tClass] += 1;
 			}
-			precisionArray[1][pClass] += 1;
-		}
-
-		for (int i = 0; i < precisionArray.length; i++) {
-			// divide with all the positives will give recall
-			precisionArray[0][i] /= precisionArray[1][i];
+			
+			root = individual.getRootNode();
 		}
 
 		return precisionArray;
@@ -133,11 +129,11 @@ public class TreePrecisionFitness extends TreeConfusionFitness {
 					root = root.getChildAt((int) instance.value(root
 							.getAttribute()));
 				}
-			}
-			root = individual.getRootNode();
+			}			
 
 			int pClass = (int) root.getValue();
 			if (pClass != attrIndex) {
+				root = individual.getRootNode();
 				continue;
 			}
 
@@ -147,6 +143,7 @@ public class TreePrecisionFitness extends TreeConfusionFitness {
 			}
 			top += 1;
 
+			root = individual.getRootNode();
 		}
 
 		return tp / top;
@@ -154,10 +151,10 @@ public class TreePrecisionFitness extends TreeConfusionFitness {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected double[][] totalConfusionValues(Instances instances,
+	protected double[] totalConfusionValues(Instances instances,
 			TreeIndividual individual) {
 		Node root = individual.getRootNode();
-		double[][] recallArray = new double[2][instances.numClasses()];
+		double[] recallArray = new double[instances.numClasses()];
 
 		Enumeration<Instance> eInstances = instances.enumerateInstances();
 		while (eInstances.hasMoreElements()) {
@@ -174,18 +171,14 @@ public class TreePrecisionFitness extends TreeConfusionFitness {
 							.getAttribute()));
 				}
 			}
-			root = individual.getRootNode();
 
 			int tClass = (int) instance.classValue();
 			int pClass = (int) root.getValue();
 			if (tClass == pClass) {
-				recallArray[0][tClass] += 1;
+				recallArray[tClass] += 1;
 			}
-			recallArray[1][pClass] += 1;
-		}
-
-		for (int i = 0; i < recallArray.length; i++) {
-			recallArray[0][i] /= recallArray[1][i];
+			
+			root = individual.getRootNode();
 		}
 
 		return recallArray;

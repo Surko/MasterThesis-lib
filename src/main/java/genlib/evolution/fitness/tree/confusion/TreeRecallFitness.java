@@ -63,19 +63,19 @@ public class TreeRecallFitness extends TreeConfusionFitness {
 			if (pClass == attrIndex) {
 				tp += 1;
 			}
+			
 			root = individual.getRootNode();
-
 		}
 
-		return tp / instances.getDistribution().getClassCounts()[attrIndex];
+		return tp / data.getClassCounts()[attrIndex];
 
 	}
 
 	@Override
-	protected double[][] totalConfusionValues(GenLibInstances instances,
+	protected double[] totalConfusionValues(GenLibInstances instances,
 			TreeIndividual individual) {
 		Node root = individual.getRootNode();
-		double[][] recallArray = new double[2][instances.numClasses()];		
+		double[] recallArray = new double[instances.numClasses()];		
 
 		Enumeration<GenLibInstance> eInstances = instances.getInstances();
 		while (eInstances.hasMoreElements()) {
@@ -97,16 +97,16 @@ public class TreeRecallFitness extends TreeConfusionFitness {
 			int tClass = (int) instance.getValueOfClass();
 			if (tClass == (int) root.getValue()) {
 				// add true positives for attribute
-				recallArray[0][tClass] += 1;
+				recallArray[tClass] += 1;
 			}
-			recallArray[1][tClass] += 1;
+			
 			root = individual.getRootNode();
-
 		}
 
+		double[] classCounts = data.getClassCounts(); 
 		for (int i = 0; i < recallArray.length; i++) {
 			// divide with all the positives will give recall
-			recallArray[0][i] /= recallArray[1][i];
+			recallArray[i] /= classCounts[i];
 		}
 
 		return recallArray;
@@ -117,8 +117,7 @@ public class TreeRecallFitness extends TreeConfusionFitness {
 	protected double attributeConfusionValue(Instances instances,
 			TreeIndividual individual) {
 		Node root = individual.getRootNode();
-		double tp = 0d;
-		double condPositive = 0;
+		double tp = 0d;		
 
 		Enumeration<Instance> eInstances = instances.enumerateInstances();
 		while (eInstances.hasMoreElements()) {
@@ -145,21 +144,20 @@ public class TreeRecallFitness extends TreeConfusionFitness {
 			if (attrIndex == (int) root.getValue()) {
 				// add true positives for attribute
 				tp += 1;
-			}
-			condPositive += 1;
+			}			
 
 			root = individual.getRootNode();
 		}
 
-		return tp/condPositive;
+		return tp / data.getClassCounts()[attrIndex];
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected double[][] totalConfusionValues(Instances instances,
+	protected double[] totalConfusionValues(Instances instances,
 			TreeIndividual individual) {
 		Node root = individual.getRootNode();
-		double[][] recallArray = new double[2][instances.numClasses()];	
+		double[] recallArray = new double[instances.numClasses()];	
 
 		Enumeration<Instance> eInstances = instances.enumerateInstances();
 		while (eInstances.hasMoreElements()) {
@@ -179,15 +177,16 @@ public class TreeRecallFitness extends TreeConfusionFitness {
 
 			int tClass = (int) instance.classValue();
 			if (tClass == (int) root.getValue()) {
-				recallArray[0][tClass] += 1;
+				recallArray[tClass] += 1;
 			}
-			recallArray[1][tClass] += 1;
+			
 			root = individual.getRootNode();
-
 		}
 
+		double[] classCounts = data.getClassCounts(); 
 		for (int i = 0; i < recallArray.length; i++) {
-			recallArray[0][i] /= recallArray[1][i];
+			// divide with all the positives will give recall
+			recallArray[i] /= classCounts[i];
 		}
 
 		return recallArray;

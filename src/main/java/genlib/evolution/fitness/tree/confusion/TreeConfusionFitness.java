@@ -18,6 +18,13 @@ import weka.core.Instances;
 public abstract class TreeConfusionFitness extends
 		FitnessFunction<TreeIndividual> {
 
+	protected enum AverageEnum {
+		OWNWEIGHT,
+		UNWEIGHTED,
+		WEIGHTED,
+		TOTAL
+	}
+	
 	protected enum ConfusionEnum {
 		AVERAGE, INDEX, MAXIMIZE
 	}
@@ -56,6 +63,34 @@ public abstract class TreeConfusionFitness extends
 		this.data = data;
 	}
 
+	protected boolean parseParamLabels(String paramLabel, String paramValue) {
+		ConfusionEnum confusionEnum = ConfusionEnum.valueOf(paramLabel);
+
+		if (confusionEnum == null) {
+			LOG.log(Level.INFO,
+					String.format(
+							TextResource.getString(TextKeys.iExcessParam),
+							paramLabel));
+			return false;
+		}
+
+		switch (confusionEnum) {
+		case AVERAGE:
+			this.averageEnum = AverageEnum.valueOf(paramValue);
+			break;
+		case INDEX:
+			this.attrIndex = Integer.parseInt(paramValue);
+			break;
+		case MAXIMIZE:
+			this.maximize = Boolean.valueOf(paramValue);
+			break;
+		default:
+			return false;
+		}
+		
+		return true;
+	}
+	
 	@Override
 	public void setParam(String param) {
 		this.attrIndex = -1;
@@ -72,29 +107,7 @@ public abstract class TreeConfusionFitness extends
 		}
 
 		for (int i = 0; i < parts.length; i += 2) {
-			ConfusionEnum confusionEnum = ConfusionEnum.valueOf(parts[i]);
-
-			if (confusionEnum == null) {
-				LOG.log(Level.INFO,
-						String.format(
-								TextResource.getString(TextKeys.iExcessParam),
-								parts[i]));
-				continue;
-			}
-
-			switch (confusionEnum) {
-			case AVERAGE:
-				this.averageEnum = AverageEnum.valueOf(parts[i + 1]);
-				break;
-			case INDEX:
-				this.attrIndex = Integer.parseInt(parts[i + 1]);
-				break;
-			case MAXIMIZE:
-				this.maximize = Boolean.valueOf(parts[i + 1]);
-				break;
-			default:
-				break;
-			}
+			parseParamLabels(parts[i], parts[i+1]);
 		}
 	}
 
@@ -143,28 +156,36 @@ public abstract class TreeConfusionFitness extends
 				return attributeConfusionValue(instances, individual);
 			}
 			double fitness = 0d;
-			double[][] array = totalConfusionValues(instances, individual);
+			double[] criteria = totalConfusionValues(instances, individual);
 			switch (averageEnum) {
+			case OWNWEIGHT:
+				for (int i = 0; i < criteria.length; i++) {
+					fitness += (criteria[i] * criteria[i]);
+				}
+				// divided by all instances
+				fitness /= instances.numInstances();
+				break;
 			case WEIGHTED:
+				double[] weight = data.getClassCounts(); 
 				// weight is their support
-				for (int i = 0; i < array.length; i++) {
-					fitness += (array[1][i] * array[0][i]);
+				for (int i = 0; i < criteria.length; i++) {
+					fitness += (weight[i] * criteria[i]);
 				}
 				// divided by all instances as defined in support
 				fitness /= instances.numInstances();
 				break;
 			case UNWEIGHTED:
 				// sum of all values
-				for (int i = 0; i < array.length; i++) {
-					fitness += array[0][i];
+				for (int i = 0; i < criteria.length; i++) {
+					fitness += criteria[i];
 				}
 				// and then average
-				fitness /= array.length;
+				fitness /= criteria.length;
 				break;
 			case TOTAL:
 				// sum of all values
-				for (int i = 0; i < array.length; i++) {
-					fitness += array[0][i];
+				for (int i = 0; i < criteria.length; i++) {
+					fitness += criteria[i];
 				}
 				// divided by all instances
 				fitness /= instances.numInstances();
@@ -185,30 +206,38 @@ public abstract class TreeConfusionFitness extends
 				attrIndex = 1;
 				return attributeConfusionValue(instances, individual);
 			}
-
+					
 			double fitness = 0d;
-			double[][] array = totalConfusionValues(instances, individual);
+			double[] criteria = totalConfusionValues(instances, individual);
 			switch (averageEnum) {
+			case OWNWEIGHT:
+				for (int i = 0; i < criteria.length; i++) {
+					fitness += (criteria[i] * criteria[i]);
+				}
+				// divided by all instances
+				fitness /= instances.numInstances();
+				break;
 			case WEIGHTED:
+				double[] weight = data.getClassCounts(); 
 				// weight is their support
-				for (int i = 0; i < array.length; i++) {
-					fitness += (array[1][i] * array[0][i]);
+				for (int i = 0; i < criteria.length; i++) {
+					fitness += (weight[i] * criteria[i]);
 				}
 				// divided by all instances as defined in support
 				fitness /= instances.numInstances();
 				break;
 			case UNWEIGHTED:
 				// sum of all values
-				for (int i = 0; i < array.length; i++) {
-					fitness += array[0][i];
+				for (int i = 0; i < criteria.length; i++) {
+					fitness += criteria[i];
 				}
 				// and then average
-				fitness /= array.length;
+				fitness /= criteria.length;
 				break;
 			case TOTAL:
 				// sum of all values
-				for (int i = 0; i < array.length; i++) {
-					fitness += array[0][i];
+				for (int i = 0; i < criteria.length; i++) {
+					fitness += criteria[i];
 				}
 				// divided by all instances
 				fitness /= instances.numInstances();
@@ -244,10 +273,8 @@ public abstract class TreeConfusionFitness extends
 
 	/**
 	 * Method which returns fitness value for all atributes. It uses
-	 * GenLibInstances as data. It returns array with 2 rows. </br> In the first
-	 * row there is fitness values for each attribute. </br> In the second row
-	 * there is value of supported samples used for each attribute. This second
-	 * row is only used when computing weighted fitness value.
+	 * GenLibInstances as data. It returns array with 1 row. </br> In the first
+	 * row there is fitness values for each attribute. </br>.
 	 * 
 	 * @param instances
 	 *            GenLibInstances
@@ -255,7 +282,7 @@ public abstract class TreeConfusionFitness extends
 	 *            TreeIndividual on which we compute fitness
 	 * @return array with fitness values
 	 */
-	protected abstract double[][] totalConfusionValues(
+	protected abstract double[] totalConfusionValues(
 			GenLibInstances instances, TreeIndividual individual);
 
 	/**
@@ -273,10 +300,8 @@ public abstract class TreeConfusionFitness extends
 
 	/**
 	 * Method which returns fitness value for all atributes. It uses Instances
-	 * from weka as data. It returns array with 2 rows. </br> In the first row
-	 * there is fitness values for each attribute. </br> In the second row there
-	 * is value of supported samples used for each attribute. This second row is
-	 * only used when computing weighted fitness value.
+	 * from weka as data. It returns array with 1 rows. </br> In the first row
+	 * there is fitness values for each attribute. </br>
 	 * 
 	 * @param instances
 	 *            Instances
@@ -284,7 +309,7 @@ public abstract class TreeConfusionFitness extends
 	 *            TreeIndividual on which we compute fitness
 	 * @return array with fitness values
 	 */
-	protected abstract double[][] totalConfusionValues(Instances instances,
+	protected abstract double[] totalConfusionValues(Instances instances,
 			TreeIndividual individual);
 
 	/**

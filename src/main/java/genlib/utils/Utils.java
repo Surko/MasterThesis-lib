@@ -3,12 +3,15 @@ package genlib.utils;
 import genlib.evolution.Population;
 import genlib.evolution.individuals.Individual;
 import genlib.evolution.individuals.TreeIndividual;
+import genlib.structures.data.GenLibInstance;
 import genlib.structures.data.GenLibInstances;
 import genlib.structures.trees.MultiWayDepthNode;
 import genlib.structures.trees.Node;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -24,6 +27,7 @@ public class Utils {
 	public static final String oDELIM = "(;|[ ]+)";
 	/** delimiter for global use when delimiting parameters */
 	public static final String pDELIM = ",";
+
 	/**
 	 * Enum of different signs that can appear in node field sign. This serves
 	 * purpose in classifying data.
@@ -47,19 +51,76 @@ public class Utils {
 
 	/** Random object which is used from all over the application */
 	public static final Random randomGen = new Random(0);
-	/** Natural logarithm of 2. Used to make logarithms at base 2.*/
+	/** Natural logarithm of 2. Used to make logarithms at base 2. */
 	private static final double log2 = Math.log(2);
 	/** very small value that works like threshold */
 	private static final double THRESHOLD = 1e-6;
 	/** filter for jar files */
 	public static final FileFilter jarFilter = new FileFilter() {
-        @Override
-        public boolean accept(File file) {
-            return file.getName().matches(".*[.]jar");
-        }
-    };
-    public static boolean DEBUG = false;
-	
+		@Override
+		public boolean accept(File file) {
+			return file.getName().matches(".*[.]jar");
+		}
+	};
+	public static boolean DEBUG = false;
+
+	public static double[][] makeConfusionMatrix(TreeIndividual individual,
+			GenLibInstances instances) {
+		if (instances.numClasses() <= 0) {
+			return (double[][]) Collections.EMPTY_LIST.toArray();
+		}
+
+		Node root = individual.getRootNode();
+		double[][] confusion = new double[instances.numClasses()][instances
+				.numClasses()];
+
+		Enumeration<GenLibInstance> eInstances = instances.getInstances();
+		while (eInstances.hasMoreElements()) {
+			GenLibInstance instance = eInstances.nextElement();
+			while (!root.isLeaf()) {
+				if (instance.getAttribute(root.getAttribute()).isNumeric()) {
+					if (instance.getValueOfAttribute(root.getAttribute()) < root
+							.getValue()) {
+						root = root.getChildAt(0);
+					} else {
+						root = root.getChildAt(1);
+					}
+				} else {
+					root = root.getChildAt((int) instance
+							.getValueOfAttribute(root.getAttribute()));
+				}
+			}
+
+			int pClass = (int) root.getValue();
+			int tClass = (int) instance.getValueOfClass();
+
+			confusion[pClass][tClass] += 1;
+
+			root = individual.getRootNode();
+		}
+
+		return confusion;
+	}
+
+	public static Sign makeSign(String sSign) {
+		switch (sSign) {
+		case "<":
+			return Sign.LESS;
+		case ">":
+			return Sign.GREATER;
+		case "<=":
+			return Sign.LESSEQ;
+		case ">=":
+			return Sign.GREATEQ;
+		case "!=":
+			return Sign.NEQUALS;
+		case "=":
+			return Sign.EQUALS;
+		default:
+			return null;
+		}
+	}
+
 	/**
 	 * Function that is used in entropy computation. It calculates simple
 	 * expression num * log_2(num). Logarithm of base 2 can be evaluated by
@@ -201,8 +262,8 @@ public class Utils {
 	}
 
 	/**
-	 * Method which gets number of nodes of a given tree. Root must
-	 * be of type Node.
+	 * Method which gets number of nodes of a given tree. Root must be of type
+	 * Node.
 	 * 
 	 * @param root
 	 *            Root node of a tree
@@ -226,17 +287,17 @@ public class Utils {
 				continue;
 			}
 			node = true;
-			numNodes += n;			
+			numNodes += n;
 		}
 
 		if (node) {
 			return numNodes + 1;
 		}
-		
+
 		return 0;
 
 	}
-	
+
 	/**
 	 * Method which computes height of a tree given by parameter root. Root must
 	 * be of type Node.
@@ -277,21 +338,21 @@ public class Utils {
 		if (root == null) {
 			return 0;
 		}
-		
+
 		if (root.isLeaf()) {
 			return 1;
 		}
-		
+
 		int size = 1;
-		
+
 		for (Node child : root.getChilds()) {
 			int n = computeSize(child);
 			size += n;
 		}
-		
+
 		return size;
 	}
-	
+
 	/**
 	 * NOT IMPLEMENTED YET
 	 * 
@@ -327,28 +388,34 @@ public class Utils {
 	}
 
 	/**
-	 * Debug method to create population from parameter individual 
-	 * @param model individual to create population from 
+	 * Debug method to create population from parameter individual
+	 * 
+	 * @param model
+	 *            individual to create population from
 	 * @return Population with individuals
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends Individual> Population<T> debugPopulationFrom(T individual) {
-		Population<T> individuals = new Population<>();	
-				
+	public static <T extends Individual> Population<T> debugPopulationFrom(
+			T individual) {
+		Population<T> individuals = new Population<>();
+
 		individuals.add(individual);
 		for (int i = 0; i < 19; i++)
-			individuals.add((T)individual.copy());
-		
+			individuals.add((T) individual.copy());
+
 		return individuals;
 	}
-	
+
 	/**
-	 * Debug method to create population from dummy individual created inside the method.
+	 * Debug method to create population from dummy individual created inside
+	 * the method.
+	 * 
 	 * @return Population with individuals
 	 */
 	public static Population<TreeIndividual> debugTreePopulation() {
-		Population<TreeIndividual> individuals = new Population<>();	
-		MultiWayDepthNode root = MultiWayDepthNode.makeNode(2, 1, Sign.LESS, 20d);
+		Population<TreeIndividual> individuals = new Population<>();
+		MultiWayDepthNode root = MultiWayDepthNode.makeNode(2, 1, Sign.LESS,
+				20d);
 		MultiWayDepthNode[] childs = new MultiWayDepthNode[2];
 		childs[0] = MultiWayDepthNode.makeLeaf(1);
 		childs[1] = MultiWayDepthNode.makeLeaf(0);
@@ -359,5 +426,5 @@ public class Utils {
 			individuals.add(new TreeIndividual(testIndividual));
 		return individuals;
 	}
-	
+
 }
