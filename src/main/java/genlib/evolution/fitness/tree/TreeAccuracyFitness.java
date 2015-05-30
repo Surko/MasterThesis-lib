@@ -53,14 +53,17 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 			return individual.getFitnessValue(index);
 		}
 
+		double fitness = 0d;
+		
 		if (data.isInstances()) {
-			return computeFitness(data.toInstances(), individual);
+			fitness = computeFitness(data.toInstances(), individual);
 		}
 		if (data.isGenLibInstances()) {
-			return computeFitness(data.toGenLibInstances(), individual);
+			fitness = computeFitness(data.toGenLibInstances(), individual);
 		}
-
-		return 0;
+		
+		individual.setFitnessValue(index, fitness);
+		return fitness;
 
 	}
 
@@ -90,8 +93,7 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 			}
 			root = individual.getRootNode();
 		}
-		double val = correct / allData;
-		individual.setFitnessValue(index, val);
+		double val = correct / allData;		
 		return val;
 	}
 

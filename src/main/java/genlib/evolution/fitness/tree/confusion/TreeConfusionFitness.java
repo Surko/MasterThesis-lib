@@ -44,13 +44,17 @@ public abstract class TreeConfusionFitness extends
 			return individual.getFitnessValue(index);
 		}
 
+		double fitness = 0d;
+		
 		if (data.isInstances()) {
-			return computeFitness(data.toInstances(), individual);
+			fitness = computeFitness(data.toInstances(), individual);
 		}
 		if (data.isGenLibInstances()) {
-			return computeFitness(data.toGenLibInstances(), individual);
+			fitness = computeFitness(data.toGenLibInstances(), individual);
 		}
-		return 0;
+		
+		individual.setFitnessValue(index, fitness);
+		return fitness;
 	}
 
 	@Override
@@ -157,6 +161,19 @@ public abstract class TreeConfusionFitness extends
 			}
 			double fitness = 0d;
 			double[] criteria = totalConfusionValues(instances, individual);
+			
+			if (averageEnum == null) {
+				LOG.log(Level.WARNING,
+						String.format(
+								TextResource.getString(TextKeys.eMissParam),
+								ConfusionEnum.AVERAGE.name(),
+								this.getFitnessName()));
+				throw new MissingParamException(String.format(
+						TextResource.getString(TextKeys.eMissParam),
+						ConfusionEnum.AVERAGE.name(),
+						this.getFitnessName()));
+			}
+			
 			switch (averageEnum) {
 			case OWNWEIGHT:
 				for (int i = 0; i < criteria.length; i++) {

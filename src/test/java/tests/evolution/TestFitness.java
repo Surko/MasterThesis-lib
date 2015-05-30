@@ -22,6 +22,7 @@ import java.util.HashMap;
 
 import org.junit.Test;
 
+import tests.TestProperties;
 import weka.datagenerators.classifiers.classification.RDG1;
 
 public class TestFitness {
@@ -128,8 +129,8 @@ public class TestFitness {
 		assertTrue(function.objectInfo().equals("tHeight x"));
 		
 		String name = TreePrevalenceFitness.initName;
-		function = new TreePrevalenceFitness();
-		assertTrue(function.objectInfo().equals(name+" x"));
+		function = new TreePrevalenceFitness();		
+		assertTrue(function.objectInfo().equals(name+" x"));		
 		function.setParam("INDEX,0");		
 		assertTrue(function.objectInfo().equals(name+" INDEX,0"));
 		function.setParam("INDEX,0,AVERAGE,WEIGHTED");
@@ -283,5 +284,46 @@ public class TestFitness {
 		FitnessFunction<TreeIndividual> function = new TreePrevalenceFitness();
 		function.setIndex(1);
 
+	}
+	
+	@Test
+	public void testRecallFitness() {
+		FitnessFunction<TreeIndividual> function = new TreeRecallFitness();
+		function.setIndex(1);
+		function.setData(wekaData);		
+		
+		int fIndex = function.getIndex();
+		assertTrue(fIndex == 1);
+		assertTrue(testIndividual.hasChanged());
+		assertTrue(wekaIndividual.hasChanged());
+		
+		double f1 = function.computeFitness(testIndividual);
+		double f2 = function.computeFitness(wekaIndividual);
+		
+		if (TestProperties.testPrints) {
+			System.out.println(f1);
+			System.out.println(f2);
+		}
+		
+		assertTrue(f1 == (19d/34));
+		assertTrue(testIndividual.getFitnessValue(1) == f1);
+		assertTrue(f2 == (29d/34));
+		assertTrue(wekaIndividual.getFitnessValue(1) == f2);
+		
+		// Different index
+		function.setParam("INDEX,0");
+		
+		f1 = function.computeFitness(testIndividual);
+		f2 = function.computeFitness(wekaIndividual);
+		
+		if (TestProperties.testPrints) {
+			System.out.println(f1);
+			System.out.println(f2);
+		}
+		
+		assertTrue(f1 == (34d/66));
+		assertTrue(testIndividual.getFitnessValue(1) == f1);
+		assertTrue(f2 == (64d/66));
+		assertTrue(wekaIndividual.getFitnessValue(1) == f2);
 	}
 }

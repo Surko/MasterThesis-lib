@@ -1,6 +1,8 @@
 package genlib.configurations;
 
 import genlib.GenLib;
+import genlib.locales.PermMessages;
+
 import java.io.File;
 import java.net.URL;
 
@@ -65,8 +67,8 @@ public class PathManager {
 			pluginPath.mkdir();
 			logPath = new File(rootPath, "_logs");
 			logPath.mkdir();
-		} catch (Exception e) {
-
+		} catch (SecurityException se) {
+			System.err.println(PermMessages._security_exc);
 		}
 	}
 

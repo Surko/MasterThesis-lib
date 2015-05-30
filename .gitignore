@@ -1,6 +1,7 @@
 build/*
 final-structure/*.*
 final-structure/_logs
+libraries/*
 .*
 !.gitignore
 !.gitattributes

@@ -23,6 +23,7 @@ public final class PermMessages {
 	public static final String _cfg_err_load = "Problem occured when loading property file. Exception : %s";
 	public static final String _cfg_set = "Missing values were succesfully set.";
 	// Exception errors
+	public static final String _security_exc = "Security exception, can't create directories";
 	public static final String _exc_badins = "Bad type of instances";
 	public static final String _exc_nonwsupp = "No support without using weka";
 	// Plugin load
