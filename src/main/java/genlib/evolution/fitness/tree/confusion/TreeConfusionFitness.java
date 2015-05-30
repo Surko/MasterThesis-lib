@@ -18,15 +18,61 @@ import weka.core.Instances;
 public abstract class TreeConfusionFitness extends
 		FitnessFunction<TreeIndividual> {
 
+	/**
+	 * AverageEnum that serves the purpose of defining what kind of fitnesses
+	 * averaging will be done. </p> Defined kinds of averaging: </br>
+	 * {@link AverageEnum#OWNWEIGHT} </br> {@link AverageEnum#UNWEIGHT} </br>
+	 * {@link AverageEnum#WEIGHT} </br> {@link AverageEnum#TOTAL}
+	 * 
+	 * @author Lukas Surin
+	 *
+	 */
 	protected enum AverageEnum {
+		/**
+		 * Averaging of fitnesses with own fitness
+		 */
 		OWNWEIGHT,
+		/**
+		 * Averaging of fitnesses with number of classes
+		 */
 		UNWEIGHTED,
+		/**
+		 * Averaging of fitnesses with weights(supports), true values for
+		 * classes
+		 */
 		WEIGHTED,
+		/**
+		 * Averaging of fitnesses with total number of instances
+		 */
 		TOTAL
 	}
-	
+
+	/**
+	 * ConfusionEnum that defines what kind of parameters are possible for
+	 * fitness function that are based on confusion matrix.</p> Defined kinds of
+	 * parameters: </br> {@link ConfusionEnum#AVERAGE} </br>
+	 * {@link ConfusionEnum#INDEX} </br> {@link ConfusionEnum#MAXIMIZe}
+	 * 
+	 * @author Lukas Surin
+	 *
+	 */
 	protected enum ConfusionEnum {
-		AVERAGE, INDEX, MAXIMIZE
+		/**
+		 * Average parameter to defined what kind of averaging we use
+		 * 
+		 * @see AverageEnum
+		 */
+		AVERAGE,
+		/**
+		 * Index parameter of attribute for which we compute fitness
+		 */
+		INDEX,
+		/**
+		 * Maximize parameter that defines if maximizing the fitness is
+		 * important. For example accuracy should be maximized. On the other
+		 * hand treeSize should be minimized.
+		 */
+		MAXIMIZE
 	}
 
 	private static final Logger LOG = Logger
@@ -38,6 +84,16 @@ public abstract class TreeConfusionFitness extends
 	protected AverageEnum averageEnum = null;
 	protected int attrIndex = -1;
 
+	/**
+	 * This method that overrides computeFitness from FitnessFunction class
+	 * computes fitness for an individual handed as parameter. If the individual
+	 * hasn't changed then we can return value of this fitness right away from
+	 * individual. Method calls other method with the same name that depends on
+	 * type of data on which this fitness function works (weka or built-in
+	 * type). </p>It calls {@link #computeFitness(Instances, TreeIndividual)} or
+	 * {@link #computeFitness(GenLibInstances, TreeIndividual)} depending on
+	 * what kind of data are used.
+	 */
 	@Override
 	public final double computeFitness(TreeIndividual individual) {
 		if (!individual.hasChanged()) {
@@ -45,15 +101,17 @@ public abstract class TreeConfusionFitness extends
 		}
 
 		double fitness = 0d;
-		
+
 		if (data.isInstances()) {
 			fitness = computeFitness(data.toInstances(), individual);
 		}
 		if (data.isGenLibInstances()) {
 			fitness = computeFitness(data.toGenLibInstances(), individual);
 		}
-		
+
+		// Set the fitness into fitness array in individual
 		individual.setFitnessValue(index, fitness);
+
 		return fitness;
 	}
 
@@ -71,10 +129,8 @@ public abstract class TreeConfusionFitness extends
 		ConfusionEnum confusionEnum = ConfusionEnum.valueOf(paramLabel);
 
 		if (confusionEnum == null) {
-			LOG.log(Level.INFO,
-					String.format(
-							TextResource.getString(TextKeys.iExcessParam),
-							paramLabel));
+			LOG.log(Level.INFO, String.format(
+					TextResource.getString(TextKeys.iExcessParam), paramLabel));
 			return false;
 		}
 
@@ -91,10 +147,10 @@ public abstract class TreeConfusionFitness extends
 		default:
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	@Override
 	public void setParam(String param) {
 		this.attrIndex = -1;
@@ -111,7 +167,7 @@ public abstract class TreeConfusionFitness extends
 		}
 
 		for (int i = 0; i < parts.length; i += 2) {
-			parseParamLabels(parts[i], parts[i+1]);
+			parseParamLabels(parts[i], parts[i + 1]);
 		}
 	}
 
@@ -161,19 +217,16 @@ public abstract class TreeConfusionFitness extends
 			}
 			double fitness = 0d;
 			double[] criteria = totalConfusionValues(instances, individual);
-			
+
 			if (averageEnum == null) {
-				LOG.log(Level.WARNING,
-						String.format(
-								TextResource.getString(TextKeys.eMissParam),
-								ConfusionEnum.AVERAGE.name(),
-								this.getFitnessName()));
+				LOG.log(Level.WARNING, String.format(
+						TextResource.getString(TextKeys.eMissParam),
+						ConfusionEnum.AVERAGE.name(), this.getFitnessName()));
 				throw new MissingParamException(String.format(
 						TextResource.getString(TextKeys.eMissParam),
-						ConfusionEnum.AVERAGE.name(),
-						this.getFitnessName()));
+						ConfusionEnum.AVERAGE.name(), this.getFitnessName()));
 			}
-			
+
 			switch (averageEnum) {
 			case OWNWEIGHT:
 				for (int i = 0; i < criteria.length; i++) {
@@ -183,7 +236,7 @@ public abstract class TreeConfusionFitness extends
 				fitness /= instances.numInstances();
 				break;
 			case WEIGHTED:
-				double[] weight = data.getClassCounts(); 
+				double[] weight = data.getClassCounts();
 				// weight is their support
 				for (int i = 0; i < criteria.length; i++) {
 					fitness += (weight[i] * criteria[i]);
@@ -223,7 +276,7 @@ public abstract class TreeConfusionFitness extends
 				attrIndex = 1;
 				return attributeConfusionValue(instances, individual);
 			}
-					
+
 			double fitness = 0d;
 			double[] criteria = totalConfusionValues(instances, individual);
 			switch (averageEnum) {
@@ -235,7 +288,7 @@ public abstract class TreeConfusionFitness extends
 				fitness /= instances.numInstances();
 				break;
 			case WEIGHTED:
-				double[] weight = data.getClassCounts(); 
+				double[] weight = data.getClassCounts();
 				// weight is their support
 				for (int i = 0; i < criteria.length; i++) {
 					fitness += (weight[i] * criteria[i]);
@@ -299,8 +352,8 @@ public abstract class TreeConfusionFitness extends
 	 *            TreeIndividual on which we compute fitness
 	 * @return array with fitness values
 	 */
-	protected abstract double[] totalConfusionValues(
-			GenLibInstances instances, TreeIndividual individual);
+	protected abstract double[] totalConfusionValues(GenLibInstances instances,
+			TreeIndividual individual);
 
 	/**
 	 * Method which returns fitness value for specific atribute. It uses

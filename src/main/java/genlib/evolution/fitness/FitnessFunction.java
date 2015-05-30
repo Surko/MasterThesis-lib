@@ -34,7 +34,7 @@ public abstract class FitnessFunction<T extends Individual> implements Serializa
 	protected int index = -1;
 	
 	/**
-	 * Abstract method which should compute fitness for specific class that 
+	 * Method which should compute fitness for specific class that 
 	 * you create. You can look at particular examples of implemented fitness functions
 	 * and their compute fitness method. Usually this method contains some type of 
 	 * differentiation of which data we use (weka or built-in type). Other thing you can take 
