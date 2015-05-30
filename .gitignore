@@ -1,7 +1,10 @@
 build/*
+final-structure/*.*
+final-structure/_logs
 .*
 !.gitignore
 !.gitattributes
+!final-structure/GenLib.bat
 
 # Windows image file caches
 Thumbs.db
@@ -31,7 +34,8 @@ $RECYCLE.BIN/
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*

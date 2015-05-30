@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="allTests" name="GenTree">
 	
-	<property name="weka.genlib.path" value="../MasterThesis-weka/src/main/java/genlib" />
-	<property name="project.class.path" value="./build/classes/main" />
-	<property name="test.class.path" value="./build/classes/test" />
-	<property name="libs.class.path" value="./libraries" />
+	<property name="jar.name" value="GenLib.jar" />
+	<property name="jar.output.dir" value="${basedir}/build/libs" />
+	<property name="weka.genlib.path" value="${basedir}/../MasterThesis-weka/src/main/java/genlib" />
+	<property name="project.class.path" value="${basedir}/build/classes/main" />
+	<property name="test.class.path" value="${basedir}/build/classes/test" />
+	<property name="libs.class.path" value="${basedir}/libraries" />
+	<property name="final.structure" value="${basedir}/final-structure" />
+	<property name="project.genlib.path" value="${basedir}/src/main/java/genlib" />
 
 	<macrodef name="copy-to-dir">
 		<attribute name="todir" />
@@ -19,16 +23,19 @@
 
 	<target name="do-deploy">
 		<delete dir="${weka.genlib.path}" />
-		<copydir src="./src/main/java/genlib" dest="${weka.genlib.path}" />
-		<delete dir="./build/libs" />
-		<delete file="./build/classes/main/GenLib.log" />
-		<delete file="./build/classes/main/config.properties" />
-		<jar destfile="./build/libs/GenLib.jar">
+		<copydir src="${project.genlib.path}" dest="${weka.genlib.path}" />
+		<delete dir="${jar.output.dir}" />
+		<delete file="${project.class.path}/GenLib.log" />
+		<delete file="${project.class.path}/config.properties" />
+		<jar destfile="${jar.output.dir}/${jar.name}">
 			<manifest>
 				<attribute name="Main-Class" value="genlib.GenLib" />
 			</manifest>
-			<fileset dir="./build/classes/main" />
-		</jar>
+			<fileset dir="${project.class.path}" />
+		</jar>		
+		<copy todir="${final.structure}">
+			<file name="${jar.output.dir}/${jar.name}" />
+		</copy>
 	</target>
 
 	<target name="allTests" depends="do-deploy">

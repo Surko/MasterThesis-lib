@@ -58,7 +58,7 @@ public class GenLib {
 				LOG.addHandler(ch);
 				// Log file located in root directory
 				FileHandler fh = new FileHandler(
-						new File(PathManager.getInstance().getRootPath(),
+						new File(PathManager.getInstance().getLogPath(),
 								"GenLib.log").getAbsolutePath(), false);
 				fh.setLevel(Level.ALL);
 				fh.setFormatter(new SimpleFormatter());
