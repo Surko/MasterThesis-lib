@@ -10,9 +10,6 @@ import genlib.structures.Data;
 import genlib.structures.data.GenLibInstances;
 import genlib.utils.Utils;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -61,7 +58,7 @@ public abstract class TreeConfusionFitness extends
 	 */
 	protected enum ConfusionEnum {
 		/**
-		 * Average parameter to defined what kind of averaging we use
+		 * Average parameter to define what kind of averaging we use
 		 * 
 		 * @see AverageEnum
 		 */
@@ -75,7 +72,21 @@ public abstract class TreeConfusionFitness extends
 		 * important. For example accuracy should be maximized. On the other
 		 * hand treeSize should be minimized.
 		 */
-		MAXIMIZE
+		MAXIMIZE;
+		
+		public static ConfusionEnum value(String name) {
+			if (name.equals(INDEX.name())) {
+				return INDEX;
+			}
+			if (name.equals(AVERAGE.name())) {
+				return AVERAGE;
+			}
+			if (name.equals(MAXIMIZE.name())) {
+				return MAXIMIZE;
+			}
+			
+			return null;
+		}
 	}
 
 	private static final Logger LOG = Logger
@@ -128,8 +139,8 @@ public abstract class TreeConfusionFitness extends
 		this.data = data;
 	}
 
-	protected boolean parseParamLabels(String paramLabel, String paramValue) {
-		ConfusionEnum confusionEnum = ConfusionEnum.valueOf(paramLabel);
+	protected boolean parseParamLabels(String paramLabel, String paramValue) {				
+		ConfusionEnum confusionEnum = ConfusionEnum.value(paramLabel);
 
 		if (confusionEnum == null) {
 			LOG.log(Level.INFO, String.format(
@@ -159,8 +170,8 @@ public abstract class TreeConfusionFitness extends
 		this.attrIndex = -1;
 		this.averageEnum = null;
 		this.maximize = null;
-
-		if (param.equals(PermMessages._blank_param)) {
+		
+		if (param.equals(PermMessages._blank_param)) {			
 			return;
 		}
 		String[] parts = param.split(Utils.pDELIM);

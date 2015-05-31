@@ -21,13 +21,20 @@ public class TreePrevalenceFitness extends TreeConfusionFitness {
 
 	/** for serialization */
 	private static final long serialVersionUID = 5404478348561054201L;
+	/** name for this fitness function, should be t$LabelOfFitness$*/
 	public static final String initName = "tPreval";
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected String getFitnessName() {
 		return TreePrevalenceFitness.initName;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected double attributeConfusionValue(GenLibInstances instances,
 			TreeIndividual individual) {
@@ -35,6 +42,9 @@ public class TreePrevalenceFitness extends TreeConfusionFitness {
 				/ instances.numInstances();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected double[] totalConfusionValues(GenLibInstances instances,
 			TreeIndividual individual) {
@@ -49,6 +59,9 @@ public class TreePrevalenceFitness extends TreeConfusionFitness {
 		return prevalArray;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected double attributeConfusionValue(Instances instances,
@@ -69,6 +82,9 @@ public class TreePrevalenceFitness extends TreeConfusionFitness {
 		return preval / instances.numInstances();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected double[] totalConfusionValues(Instances instances,

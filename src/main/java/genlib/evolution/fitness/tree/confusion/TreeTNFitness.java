@@ -9,21 +9,33 @@ import genlib.structures.trees.Node;
 import weka.core.Instance;
 import weka.core.Instances;
 
+/**
+ * Fitness function that computes true negative value/values from confusion
+ * matrix for population and its individuals. It extends from
+ * FitnessFunction<TreeIndividual> so it can be used with TreeIndividuals. It
+ * has unique initName that can be referenced when initializing this function.
+ * 
+ * @author Lukas Surin
+ *
+ */
 public class TreeTNFitness extends TreeConfusionFitness {
-
-	protected enum TrueNegativeEnum {
-		AVERAGE, INDEX
-	}
 
 	/** for serialization */
 	private static final long serialVersionUID = -6700987342218446344L;
+	/** name for this fitness function, should be t$LabelOfFitness$ */
 	public static final String initName = "tTN";
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected String getFitnessName() {
 		return TreeTNFitness.initName;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected double attributeConfusionValue(GenLibInstances instances,
 			TreeIndividual individual) {
@@ -51,13 +63,16 @@ public class TreeTNFitness extends TreeConfusionFitness {
 			if (tClass != attrIndex && pClass != attrIndex) {
 				tnValue += 1;
 			}
-			
+
 			root = individual.getRootNode();
 		}
 
 		return tnValue;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected double[] totalConfusionValues(GenLibInstances instances,
 			TreeIndividual individual) {
@@ -89,13 +104,16 @@ public class TreeTNFitness extends TreeConfusionFitness {
 					}
 				}
 			}
-			
+
 			root = individual.getRootNode();
 		}
-		
+
 		return tnArray;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected double attributeConfusionValue(Instances instances,
@@ -123,13 +141,16 @@ public class TreeTNFitness extends TreeConfusionFitness {
 			if (tClass != attrIndex && pClass != attrIndex) {
 				tnValue += 1;
 			}
-			
+
 			root = individual.getRootNode();
 		}
 
 		return tnValue;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected double[] totalConfusionValues(Instances instances,
@@ -158,16 +179,15 @@ public class TreeTNFitness extends TreeConfusionFitness {
 			if (tClass != pClass) {
 				for (int i = 0; i < instances.numClasses(); i++) {
 					if (i != tClass && i != pClass) {
-						tnArray[i] += 1;						
+						tnArray[i] += 1;
 					}
 				}
 			}
-			
+
 			root = individual.getRootNode();
 		}
-				
+
 		return tnArray;
 	}
-
 
 }

@@ -10,22 +10,41 @@ import java.util.Enumeration;
 import weka.core.Instance;
 import weka.core.Instances;
 
+/**
+ * Fitness function that computes false negative value/values from confusion
+ * matrix for population and its individuals. It extends from
+ * FitnessFunction<TreeIndividual> so it can be used with TreeIndividuals. It
+ * has unique initName that can be referenced when initializing this function.
+ * 
+ * @author Lukas Surin
+ *
+ */
 public class TreeFNFitness extends TreeConfusionFitness {
 
 	/** for serialization */
 	private static final long serialVersionUID = 7421602206568274999L;
+	/** name for this fitness function, should be t$LabelOfFitness$*/
 	public static final String initName = "tFN";
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected String getFitnessName() {
 		return TreeFNFitness.initName;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean canHandleNumeric() {
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected double attributeConfusionValue(GenLibInstances instances,
 			TreeIndividual individual) {
@@ -60,6 +79,9 @@ public class TreeFNFitness extends TreeConfusionFitness {
 		return fnValue;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected double[] totalConfusionValues(GenLibInstances instances,
 			TreeIndividual individual) {
@@ -93,7 +115,10 @@ public class TreeFNFitness extends TreeConfusionFitness {
 		
 		return fnArray;
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected double attributeConfusionValue(Instances instances,
@@ -128,6 +153,9 @@ public class TreeFNFitness extends TreeConfusionFitness {
 		return fnValue;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected double[] totalConfusionValues(Instances instances,

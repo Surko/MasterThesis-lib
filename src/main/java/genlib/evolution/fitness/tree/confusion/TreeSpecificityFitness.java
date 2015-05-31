@@ -16,8 +16,6 @@ import weka.core.Instances;
  * used with TreeIndividuals. It has unique initName that can be referenced when
  * initializing this function.
  * 
- * TODO methods are not ready
- * 
  * @author Lukas Surin
  *
  */
@@ -25,24 +23,31 @@ public class TreeSpecificityFitness extends TreeConfusionFitness {
 
 	/** for serialization */
 	private static final long serialVersionUID = -239489913433851564L;
+	/** name for this fitness function, should be t$LabelOfFitness$*/
 	public static final String initName = "tSpecificity";
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected String getFitnessName() {
 		return TreeSpecificityFitness.initName;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected double attributeConfusionValue(GenLibInstances instances,
 			TreeIndividual individual) {
 		Node root = individual.getRootNode();
 		double specificity = 0;
-		double denominator = 0;
+		double cn = 0;
 
 		Enumeration<GenLibInstance> eInstances = instances.getInstances();
 		while (eInstances.hasMoreElements()) {
 			GenLibInstance instance = eInstances.nextElement();
-			
+
 			while (!root.isLeaf()) {
 				if (instance.getAttribute(root.getAttribute()).isNumeric()) {
 					if (instance.getValueOfAttribute(root.getAttribute()) < root
@@ -61,25 +66,30 @@ public class TreeSpecificityFitness extends TreeConfusionFitness {
 			int pClass = (int) root.getValue();
 
 			if (tClass != attrIndex) {
-				denominator += 1;
+				cn += 1;
 				if (pClass != attrIndex) {
 					specificity += 1;
 				}
 			}
-			
+
 			root = individual.getRootNode();
 
 		}
 
-		return specificity / denominator;
+		return specificity / cn;
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected double[] totalConfusionValues(GenLibInstances instances,
 			TreeIndividual individual) {
 		Node root = individual.getRootNode();
-		double[] recallArray = new double[instances.numClasses()];
+		// firstly here will be inverse to condition negative => numInstances -
+		// inv_cn = cn
+		double[] specificity = new double[instances.numClasses()];
 
 		Enumeration<GenLibInstance> eInstances = instances.getInstances();
 		while (eInstances.hasMoreElements()) {
@@ -99,35 +109,43 @@ public class TreeSpecificityFitness extends TreeConfusionFitness {
 			}
 
 			int tClass = (int) instance.getValueOfClass();
-			if (tClass == (int) root.getValue()) {
-				// add true positives for attribute
-				recallArray[tClass] += 1;
+			int pClass = (int) root.getValue();
+
+			if (tClass == pClass) {
+				specificity[tClass] += 1;
+			} else {
+				specificity[tClass] += 1;
+				specificity[pClass] += 1;
 			}
 
 			root = individual.getRootNode();
 
 		}
 
-		double[] classCounts = data.getClassCounts();
-		for (int i = 0; i < recallArray.length; i++) {
-			// divide with all the positives will give recall
-			recallArray[i] /= classCounts[i];
+		// stored condition positives for each attribute. numinstances - cp = cn
+		double[] classes = data.getClassCounts();
+		for (int i = 0; i < specificity.length; i++) {
+			specificity[i] = (instances.numInstances() - specificity[i])
+					/ (instances.numInstances() - classes[i]);
 		}
 
-		return recallArray;
+		return specificity;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected double attributeConfusionValue(Instances instances,
 			TreeIndividual individual) {
 		Node root = individual.getRootNode();
 		double specificity = 0;
-		double denominator = 0;
+		double cn = 0;
 
 		Enumeration<Instance> eInstances = instances.enumerateInstances();
 		while (eInstances.hasMoreElements()) {
-			Instance instance = eInstances.nextElement();			
+			Instance instance = eInstances.nextElement();
 
 			while (!root.isLeaf()) {
 				if (instance.attribute(root.getAttribute()).isNumeric()) {
@@ -146,24 +164,29 @@ public class TreeSpecificityFitness extends TreeConfusionFitness {
 			int pClass = (int) root.getValue();
 
 			if (tClass != attrIndex) {
-				denominator += 1;
+				cn += 1;
 				if (pClass != attrIndex) {
 					specificity += 1;
 				}
-			}			
+			}
 
 			root = individual.getRootNode();
 		}
 
-		return specificity / denominator;
+		return specificity / cn;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected double[] totalConfusionValues(Instances instances,
 			TreeIndividual individual) {
 		Node root = individual.getRootNode();
-		double[] recallArray = new double[instances.numClasses()];
+		// firstly here will be inverse to condition negative => numInstances -
+		// inv_cn = cn
+		double[] specificity = new double[instances.numClasses()];
 
 		Enumeration<Instance> eInstances = instances.enumerateInstances();
 		while (eInstances.hasMoreElements()) {
@@ -182,21 +205,27 @@ public class TreeSpecificityFitness extends TreeConfusionFitness {
 			}
 
 			int tClass = (int) instance.classValue();
-			if (tClass == (int) root.getValue()) {
-				recallArray[tClass] += 1;
+			int pClass = (int) root.getValue();
+
+			if (tClass == pClass) {
+				specificity[tClass] += 1;
+			} else {
+				specificity[tClass] += 1;
+				specificity[pClass] += 1;
 			}
 
 			root = individual.getRootNode();
 
 		}
 
-		double[] classCounts = data.getClassCounts();
-		for (int i = 0; i < recallArray.length; i++) {
-			// divide with all the positives will give recall
-			recallArray[i] /= classCounts[i];
+		// stored condition positives for each attribute. numinstances - cp = cn
+		double[] classes = data.getClassCounts();
+		for (int i = 0; i < specificity.length; i++) {
+			specificity[i] = (instances.numInstances() - specificity[i])
+					/ (instances.numInstances() - classes[i]);
 		}
 
-		return recallArray;
+		return specificity;
 	}
 
 }

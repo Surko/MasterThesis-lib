@@ -9,17 +9,33 @@ import genlib.structures.trees.Node;
 import weka.core.Instance;
 import weka.core.Instances;
 
+/**
+ * Fitness function that computes false positive value/values from confusion
+ * matrix for population and its individuals. It extends from
+ * FitnessFunction<TreeIndividual> so it can be used with TreeIndividuals. It
+ * has unique initName that can be referenced when initializing this function.
+ * 
+ * @author Lukas Surin
+ *
+ */
 public class TreeFPFitness extends TreeConfusionFitness {
 
 	/** for serialization */
 	private static final long serialVersionUID = -7144813469293892175L;
+	/** name for this fitness function, should be t$LabelOfFitness$ */
 	public static final String initName = "tFP";
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected String getFitnessName() {
 		return TreeFPFitness.initName;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected double attributeConfusionValue(GenLibInstances instances,
 			TreeIndividual individual) {
@@ -47,13 +63,16 @@ public class TreeFPFitness extends TreeConfusionFitness {
 			if (tClass != attrIndex && pClass == attrIndex) {
 				fpValue += 1;
 			}
-			
+
 			root = individual.getRootNode();
 		}
 
 		return fpValue;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected double[] totalConfusionValues(GenLibInstances instances,
 			TreeIndividual individual) {
@@ -81,13 +100,16 @@ public class TreeFPFitness extends TreeConfusionFitness {
 			if (tClass != pClass) {
 				fpArray[pClass] += 1;
 			}
-			
+
 			root = individual.getRootNode();
 		}
-		
+
 		return fpArray;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected double attributeConfusionValue(Instances instances,
@@ -115,13 +137,16 @@ public class TreeFPFitness extends TreeConfusionFitness {
 			if (tClass != attrIndex && pClass == attrIndex) {
 				fpValue += 1;
 			}
-			
+
 			root = individual.getRootNode();
 		}
 
 		return fpValue;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected double[] totalConfusionValues(Instances instances,
@@ -150,10 +175,10 @@ public class TreeFPFitness extends TreeConfusionFitness {
 			if (tClass != pClass) {
 				fpArray[pClass] += 1;
 			}
-			
+
 			root = individual.getRootNode();
 		}
-		
+
 		return fpArray;
 	}
 

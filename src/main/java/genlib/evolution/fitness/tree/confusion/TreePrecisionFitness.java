@@ -23,13 +23,20 @@ public class TreePrecisionFitness extends TreeConfusionFitness {
 
 	/** for serialization */
 	private static final long serialVersionUID = 7017263653864815690L;
+	/** name for this fitness function, should be t$LabelOfFitness$*/
 	public static final String initName = "tPrecision";
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected String getFitnessName() {
 		return TreePrecisionFitness.initName;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected double attributeConfusionValue(GenLibInstances instances,
 			TreeIndividual individual) {
@@ -72,11 +79,15 @@ public class TreePrecisionFitness extends TreeConfusionFitness {
 		return tp / top;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected double[] totalConfusionValues(GenLibInstances instances,
 			TreeIndividual individual) {
 		Node root = individual.getRootNode();
 		double[] precisionArray = new double[instances.numClasses()];
+		double[] topArray = new double[instances.numClasses()];
 
 		Enumeration<GenLibInstance> eInstances = instances.getInstances();
 		while (eInstances.hasMoreElements()) {
@@ -102,12 +113,21 @@ public class TreePrecisionFitness extends TreeConfusionFitness {
 				precisionArray[tClass] += 1;
 			}
 			
+			topArray[pClass] += 1;
 			root = individual.getRootNode();
 		}
 
+		for (int i = 0; i < precisionArray.length; i++) {
+			// divide with all the positives will give recall
+			precisionArray[i] /= topArray[i];
+		}
+		
 		return precisionArray;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected double attributeConfusionValue(Instances instances,
@@ -149,12 +169,16 @@ public class TreePrecisionFitness extends TreeConfusionFitness {
 		return tp / top;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected double[] totalConfusionValues(Instances instances,
 			TreeIndividual individual) {
 		Node root = individual.getRootNode();
-		double[] recallArray = new double[instances.numClasses()];
+		double[] precisionArray = new double[instances.numClasses()];
+		double[] topArray = new double[instances.numClasses()];
 
 		Enumeration<Instance> eInstances = instances.enumerateInstances();
 		while (eInstances.hasMoreElements()) {
@@ -175,13 +199,19 @@ public class TreePrecisionFitness extends TreeConfusionFitness {
 			int tClass = (int) instance.classValue();
 			int pClass = (int) root.getValue();
 			if (tClass == pClass) {
-				recallArray[tClass] += 1;
+				precisionArray[tClass] += 1;
 			}
 			
+			topArray[pClass] += 1;
 			root = individual.getRootNode();
 		}
+		
+		for (int i = 0; i < precisionArray.length; i++) {
+			// divide with all the positives will give recall
+			precisionArray[i] /= topArray[i];
+		}
 
-		return recallArray;
+		return precisionArray;
 	}
 
 }

@@ -23,13 +23,20 @@ public class TreeRecallFitness extends TreeConfusionFitness {
 
 	/** for serialization */
 	private static final long serialVersionUID = 8140227134246347256L;
+	/** name for this fitness function, should be t$LabelOfFitness$*/
 	public static final String initName = "tRecall";
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected String getFitnessName() {
 		return TreeRecallFitness.initName;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected double attributeConfusionValue(GenLibInstances instances,
 			TreeIndividual individual) {
@@ -71,6 +78,9 @@ public class TreeRecallFitness extends TreeConfusionFitness {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected double[] totalConfusionValues(GenLibInstances instances,
 			TreeIndividual individual) {
@@ -112,6 +122,9 @@ public class TreeRecallFitness extends TreeConfusionFitness {
 		return recallArray;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected double attributeConfusionValue(Instances instances,
@@ -152,6 +165,9 @@ public class TreeRecallFitness extends TreeConfusionFitness {
 		return tp / data.getClassCounts()[attrIndex];
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected double[] totalConfusionValues(Instances instances,

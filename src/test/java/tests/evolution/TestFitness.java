@@ -1,8 +1,11 @@
 package tests.evolution;
 
 import static org.junit.Assert.assertTrue;
+import genlib.GenLib;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.fitness.tree.TreeAccuracyFitness;
+import genlib.evolution.fitness.tree.confusion.TreeConfusionFitness;
+import genlib.evolution.fitness.tree.confusion.TreeFMeasureFitness;
 import genlib.evolution.fitness.tree.confusion.TreeFNFitness;
 import genlib.evolution.fitness.tree.confusion.TreeFPFitness;
 import genlib.evolution.fitness.tree.confusion.TreePrecisionFitness;
@@ -21,6 +24,8 @@ import genlib.utils.Utils.Sign;
 import genlib.utils.WekaUtils;
 
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.junit.Test;
 
@@ -35,6 +40,10 @@ public class TestFitness {
 			wekaThreeIndividual;
 
 	static {
+
+		if (!TestProperties.testPrints)
+			Logger.getLogger(GenLib.class.getPackage().getName()).setLevel(
+					Level.OFF);
 
 		// without this individual don't have big enough array for fitness
 		FitnessFunction.registeredFunctions = 2;
@@ -228,8 +237,32 @@ public class TestFitness {
 		function.setParam("MAXIMIZE,true");
 		assertTrue(function.objectInfo().equals(name + " MAXIMIZE,true"));
 
+		name = TreeFMeasureFitness.initName;
+		function = new TreeFMeasureFitness();		
+		assertTrue(function.objectInfo().equals(name + " x"));
+		function.setParam("INDEX,0");
+		assertTrue(function.objectInfo().equals(name + " INDEX,0"));
+		function.setParam("INDEX,0,AVERAGE,WEIGHTED");
+		assertTrue(function.objectInfo().equals(
+				name + " INDEX,0,AVERAGE,WEIGHTED"));
+		function.setParam("MAXIMIZE,true");
+		assertTrue(function.objectInfo().equals(name + " MAXIMIZE,true"));
+		function.setParam("BETA,0.5");		
+		assertTrue(function.objectInfo().equals(name + " BETA,0.5"));
+		
 		name = TreeRecallFitness.initName;
 		function = new TreeRecallFitness();
+		assertTrue(function.objectInfo().equals(name + " x"));
+		function.setParam("INDEX,0");
+		assertTrue(function.objectInfo().equals(name + " INDEX,0"));
+		function.setParam("INDEX,0,AVERAGE,WEIGHTED");
+		assertTrue(function.objectInfo().equals(
+				name + " INDEX,0,AVERAGE,WEIGHTED"));
+		function.setParam("MAXIMIZE,true");
+		assertTrue(function.objectInfo().equals(name + " MAXIMIZE,true"));
+		
+		name = TreeSpecificityFitness.initName;
+		function = new TreeSpecificityFitness();
 		assertTrue(function.objectInfo().equals(name + " x"));
 		function.setParam("INDEX,0");
 		assertTrue(function.objectInfo().equals(name + " INDEX,0"));
@@ -455,14 +488,86 @@ public class TestFitness {
 
 	@Test
 	public void testPrevalenceFitness() {
-		FitnessFunction<TreeIndividual> function = new TreePrevalenceFitness();
+		TreeConfusionFitness function = new TreePrevalenceFitness();
 		function.setIndex(1);
+		function.setData(wekaData);
 
+		int fIndex = function.getIndex();
+		assertTrue(fIndex == 1);
+		assertTrue(testIndividual.hasChanged());
+		assertTrue(wekaIndividual.hasChanged());
+
+		double f1 = function.computeFitness(testIndividual);
+		double f2 = function.computeFitness(wekaIndividual);		
+
+		if (TestProperties.testPrints) {
+			System.out.println("testIndividual, prevalence fitness, binary: "
+					+ f1);
+			System.out.println("wekaIndividual, prevalence fitness, binary: "
+					+ f2);
+		}
+
+		assertTrue(f1 == (0.34d));
+		assertTrue(testIndividual.getFitnessValue(1) == f1);
+		assertTrue(f2 == (0.34d));
+		assertTrue(wekaIndividual.getFitnessValue(1) == f2);
+
+		// Different index
+		function.setParam("INDEX,0");
+
+		f1 = function.computeFitness(testIndividual);
+		f2 = function.computeFitness(wekaIndividual);
+
+		if (TestProperties.testPrints) {
+			System.out.println("testIndividual, prevalence fitness, attr 0: "
+					+ f1);
+			System.out.println("wekaIndividual, prevalence fitness, attr 0: "
+					+ f2);
+		}
+
+		assertTrue(f1 == (0.66d));
+		assertTrue(testIndividual.getFitnessValue(1) == f1);
+		assertTrue(f2 == (0.66d));
+		assertTrue(wekaIndividual.getFitnessValue(1) == f2);
+
+		function = new TreePrevalenceFitness();
+		function.setIndex(1);
+		function.setData(wekaDataThree);
+		function.setParam("AVERAGE,WEIGHTED");
+
+		f1 = function.computeFitness(wekaThreeIndividual);
+
+		if (TestProperties.testPrints) {
+			System.out
+					.println("wekaThreeIndividual, prevalence fitness, weighted: "
+							+ f1);
+		}				
+
+		double[] fitValues = function.getConfusionValues(wekaThreeIndividual);
+
+		assertTrue(f1 == (fitValues[0] * 21 + fitValues[1] * 62 + fitValues[2] * 17) / 100);
+		
+		if (TestProperties.testPrints) {
+			System.out
+					.println("wekaThreeIndividual, prevalence fitness, attr 0: "
+							+ fitValues[0]);
+			System.out
+					.println("wekaThreeIndividual, prevalence fitness, attr 1: "
+							+ fitValues[1]);
+			System.out
+					.println("wekaThreeIndividual, prevalence fitness, attr 2: "
+							+ fitValues[2]);
+		}
+		
+		assertTrue(fitValues[0] == 0.21d);
+		assertTrue(fitValues[1] == 0.62d);
+		assertTrue(fitValues[2] == 0.17d);
+		
 	}
 
 	@Test
 	public void treePrecisionFitness() {
-		FitnessFunction<TreeIndividual> function = new TreeRecallFitness();
+		TreeConfusionFitness function = new TreePrecisionFitness();
 		function.setIndex(1);
 		function.setData(wekaData);
 
@@ -472,8 +577,85 @@ public class TestFitness {
 		assertTrue(wekaIndividual.hasChanged());
 
 		double f1 = function.computeFitness(testIndividual);
-		double f2 = function.computeFitness(wekaIndividual);
-		double f3 = 0d;
+		double f2 = function.computeFitness(wekaIndividual);		
+
+		if (TestProperties.testPrints) {
+			System.out.println("testIndividual, precision fitness, binary: "
+					+ f1);
+			System.out.println("wekaIndividual, precision fitness, binary: "
+					+ f2);
+		}
+
+		assertTrue(f1 == (19d / 51));
+		assertTrue(testIndividual.getFitnessValue(1) == f1);
+		assertTrue(f2 == (29d / 31));
+		assertTrue(wekaIndividual.getFitnessValue(1) == f2);
+
+		// Different index
+		function.setParam("INDEX,0");
+
+		f1 = function.computeFitness(testIndividual);
+		f2 = function.computeFitness(wekaIndividual);
+
+		if (TestProperties.testPrints) {
+			System.out.println("testIndividual, precision fitness, attr 0: "
+					+ f1);
+			System.out.println("wekaIndividual, precision fitness, attr 0: "
+					+ f2);
+		}
+
+		assertTrue(f1 == (34d / 49));
+		assertTrue(testIndividual.getFitnessValue(1) == f1);
+		assertTrue(f2 == (64d / 69));
+		assertTrue(wekaIndividual.getFitnessValue(1) == f2);
+
+		function = new TreePrecisionFitness();
+		function.setIndex(1);
+		function.setData(wekaDataThree);
+		function.setParam("AVERAGE,WEIGHTED");
+
+		f1 = function.computeFitness(wekaThreeIndividual);
+
+		if (TestProperties.testPrints) {
+			System.out
+					.println("wekaThreeIndividual, precision fitness, weighted: "
+							+ f1);
+		}				
+
+		double[] fitValues = function.getConfusionValues(wekaThreeIndividual);
+
+		assertTrue(f1 == (fitValues[0] * 21 + fitValues[1] * 62 + fitValues[2] * 17) / 100);
+		
+		if (TestProperties.testPrints) {
+			System.out
+					.println("wekaThreeIndividual, precision fitness, attr 0: "
+							+ fitValues[0]);
+			System.out
+					.println("wekaThreeIndividual, precision fitness, attr 1: "
+							+ fitValues[1]);
+			System.out
+					.println("wekaThreeIndividual, precision fitness, attr 2: "
+							+ fitValues[2]);
+		}
+		
+		assertTrue(fitValues[0] == 16d/19);
+		assertTrue(fitValues[1] == 58d/62);
+		assertTrue(fitValues[2] == 16d/19);		
+	}
+
+	@Test
+	public void testRecallFitness() {
+		TreeConfusionFitness function = new TreeRecallFitness();
+		function.setIndex(1);
+		function.setData(wekaData);
+
+		int fIndex = function.getIndex();
+		assertTrue(fIndex == 1);
+		assertTrue(testIndividual.hasChanged());
+		assertTrue(wekaIndividual.hasChanged());
+
+		double f1 = function.computeFitness(testIndividual);
+		double f2 = function.computeFitness(wekaIndividual);		
 
 		if (TestProperties.testPrints) {
 			System.out.println("testIndividual, recall fitness, binary: " + f1);
@@ -509,28 +691,34 @@ public class TestFitness {
 		f1 = function.computeFitness(wekaThreeIndividual);
 
 		if (TestProperties.testPrints) {
-			System.out.println("wekaThreeIndividual, recall fitness, weighted: " + f1);
+			System.out
+					.println("wekaThreeIndividual, recall fitness, weighted: "
+							+ f1);
 		}
 		assertTrue(f1 == 0.9d);
 
-		function.setParam("INDEX,0");
-		f1 = function.computeFitness(wekaThreeIndividual);
-		function.setParam("INDEX,1");
-		f2 = function.computeFitness(wekaThreeIndividual);
-		function.setParam("INDEX,2");
-		f3 = function.computeFitness(wekaThreeIndividual);
-		
+		double[] fitValues = function.getConfusionValues(wekaThreeIndividual);
 
 		if (TestProperties.testPrints) {
-			System.out.println("wekaThreeIndividual, recall fitness, attr 0: " + f1);
-			System.out.println("wekaThreeIndividual, recall fitness, attr 1: " + f2);
-			System.out.println("wekaThreeIndividual, recall fitness, attr 2: " + f3);
+			System.out
+					.println("wekaThreeIndividual, recall fitness, attr 0: "
+							+ fitValues[0]);
+			System.out
+					.println("wekaThreeIndividual, recall fitness, attr 1: "
+							+ fitValues[1]);
+			System.out
+					.println("wekaThreeIndividual, recall fitness, attr 2: "
+							+ fitValues[2]);
 		}
+		
+		assertTrue(fitValues[0] == 16d/21);
+		assertTrue(fitValues[1] == 58d/62);
+		assertTrue(fitValues[2] == 16d/17);			
 	}
 	
 	@Test
-	public void testRecallFitness() {
-		FitnessFunction<TreeIndividual> function = new TreeRecallFitness();
+	public void testSpecificityFitness() {
+		TreeConfusionFitness function = new TreeSpecificityFitness();
 		function.setIndex(1);
 		function.setData(wekaData);
 
@@ -540,17 +728,16 @@ public class TestFitness {
 		assertTrue(wekaIndividual.hasChanged());
 
 		double f1 = function.computeFitness(testIndividual);
-		double f2 = function.computeFitness(wekaIndividual);
-		double f3 = 0d;
+		double f2 = function.computeFitness(wekaIndividual);		
 
 		if (TestProperties.testPrints) {
-			System.out.println("testIndividual, recall fitness, binary: " + f1);
-			System.out.println("wekaIndividual, recall fitness, binary: " + f2);
+			System.out.println("testIndividual, specificity fitness, binary: " + f1);
+			System.out.println("wekaIndividual, specificity fitness, binary: " + f2);
 		}
 
-		assertTrue(f1 == (19d / 34));
+		assertTrue(f1 == (34d / 66));
 		assertTrue(testIndividual.getFitnessValue(1) == f1);
-		assertTrue(f2 == (29d / 34));
+		assertTrue(f2 == (64d / 66));
 		assertTrue(wekaIndividual.getFitnessValue(1) == f2);
 
 		// Different index
@@ -560,16 +747,16 @@ public class TestFitness {
 		f2 = function.computeFitness(wekaIndividual);
 
 		if (TestProperties.testPrints) {
-			System.out.println("testIndividual, recall fitness, attr 0: " + f1);
-			System.out.println("wekaIndividual, recall fitness, attr 0: " + f2);
+			System.out.println("testIndividual, specificity fitness, attr 0: " + f1);
+			System.out.println("wekaIndividual, specificity fitness, attr 0: " + f2);
 		}
 
-		assertTrue(f1 == (34d / 66));
+		assertTrue(f1 == (19d / 34));
 		assertTrue(testIndividual.getFitnessValue(1) == f1);
-		assertTrue(f2 == (64d / 66));
+		assertTrue(f2 == (29d / 34));
 		assertTrue(wekaIndividual.getFitnessValue(1) == f2);
 
-		function = new TreeRecallFitness();
+		function = new TreeSpecificityFitness();
 		function.setIndex(1);
 		function.setData(wekaDataThree);
 		function.setParam("AVERAGE,WEIGHTED");
@@ -577,21 +764,29 @@ public class TestFitness {
 		f1 = function.computeFitness(wekaThreeIndividual);
 
 		if (TestProperties.testPrints) {
-			System.out.println("wekaThreeIndividual, recall fitness, weighted: " + f1);
+			System.out
+					.println("wekaThreeIndividual, specificity fitness, weighted: "
+							+ f1);
 		}
-		assertTrue(f1 == 0.9d);
-
-		function.setParam("INDEX,0");
-		f1 = function.computeFitness(wekaThreeIndividual);
-		function.setParam("INDEX,1");
-		f2 = function.computeFitness(wekaThreeIndividual);
-		function.setParam("INDEX,2");
-		f3 = function.computeFitness(wekaThreeIndividual);
 		
+		double[] fitValues = function.getConfusionValues(wekaThreeIndividual);
+		assertTrue(f1 == (fitValues[0] * 21 + fitValues[1] * 62 + fitValues[2] * 17) / 100);
+
 		if (TestProperties.testPrints) {
-			System.out.println("wekaThreeIndividual, recall fitness, attr 0: " + f1);
-			System.out.println("wekaThreeIndividual, recall fitness, attr 1: " + f2);
-			System.out.println("wekaThreeIndividual, recall fitness, attr 2: " + f3);
+			System.out
+					.println("wekaThreeIndividual, specificity fitness, attr 0: "
+							+ fitValues[0]);
+			System.out
+					.println("wekaThreeIndividual, specificity fitness, attr 1: "
+							+ fitValues[1]);
+			System.out
+					.println("wekaThreeIndividual, specificity fitness, attr 2: "
+							+ fitValues[2]);
 		}
+		
+		assertTrue(fitValues[0] == 76d/79);
+		assertTrue(fitValues[1] == 34d/38);
+		assertTrue(fitValues[2] == 80d/83);			
 	}
+	
 }
