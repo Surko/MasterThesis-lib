@@ -26,7 +26,7 @@ public abstract class FitnessFunction<T extends Individual> implements Serializa
 	
 	/** for serialization */
 	private static final long serialVersionUID = -90043146335682343L;
-	public static final HashMap<String, Class<FitnessFunction<TreeIndividual>>> tFitFuncs = new HashMap<>();
+	public static final HashMap<String, Class<? extends FitnessFunction<TreeIndividual>>> tFitFuncs = new HashMap<>();
 	
 	/** How many fitness functions is already registered */
 	public static int registeredFunctions = 0;

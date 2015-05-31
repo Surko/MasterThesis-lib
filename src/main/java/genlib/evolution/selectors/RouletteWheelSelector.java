@@ -1,13 +1,12 @@
 package genlib.evolution.selectors;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.fitness.comparators.FitnessComparator;
 import genlib.evolution.individuals.Individual;
 import genlib.evolution.population.IPopulation;
-import genlib.evolution.population.Population;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 public class RouletteWheelSelector implements Selector {
 	/** for serialization */

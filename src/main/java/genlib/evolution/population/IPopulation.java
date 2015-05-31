@@ -10,9 +10,10 @@ import java.util.HashMap;
 
 public interface IPopulation<T extends Individual> {
 
-	public static final HashMap<String, Class<IPopulation<?>>> populationTypes = new HashMap<>();
-
-	public Class<?> getIndividualType();
+	@SuppressWarnings("rawtypes")
+	public static final HashMap<String, Class<? extends IPopulation>> populationTypes = new HashMap<>();	
+	
+	public <S extends Individual> IPopulation<S> makeNewInstance();
 	
 	public IPopulation<T> createNewInstance();
 

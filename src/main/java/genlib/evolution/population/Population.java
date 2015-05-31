@@ -69,12 +69,12 @@ public class Population<T extends Individual> implements Serializable, IPopulati
 		this.maxPopSize = maxPopSize;
 		this.randomGen = new Random(Utils.randomGen.nextLong());
 	}	
-	
-	@Override
-	public Class<?> getIndividualType() {
-		return Individual.class;
-	}
 
+	@Override
+	public <S extends Individual> IPopulation<S> makeNewInstance() {
+		return new Population<S>();
+	}
+	
 	public Population<T> createNewInstance() {
 		return new Population<T>();
 	}

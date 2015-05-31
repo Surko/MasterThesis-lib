@@ -158,8 +158,7 @@ public class EvolutionTreeClassifier implements Serializable,
 			makeEnvSelectorSet();
 		}
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	public IPopulation<TreeIndividual> makePopulation() throws Exception {
 		String[] parameters = c.getPopulationType().split(Utils.oDELIM);
 
@@ -173,14 +172,16 @@ public class EvolutionTreeClassifier implements Serializable,
 					c.getPopulationSize());
 		}
 
-		IPopulation<?> population = IPopulation.populationTypes
-				.get(parameters[0]).newInstance();
-		if (TreeIndividual.class == population.getIndividualType()) {
-			return (IPopulation<TreeIndividual>)population;
+		@SuppressWarnings("rawtypes")
+		Class<? extends IPopulation> iPopClass = IPopulation.populationTypes.get(parameters[0]);
+
+		if (iPopClass != null) {
+			IPopulation<?> population = iPopClass.newInstance();
+			return population.makeNewInstance();
 		}
 		
 		return new Population<>(popInit.getPopulation(),
-				c.getPopulationSize()); 
+				c.getPopulationSize());
 	}
 
 	private void makeSelectorSet() throws Exception {
@@ -286,7 +287,7 @@ public class EvolutionTreeClassifier implements Serializable,
 
 		int max = 0;
 
-		HashMap<String, Class<FitnessFunction<TreeIndividual>>> h = FitnessFunction.tFitFuncs;
+		HashMap<String, Class<? extends FitnessFunction<TreeIndividual>>> h = FitnessFunction.tFitFuncs;
 		for (int i = 0; i < parameters.length; i += 2) {
 			if (parameters[i] == "") {
 				fitFuncs.clear();

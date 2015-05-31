@@ -3,7 +3,6 @@ package genlib.evolution.selectors;
 import genlib.evolution.fitness.comparators.FitnessComparator;
 import genlib.evolution.individuals.Individual;
 import genlib.evolution.population.IPopulation;
-import genlib.evolution.population.Population;
 
 import java.io.Serializable;
 import java.util.ArrayList;

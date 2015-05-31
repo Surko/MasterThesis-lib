@@ -1,6 +1,6 @@
 package genlib.annotations;
 
-import genlib.evolution.population.Population;
+import genlib.evolution.population.IPopulation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 public @interface PopulationAnnot {
 	boolean[] wekaCompatibility();
 	String[] toInjectNames();
-	Class<? extends Population<?>>[] toInjectClasses();
+	Class<? extends IPopulation<?>>[] toInjectClasses();
 	String toInjectField();
 	Class<?> toInjectClass();
 }
