@@ -8,11 +8,13 @@ import genlib.evolution.fitness.tree.confusion.TreeFPFitness;
 import genlib.evolution.fitness.tree.confusion.TreePrecisionFitness;
 import genlib.evolution.fitness.tree.confusion.TreePrevalenceFitness;
 import genlib.evolution.fitness.tree.confusion.TreeRecallFitness;
+import genlib.evolution.fitness.tree.confusion.TreeSpecificityFitness;
 import genlib.evolution.fitness.tree.confusion.TreeTNFitness;
 import genlib.evolution.fitness.tree.confusion.TreeTPFitness;
 import genlib.evolution.fitness.tree.look.TreeSizeFitness;
 import genlib.evolution.fitness.tree.look.TreeHeightFitness;
 import genlib.evolution.individuals.TreeIndividual;
+import genlib.exceptions.MissingParamException;
 import genlib.structures.Data;
 import genlib.structures.trees.MultiWayDepthNode;
 import genlib.utils.Utils.Sign;
@@ -27,9 +29,10 @@ import weka.datagenerators.classifiers.classification.RDG1;
 
 public class TestFitness {
 
-	public static Data wekaData;
+	public static Data wekaData, wekaDataThree;
 	public static Data arrayData;
-	public static TreeIndividual testIndividual, wekaIndividual;
+	public static TreeIndividual testIndividual, wekaIndividual,
+			wekaThreeIndividual;
 
 	static {
 
@@ -99,6 +102,92 @@ public class TestFitness {
 					wekaData.numInstances(), attrIndexMap, attrValueIndexMap,
 					false);
 
+			// ternary class problem
+			options = new String[] {
+					"-r",
+					"weka.datagenerators.classifiers.classification.RDG1-S_1_-n_100_-a_10_-c_2_-N_0_-I_0_-M_1_-R_10",
+					"-S", "1", "-n", "100", "-a", "10", "-c", "3", "-N", "0",
+					"-I", "0", "-M", "1", "-R", "10" };
+			rdg = new RDG1();
+			rdg.setOptions(options);
+			rdg.defineDataFormat();
+			wekaDataThree = new Data(rdg.generateExamples());
+
+			attrIndexMap = wekaDataThree.getAttrIndexMap();
+			attrValueIndexMap = wekaDataThree.getAttrValueIndexMap();
+
+			sTree = "digraph J48Tree {\n"
+					+ "N0 [label=\"a9\" ]\n"
+					+ "N0->N1 [label=\"\'= false\'\"]\n"
+					+ "N1 [label=\"a4\" ]\n"
+					+ "N1->N2 [label=\"\'= false\'\"]\n"
+					+ "N2 [label=\"a1\" ]\n"
+					+ "N2->N3 [label=\"\'= false\'\"]\n"
+					+ "N3 [label=\"\'c1 (17.0/2.0)\'\" shape=box style=filled ]\n"
+					+ "N2->N4 [label=\"\'= true\'\"]\n"
+					+ "N4 [label=\"a5\" ]\n"
+					+ "N4->N5 [label=\"\'= false\'\"]\n"
+					+ "N5 [label=\"\'c1 (3.0)\'\" shape=box style=filled ]\n"
+					+ "N4->N6 [label=\"\'= true\'\"]\n"
+					+ "N6 [label=\"\'c2 (5.0/1.0)\'\" shape=box style=filled ]\n"
+					+ "N1->N7 [label=\"\'= true\'\"]\n"
+					+ "N7 [label=\"a5\" ]\n"
+					+ "N7->N8 [label=\"\'= false\'\"]\n"
+					+ "N8 [label=\"a6\" ]\n"
+					+ "N8->N9 [label=\"\'= false\'\"]\n"
+					+ "N9 [label=\"\'c1 (4.0)\'\" shape=box style=filled ]\n"
+					+ "N8->N10 [label=\"\'= true\'\"]\n"
+					+ "N10 [label=\"\'c2 (5.0)\'\" shape=box style=filled ]\n"
+					+ "N7->N11 [label=\"\'= true\'\"]\n"
+					+ "N11 [label=\"a8\" ]\n"
+					+ "N11->N12 [label=\"\'= false\'\"]\n"
+					+ "N12 [label=\"\'c0 (6.0/1.0)\'\" shape=box style=filled ]\n"
+					+ "N11->N13 [label=\"\'= true\'\"]\n"
+					+ "N13 [label=\"a6\" ]\n"
+					+ "N13->N14 [label=\"\'= false\'\"]\n"
+					+ "N14 [label=\"a1\" ]\n"
+					+ "N14->N15 [label=\"\'= false\'\"]\n"
+					+ "N15 [label=\"\'c0 (3.0)\'\" shape=box style=filled ]\n"
+					+ "N14->N16 [label=\"\'= true\'\"]\n"
+					+ "N16 [label=\"\'c2 (3.0/1.0)\'\" shape=box style=filled ]\n"
+					+ "N13->N17 [label=\"\'= true\'\"]\n"
+					+ "N17 [label=\"\'c2 (3.0)\'\" shape=box style=filled ]\n"
+					+ "N0->N18 [label=\"\'= true\'\"]\n"
+					+ "N18 [label=\"a8\" ]\n"
+					+ "N18->N19 [label=\"\'= false\'\"]\n"
+					+ "N19 [label=\"\'c1 (28.0/2.0)\'\" shape=box style=filled ]\n"
+					+ "N18->N20 [label=\"\'= true\'\"]\n"
+					+ "N20 [label=\"a6\" ]\n"
+					+ "N20->N21 [label=\"\'= false\'\"]\n"
+					+ "N21 [label=\"a5\" ]\n"
+					+ "N21->N22 [label=\"\'= false\'\"]\n"
+					+ "N22 [label=\"\'c1 (6.0)\'\" shape=box style=filled ]\n"
+					+ "N21->N23 [label=\"\'= true\'\"]\n"
+					+ "N23 [label=\"a2\" ]\n"
+					+ "N23->N24 [label=\"\'= false\'\"]\n"
+					+ "N24 [label=\"a1\" ]\n"
+					+ "N24->N25 [label=\"\'= false\'\"]\n"
+					+ "N25 [label=\"\'c1 (2.0)\'\" shape=box style=filled ]\n"
+					+ "N24->N26 [label=\"\'= true\'\"]\n"
+					+ "N26 [label=\"\'c0 (3.0/1.0)\'\" shape=box style=filled ]\n"
+					+ "N23->N27 [label=\"\'= true\'\"]\n"
+					+ "N27 [label=\"\'c0 (4.0/1.0)\'\" shape=box style=filled ]\n"
+					+ "N20->N28 [label=\"\'= true\'\"]\n"
+					+ "N28 [label=\"a0\" ]\n"
+					+ "N28->N29 [label=\"\'= false\'\"]\n"
+					+ "N29 [label=\"\'c1 (2.0)\'\" shape=box style=filled ]\n"
+					+ "N28->N30 [label=\"\'= true\'\"]\n"
+					+ "N30 [label=\"a1\" ]\n"
+					+ "N30->N31 [label=\"\'= false\'\"]\n"
+					+ "N31 [label=\"\'c2 (3.0/1.0)\'\" shape=box style=filled ]\n"
+					+ "N30->N32 [label=\"\'= true\'\"]\n"
+					+ "N32 [label=\"\'c0 (3.0)\'\" shape=box style=filled ]\n"
+					+ "}";
+
+			wekaThreeIndividual = WekaUtils.constructTreeIndividual(sTree, 33,
+					wekaDataThree.numInstances(), attrIndexMap,
+					attrValueIndexMap, true);
+
 		} catch (Exception e) {
 		}
 
@@ -114,7 +203,7 @@ public class TestFitness {
 	@Test
 	public void testFitnessObjectInfos() {
 		FitnessFunction<TreeIndividual> function;
-		
+
 		function = new TreeAccuracyFitness();
 		assertTrue(function.objectInfo().equals("tAcc x"));
 		function.setParam("INDEX,0");
@@ -124,81 +213,166 @@ public class TestFitness {
 
 		function = new TreeSizeFitness();
 		assertTrue(function.objectInfo().equals("tSize x"));
-		
+
 		function = new TreeHeightFitness();
 		assertTrue(function.objectInfo().equals("tHeight x"));
-		
+
 		String name = TreePrevalenceFitness.initName;
-		function = new TreePrevalenceFitness();		
-		assertTrue(function.objectInfo().equals(name+" x"));		
-		function.setParam("INDEX,0");		
-		assertTrue(function.objectInfo().equals(name+" INDEX,0"));
+		function = new TreePrevalenceFitness();
+		assertTrue(function.objectInfo().equals(name + " x"));
+		function.setParam("INDEX,0");
+		assertTrue(function.objectInfo().equals(name + " INDEX,0"));
 		function.setParam("INDEX,0,AVERAGE,WEIGHTED");
-		assertTrue(function.objectInfo().equals(name+" INDEX,0,AVERAGE,WEIGHTED"));
+		assertTrue(function.objectInfo().equals(
+				name + " INDEX,0,AVERAGE,WEIGHTED"));
 		function.setParam("MAXIMIZE,true");
-		assertTrue(function.objectInfo().equals(name+" MAXIMIZE,true"));
-		
+		assertTrue(function.objectInfo().equals(name + " MAXIMIZE,true"));
+
 		name = TreeRecallFitness.initName;
 		function = new TreeRecallFitness();
-		assertTrue(function.objectInfo().equals(name+" x"));
-		function.setParam("INDEX,0");		
-		assertTrue(function.objectInfo().equals(name+" INDEX,0"));
+		assertTrue(function.objectInfo().equals(name + " x"));
+		function.setParam("INDEX,0");
+		assertTrue(function.objectInfo().equals(name + " INDEX,0"));
 		function.setParam("INDEX,0,AVERAGE,WEIGHTED");
-		assertTrue(function.objectInfo().equals(name+" INDEX,0,AVERAGE,WEIGHTED"));
+		assertTrue(function.objectInfo().equals(
+				name + " INDEX,0,AVERAGE,WEIGHTED"));
 		function.setParam("MAXIMIZE,true");
-		assertTrue(function.objectInfo().equals(name+" MAXIMIZE,true"));
-		
+		assertTrue(function.objectInfo().equals(name + " MAXIMIZE,true"));
+
 		name = TreePrecisionFitness.initName;
 		function = new TreePrecisionFitness();
-		assertTrue(function.objectInfo().equals(name+" x"));
-		function.setParam("INDEX,0");		
-		assertTrue(function.objectInfo().equals(name+" INDEX,0"));
+		assertTrue(function.objectInfo().equals(name + " x"));
+		function.setParam("INDEX,0");
+		assertTrue(function.objectInfo().equals(name + " INDEX,0"));
 		function.setParam("INDEX,0,AVERAGE,WEIGHTED");
-		assertTrue(function.objectInfo().equals(name+" INDEX,0,AVERAGE,WEIGHTED"));
+		assertTrue(function.objectInfo().equals(
+				name + " INDEX,0,AVERAGE,WEIGHTED"));
 		function.setParam("MAXIMIZE,true");
-		assertTrue(function.objectInfo().equals(name+" MAXIMIZE,true"));
-		
+		assertTrue(function.objectInfo().equals(name + " MAXIMIZE,true"));
+
 		name = TreeTPFitness.initName;
 		function = new TreeTPFitness();
-		assertTrue(function.objectInfo().equals(name+" x"));
-		function.setParam("INDEX,0");		
-		assertTrue(function.objectInfo().equals(name+" INDEX,0"));
+		assertTrue(function.objectInfo().equals(name + " x"));
+		function.setParam("INDEX,0");
+		assertTrue(function.objectInfo().equals(name + " INDEX,0"));
 		function.setParam("INDEX,0,AVERAGE,WEIGHTED");
-		assertTrue(function.objectInfo().equals(name+" INDEX,0,AVERAGE,WEIGHTED"));
+		assertTrue(function.objectInfo().equals(
+				name + " INDEX,0,AVERAGE,WEIGHTED"));
 		function.setParam("MAXIMIZE,true");
-		assertTrue(function.objectInfo().equals(name+" MAXIMIZE,true"));
-		
+		assertTrue(function.objectInfo().equals(name + " MAXIMIZE,true"));
+
 		name = TreeTNFitness.initName;
 		function = new TreeTNFitness();
-		assertTrue(function.objectInfo().equals(name+" x"));
-		function.setParam("INDEX,0");		
-		assertTrue(function.objectInfo().equals(name+" INDEX,0"));
+		assertTrue(function.objectInfo().equals(name + " x"));
+		function.setParam("INDEX,0");
+		assertTrue(function.objectInfo().equals(name + " INDEX,0"));
 		function.setParam("INDEX,0,AVERAGE,WEIGHTED");
-		assertTrue(function.objectInfo().equals(name+" INDEX,0,AVERAGE,WEIGHTED"));
+		assertTrue(function.objectInfo().equals(
+				name + " INDEX,0,AVERAGE,WEIGHTED"));
 		function.setParam("MAXIMIZE,true");
-		assertTrue(function.objectInfo().equals(name+" MAXIMIZE,true"));
-		
+		assertTrue(function.objectInfo().equals(name + " MAXIMIZE,true"));
+
 		name = TreeFPFitness.initName;
 		function = new TreeFPFitness();
-		assertTrue(function.objectInfo().equals(name+" x"));
-		function.setParam("INDEX,0");		
-		assertTrue(function.objectInfo().equals(name+" INDEX,0"));
+		assertTrue(function.objectInfo().equals(name + " x"));
+		function.setParam("INDEX,0");
+		assertTrue(function.objectInfo().equals(name + " INDEX,0"));
 		function.setParam("INDEX,0,AVERAGE,WEIGHTED");
-		assertTrue(function.objectInfo().equals(name+" INDEX,0,AVERAGE,WEIGHTED"));
+		assertTrue(function.objectInfo().equals(
+				name + " INDEX,0,AVERAGE,WEIGHTED"));
 		function.setParam("MAXIMIZE,true");
-		assertTrue(function.objectInfo().equals(name+" MAXIMIZE,true"));
-		
+		assertTrue(function.objectInfo().equals(name + " MAXIMIZE,true"));
+
 		name = TreeFNFitness.initName;
 		function = new TreeFNFitness();
-		assertTrue(function.objectInfo().equals(name+" x"));
-		function.setParam("INDEX,0");		
-		assertTrue(function.objectInfo().equals(name+" INDEX,0"));
+		assertTrue(function.objectInfo().equals(name + " x"));
+		function.setParam("INDEX,0");
+		assertTrue(function.objectInfo().equals(name + " INDEX,0"));
 		function.setParam("INDEX,0,AVERAGE,WEIGHTED");
-		assertTrue(function.objectInfo().equals(name+" INDEX,0,AVERAGE,WEIGHTED"));
+		assertTrue(function.objectInfo().equals(
+				name + " INDEX,0,AVERAGE,WEIGHTED"));
 		function.setParam("MAXIMIZE,true");
-		assertTrue(function.objectInfo().equals(name+" MAXIMIZE,true"));
+		assertTrue(function.objectInfo().equals(name + " MAXIMIZE,true"));
 	}
-	
+
+	@Test
+	public void testConfusionFitnessNotSet() {
+		FitnessFunction<TreeIndividual> function = null;
+		try {
+			function = new TreeTPFitness();
+			function.setData(wekaDataThree);
+			function.computeFitness(wekaThreeIndividual);
+			assertTrue(false);
+		} catch (MissingParamException e) {
+			assertTrue(true);
+		}
+		try {
+			function = new TreeTNFitness();
+			function.setData(wekaDataThree);
+			function.computeFitness(wekaThreeIndividual);
+			assertTrue(false);
+		} catch (MissingParamException e) {
+			assertTrue(true);
+		}
+		try {
+			function = new TreeFNFitness();
+			function.setData(wekaDataThree);
+			function.computeFitness(wekaThreeIndividual);
+			assertTrue(false);
+		} catch (MissingParamException e) {
+			assertTrue(true);
+		}
+		try {
+			function = new TreeFPFitness();
+			function.setData(wekaDataThree);
+			function.computeFitness(wekaThreeIndividual);
+			assertTrue(false);
+		} catch (MissingParamException e) {
+			assertTrue(true);
+		}
+		try {
+			function = new TreePrevalenceFitness();
+			function.setData(wekaDataThree);
+			function.computeFitness(wekaThreeIndividual);
+			assertTrue(false);
+		} catch (MissingParamException e) {
+			assertTrue(true);
+		}
+		try {
+			function = new TreePrecisionFitness();
+			function.setData(wekaDataThree);
+			function.computeFitness(wekaThreeIndividual);
+			assertTrue(false);
+		} catch (MissingParamException e) {
+			assertTrue(true);
+		}
+		try {
+			function = new TreeRecallFitness();
+			function.setData(wekaDataThree);
+			function.computeFitness(wekaThreeIndividual);
+			assertTrue(false);
+		} catch (MissingParamException e) {
+			assertTrue(true);
+		}
+		try {
+			function = new TreeSpecificityFitness();
+			function.setData(wekaDataThree);
+			function.computeFitness(wekaThreeIndividual);
+			assertTrue(false);
+		} catch (MissingParamException e) {
+			assertTrue(true);
+		}
+		try {
+			function = new TreeSpecificityFitness();
+			function.setData(wekaDataThree);
+			function.computeFitness(wekaThreeIndividual);
+			assertTrue(false);
+		} catch (MissingParamException e) {
+			assertTrue(true);
+		}
+
+	}
+
 	@Test
 	public void testAccuracyFitness() {
 		FitnessFunction<TreeIndividual> function = new TreeAccuracyFitness();
@@ -222,7 +396,7 @@ public class TestFitness {
 
 		assertTrue(testIndividual.hasChanged());
 		assertTrue(wekaIndividual.hasChanged());
-		assertTrue(function.objectInfo().equals("tAcc x"));					
+		assertTrue(function.objectInfo().equals("tAcc x"));
 	}
 
 	@Test
@@ -249,7 +423,7 @@ public class TestFitness {
 		assertTrue(wekaIndividual.getFitnessValue(fIndex) == f2);
 
 		assertTrue(testIndividual.hasChanged());
-		assertTrue(wekaIndividual.hasChanged());		
+		assertTrue(wekaIndividual.hasChanged());
 	}
 
 	@Test
@@ -276,7 +450,7 @@ public class TestFitness {
 		assertTrue(wekaIndividual.getFitnessValue(fIndex) == f2);
 
 		assertTrue(testIndividual.hasChanged());
-		assertTrue(wekaIndividual.hasChanged());		
+		assertTrue(wekaIndividual.hasChanged());
 	}
 
 	@Test
@@ -285,45 +459,139 @@ public class TestFitness {
 		function.setIndex(1);
 
 	}
+
+	@Test
+	public void treePrecisionFitness() {
+		FitnessFunction<TreeIndividual> function = new TreeRecallFitness();
+		function.setIndex(1);
+		function.setData(wekaData);
+
+		int fIndex = function.getIndex();
+		assertTrue(fIndex == 1);
+		assertTrue(testIndividual.hasChanged());
+		assertTrue(wekaIndividual.hasChanged());
+
+		double f1 = function.computeFitness(testIndividual);
+		double f2 = function.computeFitness(wekaIndividual);
+		double f3 = 0d;
+
+		if (TestProperties.testPrints) {
+			System.out.println("testIndividual, recall fitness, binary: " + f1);
+			System.out.println("wekaIndividual, recall fitness, binary: " + f2);
+		}
+
+		assertTrue(f1 == (19d / 34));
+		assertTrue(testIndividual.getFitnessValue(1) == f1);
+		assertTrue(f2 == (29d / 34));
+		assertTrue(wekaIndividual.getFitnessValue(1) == f2);
+
+		// Different index
+		function.setParam("INDEX,0");
+
+		f1 = function.computeFitness(testIndividual);
+		f2 = function.computeFitness(wekaIndividual);
+
+		if (TestProperties.testPrints) {
+			System.out.println("testIndividual, recall fitness, attr 0: " + f1);
+			System.out.println("wekaIndividual, recall fitness, attr 0: " + f2);
+		}
+
+		assertTrue(f1 == (34d / 66));
+		assertTrue(testIndividual.getFitnessValue(1) == f1);
+		assertTrue(f2 == (64d / 66));
+		assertTrue(wekaIndividual.getFitnessValue(1) == f2);
+
+		function = new TreeRecallFitness();
+		function.setIndex(1);
+		function.setData(wekaDataThree);
+		function.setParam("AVERAGE,WEIGHTED");
+
+		f1 = function.computeFitness(wekaThreeIndividual);
+
+		if (TestProperties.testPrints) {
+			System.out.println("wekaThreeIndividual, recall fitness, weighted: " + f1);
+		}
+		assertTrue(f1 == 0.9d);
+
+		function.setParam("INDEX,0");
+		f1 = function.computeFitness(wekaThreeIndividual);
+		function.setParam("INDEX,1");
+		f2 = function.computeFitness(wekaThreeIndividual);
+		function.setParam("INDEX,2");
+		f3 = function.computeFitness(wekaThreeIndividual);
+		
+
+		if (TestProperties.testPrints) {
+			System.out.println("wekaThreeIndividual, recall fitness, attr 0: " + f1);
+			System.out.println("wekaThreeIndividual, recall fitness, attr 1: " + f2);
+			System.out.println("wekaThreeIndividual, recall fitness, attr 2: " + f3);
+		}
+	}
 	
 	@Test
 	public void testRecallFitness() {
 		FitnessFunction<TreeIndividual> function = new TreeRecallFitness();
 		function.setIndex(1);
-		function.setData(wekaData);		
-		
+		function.setData(wekaData);
+
 		int fIndex = function.getIndex();
 		assertTrue(fIndex == 1);
 		assertTrue(testIndividual.hasChanged());
 		assertTrue(wekaIndividual.hasChanged());
-		
+
 		double f1 = function.computeFitness(testIndividual);
 		double f2 = function.computeFitness(wekaIndividual);
-		
+		double f3 = 0d;
+
 		if (TestProperties.testPrints) {
-			System.out.println(f1);
-			System.out.println(f2);
+			System.out.println("testIndividual, recall fitness, binary: " + f1);
+			System.out.println("wekaIndividual, recall fitness, binary: " + f2);
 		}
-		
-		assertTrue(f1 == (19d/34));
+
+		assertTrue(f1 == (19d / 34));
 		assertTrue(testIndividual.getFitnessValue(1) == f1);
-		assertTrue(f2 == (29d/34));
+		assertTrue(f2 == (29d / 34));
 		assertTrue(wekaIndividual.getFitnessValue(1) == f2);
-		
+
 		// Different index
 		function.setParam("INDEX,0");
-		
+
 		f1 = function.computeFitness(testIndividual);
 		f2 = function.computeFitness(wekaIndividual);
+
+		if (TestProperties.testPrints) {
+			System.out.println("testIndividual, recall fitness, attr 0: " + f1);
+			System.out.println("wekaIndividual, recall fitness, attr 0: " + f2);
+		}
+
+		assertTrue(f1 == (34d / 66));
+		assertTrue(testIndividual.getFitnessValue(1) == f1);
+		assertTrue(f2 == (64d / 66));
+		assertTrue(wekaIndividual.getFitnessValue(1) == f2);
+
+		function = new TreeRecallFitness();
+		function.setIndex(1);
+		function.setData(wekaDataThree);
+		function.setParam("AVERAGE,WEIGHTED");
+
+		f1 = function.computeFitness(wekaThreeIndividual);
+
+		if (TestProperties.testPrints) {
+			System.out.println("wekaThreeIndividual, recall fitness, weighted: " + f1);
+		}
+		assertTrue(f1 == 0.9d);
+
+		function.setParam("INDEX,0");
+		f1 = function.computeFitness(wekaThreeIndividual);
+		function.setParam("INDEX,1");
+		f2 = function.computeFitness(wekaThreeIndividual);
+		function.setParam("INDEX,2");
+		f3 = function.computeFitness(wekaThreeIndividual);
 		
 		if (TestProperties.testPrints) {
-			System.out.println(f1);
-			System.out.println(f2);
+			System.out.println("wekaThreeIndividual, recall fitness, attr 0: " + f1);
+			System.out.println("wekaThreeIndividual, recall fitness, attr 1: " + f2);
+			System.out.println("wekaThreeIndividual, recall fitness, attr 2: " + f3);
 		}
-		
-		assertTrue(f1 == (34d/66));
-		assertTrue(testIndividual.getFitnessValue(1) == f1);
-		assertTrue(f2 == (64d/66));
-		assertTrue(wekaIndividual.getFitnessValue(1) == f2);
 	}
 }

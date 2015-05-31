@@ -157,7 +157,7 @@ public class TreeRecallFitness extends TreeConfusionFitness {
 	protected double[] totalConfusionValues(Instances instances,
 			TreeIndividual individual) {
 		Node root = individual.getRootNode();
-		double[] recallArray = new double[instances.numClasses()];	
+		double[] recallArray = new double[instances.numClasses()];
 
 		Enumeration<Instance> eInstances = instances.enumerateInstances();
 		while (eInstances.hasMoreElements()) {

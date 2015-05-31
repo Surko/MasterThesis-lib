@@ -10,6 +10,9 @@ import genlib.structures.Data;
 import genlib.structures.data.GenLibInstances;
 import genlib.utils.Utils;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -215,9 +218,7 @@ public abstract class TreeConfusionFitness extends
 				attrIndex = 1;
 				return attributeConfusionValue(instances, individual);
 			}
-			double fitness = 0d;
-			double[] criteria = totalConfusionValues(instances, individual);
-
+			
 			if (averageEnum == null) {
 				LOG.log(Level.WARNING, String.format(
 						TextResource.getString(TextKeys.eMissParam),
@@ -226,6 +227,9 @@ public abstract class TreeConfusionFitness extends
 						TextResource.getString(TextKeys.eMissParam),
 						ConfusionEnum.AVERAGE.name(), this.getFitnessName()));
 			}
+			
+			double fitness = 0d;
+			double[] criteria = totalConfusionValues(instances, individual);			
 
 			switch (averageEnum) {
 			case OWNWEIGHT:
@@ -277,8 +281,18 @@ public abstract class TreeConfusionFitness extends
 				return attributeConfusionValue(instances, individual);
 			}
 
+			if (averageEnum == null) {
+				LOG.log(Level.WARNING, String.format(
+						TextResource.getString(TextKeys.eMissParam),
+						ConfusionEnum.AVERAGE.name(), this.getFitnessName()));
+				throw new MissingParamException(String.format(
+						TextResource.getString(TextKeys.eMissParam),
+						ConfusionEnum.AVERAGE.name(), this.getFitnessName()));
+			}
+			
 			double fitness = 0d;
 			double[] criteria = totalConfusionValues(instances, individual);
+			
 			switch (averageEnum) {
 			case OWNWEIGHT:
 				for (int i = 0; i < criteria.length; i++) {
@@ -319,6 +333,17 @@ public abstract class TreeConfusionFitness extends
 		}
 	}
 
+	public double[] getConfusionValues(TreeIndividual individual) {
+		if (data.isGenLibInstances()) {
+			return totalConfusionValues(data.toGenLibInstances(), individual);
+		}
+		if (data.isInstances()) {
+			return totalConfusionValues(data.toInstances(), individual);
+		}
+		
+		return Utils.empty_double_array;
+	}
+	
 	/**
 	 * Method which return false. This is because all the fitness functions
 	 * based on confusion matrix are dependent on nominal attributes

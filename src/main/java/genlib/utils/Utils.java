@@ -23,6 +23,11 @@ import java.util.Random;
  */
 public class Utils {
 
+	/** empty double arrray to return instead of null */
+	public static final double[] empty_double_array = new double[0];
+	/** empty int array to return instead of null */
+	public static final int[] empty_int_array = new int[0];	
+	
 	/** delimiter for global use when delimiting different types of object */
 	public static final String oDELIM = "(;|[ ]+)";
 	/** delimiter for global use when delimiting parameters */

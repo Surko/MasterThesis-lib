@@ -11,6 +11,7 @@
 			genlib.evolution.fitness.tree.confusion.TreePrevalenceFitness.initName,
 			genlib.evolution.fitness.tree.confusion.TreeRecallFitness.initName,
 			genlib.evolution.fitness.tree.confusion.TreePrecisionFitness.initName,
+			genlib.evolution.fitness.tree.confusion.TreeSpecificityFitness.initName,
 			genlib.evolution.fitness.tree.confusion.TreeFMeasureFitness.initName
 		},
 		toInjectClasses = {
@@ -25,6 +26,7 @@
 			genlib.evolution.fitness.tree.confusion.TreePrevalenceFitness.class,
 			genlib.evolution.fitness.tree.confusion.TreeRecallFitness.class,
 			genlib.evolution.fitness.tree.confusion.TreePrecisionFitness.class,
+			genlib.evolution.fitness.tree.confusion.TreeSpecificityFitness.class,
 			genlib.evolution.fitness.tree.confusion.TreeFMeasureFitness.class
 		},
 		toInjectField = "tFitFuncs",

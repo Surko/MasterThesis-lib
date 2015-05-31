@@ -4,7 +4,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class TestProperties {
-	public static boolean testPrints = true;
+	public static boolean testPrints = false;
 	
 	@Test
 	public void dummyTest() {
