@@ -27,6 +27,7 @@ public class TextKeys {
 	public static final String eConsistencyStumpGen = "eConsistencyStumpGen";
 	public static final String eSelFormat = "eSelFormat";
 	public static final String eOperFormat = "eOperFormat";
+	public static final String ePopTypeFormat = "ePopTypeFormat";
 	public static final String eFitnessFormat = "eFitnessFormat";
 	public static final String eFitCompFormat = "eFitCompFormat";
 	public static final String eInvalidInputParams = "eInvalidInputParams";

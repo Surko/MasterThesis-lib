@@ -5,7 +5,6 @@ import genlib.classifier.popinit.TreePopulationInitializator;
 import genlib.classifier.weka.WekaClassifierExtension;
 import genlib.configurations.Config;
 import genlib.evolution.EvolutionAlgorithm;
-import genlib.evolution.Population;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.fitness.comparators.FitnessComparator;
 import genlib.evolution.fitness.comparators.FitnessComparator.FitCompare;
@@ -15,6 +14,8 @@ import genlib.evolution.fitness.comparators.SingleFitnessComparator;
 import genlib.evolution.fitness.comparators.WeightedFitnessComparator;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.operators.Operator;
+import genlib.evolution.population.IPopulation;
+import genlib.evolution.population.Population;
 import genlib.evolution.selectors.Selector;
 import genlib.exceptions.CompatibleWekaException;
 import genlib.exceptions.NotDefClassException;
@@ -24,6 +25,7 @@ import genlib.exceptions.format.FitCompStringFormatException;
 import genlib.exceptions.format.FitnessStringFormatException;
 import genlib.exceptions.format.OperatorStringFormatException;
 import genlib.exceptions.format.PopulationInitStringFormatException;
+import genlib.exceptions.format.PopulationTypeStringFormatException;
 import genlib.exceptions.format.SelectorStringFormatException;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
@@ -88,8 +90,7 @@ public class EvolutionTreeClassifier implements Serializable,
 		popInit.initPopulation();
 		// Population object that contains tree individuals from population
 		// initializator
-		Population<TreeIndividual> population = new Population<>(
-				popInit.getPopulation(), c.getPopulationSize());
+		IPopulation<TreeIndividual> population = makePopulation();
 
 		// Evolution algorithm that evolves population of tree individuals.
 		ea = new EvolutionAlgorithm<>(workData, population,
@@ -156,6 +157,30 @@ public class EvolutionTreeClassifier implements Serializable,
 		if (c.getEnvSelectors() != null) {
 			makeEnvSelectorSet();
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public IPopulation<TreeIndividual> makePopulation() throws Exception {
+		String[] parameters = c.getPopulationType().split(Utils.oDELIM);
+
+		if (parameters.length < 2) {
+			throw new PopulationTypeStringFormatException(
+					TextResource.getString(TextKeys.ePopTypeFormat));
+		}
+
+		if (parameters[0].equals(Population.initName)) {
+			return new Population<>(popInit.getPopulation(),
+					c.getPopulationSize());
+		}
+
+		IPopulation<?> population = IPopulation.populationTypes
+				.get(parameters[0]).newInstance();
+		if (TreeIndividual.class == population.getIndividualType()) {
+			return (IPopulation<TreeIndividual>)population;
+		}
+		
+		return new Population<>(popInit.getPopulation(),
+				c.getPopulationSize()); 
 	}
 
 	private void makeSelectorSet() throws Exception {
@@ -273,14 +298,14 @@ public class EvolutionTreeClassifier implements Serializable,
 			// inner error
 			FitnessFunction<TreeIndividual> func = h.get(parameters[i])
 					.newInstance();
-			
+
 			// if class attribute is numeric and function can't handle it.
 			if (isNumeric && !func.canHandleNumeric()) {
-				throw new NumericHandleException(String.format(
-						TextResource.getString("eNumericHandle"),
-						func.getClass().getName()));
+				throw new NumericHandleException(
+						String.format(TextResource.getString("eNumericHandle"),
+								func.getClass().getName()));
 			}
-			
+
 			// if there's not already defined index than set the index
 			if (func.getIndex() == -1) {
 				func.setIndex(max++);
@@ -348,37 +373,41 @@ public class EvolutionTreeClassifier implements Serializable,
 	/**
 	 * 
 	 * Method accessed only from this method that parses parameter IP which
-	 * contains information about initial population generator. Parameters are 
+	 * contains information about initial population generator. Parameters are
 	 * then set into population initializator.
 	 * 
-	 * @throws PopulationInitStringFormatException if there is bad format for population initializator
-	 * @throws NotDefClassException if there isn't population initializator for type
-	 * @throws IllegalAccessException if there is problem with access to class
-	 * @throws InstantiationException if there is problem with instancing of class
+	 * @throws PopulationInitStringFormatException
+	 *             if there is bad format for population initializator
+	 * @throws NotDefClassException
+	 *             if there isn't population initializator for type
+	 * @throws IllegalAccessException
+	 *             if there is problem with access to class
+	 * @throws InstantiationException
+	 *             if there is problem with instancing of class
 	 */
-	private void makePopInitializator() throws InstantiationException, IllegalAccessException {
-		String popInitString = c.getPopulationInit();		
+	private void makePopInitializator() throws InstantiationException,
+			IllegalAccessException {
+		String popInitString = c.getPopulationInit();
 		popInit = null;
 		String[] parameters = popInitString.split(Utils.oDELIM);
-		
+
 		if (parameters.length % 2 != 0) {
 			// bad format
 			throw new PopulationInitStringFormatException(
-					TextResource.getString("eOperFormat"));
+					TextResource.getString(TextKeys.eOperFormat));
 		}
-		
-		
+
 		if (parameters[0] == "") {
 			mutSet.clear();
 			// blank alias
 			throw new PopulationInitStringFormatException(
-					TextResource.getString("eOperFormat"));
+					TextResource.getString(TextKeys.eOperFormat));
 		}
 
 		// inner error
 		Class<? extends TreePopulationInitializator> popInitClass = TreePopulationInitializator.treePopInits
 				.get(parameters[0]);
-		
+
 		if (popInitClass == null) {
 			LOG.log(Level.SEVERE, String.format(
 					TextResource.getString(TextKeys.eNotDefClass),
@@ -388,9 +417,9 @@ public class EvolutionTreeClassifier implements Serializable,
 					TextResource.getString(TextKeys.eNotDefClass),
 					parameters[0]));
 		}
-		
+
 		popInit = popInitClass.newInstance();
-		
+
 		if (popInit.isWekaCompatible() && !isWeka) {
 			LOG.log(Level.SEVERE, String.format(
 					TextResource.getString(TextKeys.eWekaCompatibility),
@@ -398,25 +427,25 @@ public class EvolutionTreeClassifier implements Serializable,
 			throw new CompatibleWekaException(String.format(
 					TextResource.getString(TextKeys.eWekaCompatibility),
 					popInit.getClass().getName()));
-		}	
-		
+		}
+
 		if (parameters.length > 1) {
 			popInit.setParam(parameters[1]);
 		}
-		
-		popInit.setPopulationSize(c.getPopulationSize());	
+
+		popInit.setPopulationSize(c.getPopulationSize());
 		popInit.setNumOfThreads(c.getGenNumOfThreads());
 	}
 
 	private void makeGenerators() throws Exception {
-		String indGen = c.getPopulationInit();	
+		String indGen = c.getPopulationInit();
 		String[] parameters = indGen.split(Utils.oDELIM);
-		
+
 		if (popInit == null) {
 			throw new NotInitializedFieldException();
 		}
-		
-		if (parameters.length % 2 != 0) {			
+
+		if (parameters.length % 2 != 0) {
 			throw new PopulationInitStringFormatException();
 		}
 
@@ -440,8 +469,8 @@ public class EvolutionTreeClassifier implements Serializable,
 						TextResource.getString(TextKeys.eWekaCompatibility),
 						generator.getClass().getName()));
 			}
-			
-			generator.setParam(parameters[i + 1]);	
+
+			generator.setParam(parameters[i + 1]);
 			genList.add(generator);
 		}
 

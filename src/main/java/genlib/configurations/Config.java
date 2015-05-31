@@ -95,6 +95,8 @@ public class Config implements Serializable {
 	 * Key in property file with saved number of generations
 	 */
 	public static final String NUM_OF_GEN = "number-of-generations";
+	/** Key in property file with population type to be used */
+	public static final String POP_TYPE = "population-type";
 	/**
 	 * Key in property file with saved seed
 	 */
@@ -216,6 +218,7 @@ public class Config implements Serializable {
 		putIfAbsent(IND_GEN, "wJ48Gen -C,0.25,-M,2");
 		putIfAbsent(POP_SIZE, "100");
 		putIfAbsent(SEED, "28041991");
+		putIfAbsent(POP_TYPE, "typical x");
 		putIfAbsent(FILE_LOCALISE, "false");
 		putIfAbsent(LOCALE, "en");
 	}
@@ -338,6 +341,16 @@ public class Config implements Serializable {
 		return Integer.parseInt(prop.getProperty(POP_SIZE));
 	}
 
+	/**
+	 * Getter which returns population value from config file. It can
+	 * be even plugin name.
+	 * 
+	 * @return population type
+	 */
+	public String getPopulationType() {
+		return prop.getProperty(POP_TYPE); 
+	}
+	
 	/**
 	 * Getter which returns Number of generations value from config file
 	 * 

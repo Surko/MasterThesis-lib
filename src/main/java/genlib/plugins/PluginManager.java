@@ -12,6 +12,7 @@ import genlib.classifier.popinit.PopulationInitializator;
 import genlib.configurations.PathManager;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.operators.Operator;
+import genlib.evolution.population.IPopulation;
 import genlib.evolution.selectors.Selector;
 import genlib.locales.PermMessages;
 import genlib.utils.Utils;
@@ -49,8 +50,50 @@ public class PluginManager {
 		initFitnessPlugins();
 		initOperatorPlugins();
 		initSelectorPlugins();
+		initPopulationPlugins();
 	}
 
+	private static void initPopulationPlugins() {
+		LOG.log(Level.INFO,
+				String.format(PermMessages._s_fitinit,
+						IPopulation.class.getName()));
+		int plugLoaded = 0;		
+
+		// loading jar plugins inside plugin directory
+		PathManager pm = PathManager.getInstance();
+		File populationPluginPath = new File(pm.getPluginPath(), "population");
+
+		if (populationPluginPath.exists() && populationPluginPath.isDirectory()) {
+
+			for (File plugFile : populationPluginPath.listFiles(Utils.jarFilter)) {
+				try {
+					URLClassLoader authorizedLoader = URLClassLoader
+							.newInstance(new URL[] { plugFile.toURI().toURL() });
+					URL url = authorizedLoader
+							.findResource("META-INF/MANIFEST.MF");
+					Manifest mf = new Manifest(url.openStream());
+					Attributes mfAttributes = mf.getMainAttributes();
+					PopulationPlugin plugin = (PopulationPlugin) authorizedLoader
+							.loadClass(mfAttributes.getValue(pluginClassTag))
+							.newInstance();
+					plugin.initPopulations();
+					plugLoaded++;
+				} catch (ClassCastException cce) {
+					LOG.log(Level.WARNING,
+							String.format(PermMessages._plug_type_err,
+									plugFile.getName()));
+				} catch (Exception e) {
+					LOG.log(Level.SEVERE, e.toString());
+				}
+			}
+		}
+
+		String sPopInit = "population types";		
+		LOG.log(Level.INFO, String.format(PermMessages._c_plug_loaded,
+				sPopInit, plugLoaded));
+
+	}
+	
 	private static void initPopInitPlugins() {
 		LOG.log(Level.INFO, String.format(PermMessages._s_popinit,
 				PopulationInitializator.class.getName()));

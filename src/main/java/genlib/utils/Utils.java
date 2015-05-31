@@ -1,8 +1,8 @@
 package genlib.utils;
 
-import genlib.evolution.Population;
 import genlib.evolution.individuals.Individual;
 import genlib.evolution.individuals.TreeIndividual;
+import genlib.evolution.population.Population;
 import genlib.structures.data.GenLibInstance;
 import genlib.structures.data.GenLibInstances;
 import genlib.structures.trees.MultiWayDepthNode;

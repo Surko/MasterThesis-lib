@@ -2,9 +2,9 @@ package tests.individuals;
 
 import java.util.HashMap;
 
-import genlib.evolution.Population;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.individuals.TreeIndividual;
+import genlib.evolution.population.Population;
 import genlib.structures.data.GenLibInstances;
 import genlib.structures.trees.MultiWayDepthNode;
 import genlib.utils.WekaUtils;

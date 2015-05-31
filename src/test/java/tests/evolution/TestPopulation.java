@@ -1,12 +1,12 @@
 package tests.evolution;
 
 import static org.junit.Assert.assertTrue;
-import genlib.evolution.Population;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.fitness.comparators.FitnessComparator;
 import genlib.evolution.fitness.comparators.SingleFitnessComparator;
 import genlib.evolution.fitness.tree.TreeAccuracyFitness;
 import genlib.evolution.individuals.TreeIndividual;
+import genlib.evolution.population.Population;
 import genlib.structures.Data;
 import genlib.structures.trees.MultiWayDepthNode;
 import genlib.utils.Utils;
@@ -52,11 +52,11 @@ public class TestPopulation {
 
 	@Test
 	public void testPopulationScaling() {
-		assertTrue(individuals.getPopulationSize() == 20);
+		assertTrue(individuals.getActualPopSize() == 20);
 		individuals.add(new TreeIndividual(testIndividual));
-		assertTrue(individuals.getPopulationSize() == 21);
+		assertTrue(individuals.getActualPopSize() == 21);
 		individuals.clear();
-		assertTrue(individuals.getPopulationSize() == 0);
+		assertTrue(individuals.getActualPopSize() == 0);
 	}
 
 	@Test(timeout = 100)

@@ -1,11 +1,11 @@
 package genlib.evolution.fitness;
 
 import genlib.evolution.EvolutionAlgorithm;
-import genlib.evolution.Population;
 import genlib.evolution.fitness.tree.TreeAccuracyFitness;
 import genlib.evolution.fitness.tree.look.TreeHeightFitness;
 import genlib.evolution.individuals.Individual;
 import genlib.evolution.individuals.TreeIndividual;
+import genlib.evolution.population.Population;
 import genlib.structures.Data;
 
 import java.io.Serializable;

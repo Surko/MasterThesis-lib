@@ -3,10 +3,11 @@ package genlib.evolution.selectors;
 import java.util.ArrayList;
 import java.util.Random;
 
-import genlib.evolution.Population;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.fitness.comparators.FitnessComparator;
 import genlib.evolution.individuals.Individual;
+import genlib.evolution.population.IPopulation;
+import genlib.evolution.population.Population;
 
 public class RouletteWheelSelector implements Selector {
 	/** for serialization */
@@ -60,20 +61,20 @@ public class RouletteWheelSelector implements Selector {
 		return dest;
 	}
 	
-	public <T extends Individual> Population<T> select(Population<T> origin, int count) {
+	public <T extends Individual> IPopulation<T> select(IPopulation<T> origin, int count) {
 		return select(origin,null,count);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T extends Individual> Population<T> select(Population<T> origin, Population<T> dest, int count) {
+	public <T extends Individual> IPopulation<T> select(IPopulation<T> origin, IPopulation<T> dest, int count) {
 		if (dest == null) {
-			dest = new Population<T>();
+			dest = origin.createNewInstance();
 			dest.setFitnessComparator(origin.getFitnessComparator());
 		}
 		
 		FitnessFunction<T> function = origin.getFitnessComparator().getFitnessFuncs().get(fitnessIndex);
 		int individualFitIndex = function.getIndex();
-		int length = origin.getPopulationSize();
+		int length = origin.getActualPopSize();
 		
 		double fitSum = 0d;
 		double[] fitnesses = new double[length];

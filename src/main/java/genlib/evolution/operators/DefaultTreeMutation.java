@@ -1,7 +1,8 @@
 package genlib.evolution.operators;
 
-import genlib.evolution.Population;
 import genlib.evolution.individuals.TreeIndividual;
+import genlib.evolution.population.IPopulation;
+import genlib.evolution.population.Population;
 
 /**
  * Default Tree Mutation is simple class with very simple functionality. It just
@@ -26,8 +27,8 @@ public class DefaultTreeMutation extends Operator<TreeIndividual> {
 	}
 
 	@Override
-	public void execute(Population<TreeIndividual> parents,
-			Population<TreeIndividual> childs) {
+	public void execute(IPopulation<TreeIndividual> parents,
+			IPopulation<TreeIndividual> childs) {
 		childs.deepCopy(parents);
 	}
 

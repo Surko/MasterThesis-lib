@@ -1,8 +1,9 @@
 package genlib.evolution.selectors;
 
-import genlib.evolution.Population;
 import genlib.evolution.fitness.comparators.FitnessComparator;
 import genlib.evolution.individuals.Individual;
+import genlib.evolution.population.IPopulation;
+import genlib.evolution.population.Population;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -44,21 +45,21 @@ public class TournamentSelector implements Selector {
 		return dest;
 	}
 	
-	public <T extends Individual> Population<T> select(Population<T> origin, int count) {		
+	public <T extends Individual> IPopulation<T> select(IPopulation<T> origin, int count) {		
 		return select(origin, null, count);		
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Individual> Population<T> select(Population<T> origin,
-			Population<T> dest, int count) {
+	public <T extends Individual> IPopulation<T> select(IPopulation<T> origin,
+			IPopulation<T> dest, int count) {
 		if (dest == null) {
-			dest = new Population<T>();
+			dest = origin.createNewInstance();
 			dest.setFitnessComparator(origin.getFitnessComparator());
 		}
 		
 		for (int i = 0; i < count; i++) {
-			int i1 = rng.nextInt(origin.getPopulationSize());
-			int i2 = rng.nextInt(origin.getPopulationSize());
+			int i1 = rng.nextInt(origin.getActualPopSize());
+			int i2 = rng.nextInt(origin.getActualPopSize());
 			
 			T ind1 = origin.getIndividual(i1);
 			T ind2 = origin.getIndividual(i2);

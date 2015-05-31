@@ -9,7 +9,7 @@ public interface Classifier {
 	public static final HashMap<String, Class<? extends Classifier>> classifiers = new HashMap<>();
 	
 	public void buildClassifier(GenLibInstances data) throws Exception;
-	public void makePropsFromString(boolean isNumeric) throws Exception;
+	public void makePropsFromString(boolean isNumeric) throws Exception;	
 	public int getSeed();
 	public Random getRandom();	
 }
