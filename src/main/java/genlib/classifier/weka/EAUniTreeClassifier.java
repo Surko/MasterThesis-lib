@@ -3,10 +3,12 @@ package genlib.classifier.weka;
 import genlib.GenLib;
 import genlib.classifier.EvolutionTreeClassifier;
 import genlib.configurations.Config;
+import genlib.evolution.individuals.TreeIndividual;
 import genlib.exceptions.ConfigInternalException;
 import genlib.exceptions.EmptyConfigParamException;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
+import genlib.structures.trees.Node;
 
 import java.util.Enumeration;
 import java.util.Vector;
@@ -158,7 +160,7 @@ public class EAUniTreeClassifier extends Classifier implements Randomizable,
 		// stands for selectors
 		result.add("-SE");
 		result.add("" + getSelectors());
-		
+
 		// stands for environmental selectors
 		result.add("-ESE");
 		result.add("" + getEnvSelectors());
@@ -271,12 +273,12 @@ public class EAUniTreeClassifier extends Classifier implements Randomizable,
 		if (tmpStr.length() != 0) {
 			e_tree_class.setElitism(Double.parseDouble(tmpStr));
 		}
-		
+
 		tmpStr = Utils.getOption("SE", options);
 		if (tmpStr.length() != 0) {
 			e_tree_class.setSelectorsString(tmpStr);
 		}
-		
+
 		tmpStr = Utils.getOption("ESE", options);
 		if (tmpStr.length() != 0) {
 			e_tree_class.setEnvSelectorsString(tmpStr);
@@ -364,7 +366,25 @@ public class EAUniTreeClassifier extends Classifier implements Randomizable,
 	 *             if instance can't be classified successfully
 	 */
 	public double classifyInstance(Instance instance) throws Exception {
-		return 0d;
+		TreeIndividual bestIndividual = e_tree_class.getBestIndividual();
+
+		Node root = bestIndividual.getRootNode();
+
+		while (!root.isLeaf()) {
+			if (instance.attribute(root.getAttribute()).isNumeric()) {
+				if (instance.value(root.getAttribute()) < root.getValue()) {
+					root = root.getChildAt(0);
+				} else {
+					root = root.getChildAt(1);
+				}
+			} else {
+				root = root
+						.getChildAt((int) instance.value(root.getAttribute()));
+			}
+		}
+
+		return root.getValue();
+
 	}
 
 	/**

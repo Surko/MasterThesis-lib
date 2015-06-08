@@ -39,6 +39,7 @@ public class TextKeys {
 	public static final String eWrongData = "eWrongData";
 	public static final String eWekaCompatibility = "eWekaCompatibility";
 	public static final String eNumericHandle = "eNumericHandle";
+	public static final String eNotImplemented = "eNotImplemented";
 	// Info keys
 	public static final String iExcessParam = "iExcessParam";
 	public static final String comparator_complex_fit = "comparator_complex_fit";

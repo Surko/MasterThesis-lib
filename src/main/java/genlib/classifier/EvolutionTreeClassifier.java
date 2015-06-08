@@ -36,7 +36,6 @@ import genlib.utils.Utils;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Properties;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,6 +60,7 @@ public class EvolutionTreeClassifier implements Serializable,
 	private boolean isWeka;
 	private TreePopulationInitializator popInit;
 	private EvolutionAlgorithm<TreeIndividual> ea;
+	private TreeIndividual theBestIndividual;
 
 	public EvolutionTreeClassifier(boolean isWeka) throws Exception {
 		this.c = Config.getInstance();
@@ -75,6 +75,8 @@ public class EvolutionTreeClassifier implements Serializable,
 
 	@Override
 	public void buildClassifier(Instances data) throws Exception {
+		theBestIndividual = null;
+		
 		random.setSeed(c.getSeed());
 		// making properties from string
 		makePropsFromString(data.classAttribute().isNumeric());
@@ -116,7 +118,7 @@ public class EvolutionTreeClassifier implements Serializable,
 		// run population evolving
 		ea.run();
 
-		TreeIndividual theBest = population.getBestIndividual();
+		theBestIndividual = population.getBestIndividual();
 	}
 
 	@Override
@@ -251,7 +253,7 @@ public class EvolutionTreeClassifier implements Serializable,
 
 		FitCompare fitCompare = FitCompare.valueOf(parameters[0]);
 
-		switch (fitCompare) {
+		switch (fitCompare) {	
 		case PARETO:
 			fitComp = new ParetoFitnessComparator<>();
 			break;
@@ -567,6 +569,10 @@ public class EvolutionTreeClassifier implements Serializable,
 		return c.getFitnessFunctions();
 	}
 
+	public TreeIndividual getBestIndividual() {
+		return theBestIndividual;
+	}
+	
 	/**
 	 * Set seed for this run of classifier. Seed is further set from
 	 * buildClassifier function into Random object. It even serves purpose of

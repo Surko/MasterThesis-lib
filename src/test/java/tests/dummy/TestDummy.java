@@ -87,6 +87,7 @@ public class TestDummy {
 			try {
 				Field f = anot.toInjectClass().getField(anot.toInjectField());
 				// it's static map, so null object as parameter is adequate
+				@SuppressWarnings("unchecked")
 				HashMap<String, Class<? extends PopulationInitializator<?>>> h = (HashMap<String, Class<? extends PopulationInitializator<?>>>) f
 						.get(null);
 			} catch (Exception e) {

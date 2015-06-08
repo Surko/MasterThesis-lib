@@ -4,7 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.fitness.comparators.FitnessComparator;
-import genlib.evolution.fitness.comparators.ParetoFitnessComparator;
 import genlib.evolution.fitness.comparators.PriorityFitnessComparator;
 import genlib.evolution.fitness.comparators.SingleFitnessComparator;
 import genlib.evolution.fitness.comparators.WeightedFitnessComparator;
@@ -201,24 +200,6 @@ public class TestComparators {
 	}
 
 	@Test
-	public void testParetoComparator() {
-		FitnessComparator<TreeIndividual> comp = new ParetoFitnessComparator<>();
-
-		FitnessFunction<TreeIndividual> accFunction = new TreeAccuracyFitness();
-		accFunction.setIndex(0);
-		accFunction.setData(wekaData);
-		FitnessFunction<TreeIndividual> depthFunction = new TreeSizeFitness();
-		depthFunction.setIndex(1);
-
-		ArrayList<FitnessFunction<TreeIndividual>> fitFuncs = new ArrayList<>();
-		fitFuncs.add(accFunction);
-		fitFuncs.add(depthFunction);
-		FitnessFunction.registeredFunctions = fitFuncs.size();
-
-		comp.setFitFuncs(fitFuncs);
-	}
-
-	@Test
 	public void testWeightedComparator() {
 		transIndividual.change();
 		testIndividual.change();
@@ -253,10 +234,10 @@ public class TestComparators {
 		// consistency
 		assertTrue(comp.compare(wekaIndividual, transIndividual) < 0);
 		assertTrue(comp.compare(transIndividual, wekaIndividual) > 0);
-		// transitivity, correct positions (descending) 
+		// transitivity, correct positions (descending)
 		// wekaIndividual 0.9538095238095239
 		// transIndividual 0.8400000000000001
-		// testIndividual 0.6966666666666667		
+		// testIndividual 0.6966666666666667
 		assertTrue(comp.compare(wekaIndividual, transIndividual) < 0);
 		assertTrue(comp.compare(transIndividual, testIndividual) < 0);
 		assertTrue(comp.compare(wekaIndividual, testIndividual) < 0);
@@ -268,7 +249,7 @@ public class TestComparators {
 		System.out.println(wekaIndividual.getComplexFitness());
 		System.out.println(testIndividual.getComplexFitness());
 		System.out.println(transIndividual.getComplexFitness());
-		
+
 		assertTrue(Double.compare(1 * testIndividual.getFitnessValue(0) + 0.5
 				* testIndividual.getFitnessValue(1),
 				testIndividual.getComplexFitness()) == 0);

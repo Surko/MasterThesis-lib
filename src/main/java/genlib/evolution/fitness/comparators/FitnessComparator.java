@@ -28,7 +28,7 @@ public abstract class FitnessComparator<T extends Individual> implements
 		/**
 		 * Simple signle fitness evaluator. Only one function is utilized.
 		 */
-		SINGLE,
+		SINGLE,		
 		/**
 		 * Pareto fitness evaluator. All the functions are utilized.
 		 * Comparator of this type should work according to
