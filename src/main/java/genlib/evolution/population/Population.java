@@ -325,7 +325,7 @@ public class Population<T extends Individual> implements Serializable, IPopulati
 		}
 
 		for (Operator<T> o : mutationOperators) {
-			o.execute(this, offspring);
+			o.execute(offspring, null);
 		}
 
 		return offspring;

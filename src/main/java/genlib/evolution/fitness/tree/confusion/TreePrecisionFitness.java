@@ -207,7 +207,7 @@ public class TreePrecisionFitness extends TreeConfusionFitness {
 		}
 		
 		for (int i = 0; i < precisionArray.length; i++) {
-			// divide with all the positives will give recall
+			// divide with all the test positives will give precision
 			precisionArray[i] /= topArray[i];
 		}
 

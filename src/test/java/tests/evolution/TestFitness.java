@@ -789,4 +789,83 @@ public class TestFitness {
 		assertTrue(fitValues[2] == 80d/83);			
 	}
 	
+	@Test
+	public void treeFMeasureFitness() {
+		TreeConfusionFitness function = new TreeFMeasureFitness();
+		function.setIndex(1);
+		function.setParam("BETA,1");
+		function.setData(wekaData);
+
+		int fIndex = function.getIndex();
+		assertTrue(fIndex == 1);
+		assertTrue(testIndividual.hasChanged());
+		assertTrue(wekaIndividual.hasChanged());
+
+		double f1 = function.computeFitness(testIndividual);
+		double f2 = function.computeFitness(wekaIndividual);		
+
+		if (TestProperties.testPrints) {
+			System.out.println("testIndividual, fmeasure fitness, binary: "
+					+ f1);
+			System.out.println("wekaIndividual, fmeasure fitness, binary: "
+					+ f2);
+		}		
+		
+		assertTrue(f1 == (2 * (19d / 51) * (19d / 34) / ((19d / 51) + (19d / 34))));
+		assertTrue(testIndividual.getFitnessValue(1) == f1);
+		assertTrue(f2 == (2 * (29d / 31) * (29d / 34) / ((29d / 31) + (29d / 34))));
+		assertTrue(wekaIndividual.getFitnessValue(1) == f2);
+
+		// Different index
+		function.setParam("INDEX,0,BETA,1");
+
+		f1 = function.computeFitness(testIndividual);
+		f2 = function.computeFitness(wekaIndividual);
+
+		if (TestProperties.testPrints) {
+			System.out.println("testIndividual, fmeasure fitness, attr 0: "
+					+ f1);
+			System.out.println("wekaIndividual, fmeasure fitness, attr 0: "
+					+ f2);
+		}		
+		
+		assertTrue(f1 == (2 * (34d / 49) * (34d / 66) / ((34d / 49) + (34d / 66))));
+		assertTrue(testIndividual.getFitnessValue(1) == f1);
+		assertTrue(f2 == (2 * (64d / 69) * (64d / 66) / ((64d / 69) + (64d / 66))));
+		assertTrue(wekaIndividual.getFitnessValue(1) == f2);
+
+		function = new TreeFMeasureFitness();
+		function.setIndex(1);
+		function.setData(wekaDataThree);
+		function.setParam("AVERAGE,WEIGHTED,BETA,1");
+
+		f1 = function.computeFitness(wekaThreeIndividual);
+
+		if (TestProperties.testPrints) {
+			System.out
+					.println("wekaThreeIndividual, fmeasure fitness, weighted: "
+							+ f1);
+		}				
+
+		double[] fitValues = function.getConfusionValues(wekaThreeIndividual);
+
+		assertTrue(f1 == (fitValues[0] * 21 + fitValues[1] * 62 + fitValues[2] * 17) / 100);
+		
+		if (TestProperties.testPrints) {
+			System.out
+					.println("wekaThreeIndividual, fmeasure fitness, attr 0: "
+							+ fitValues[0]);
+			System.out
+					.println("wekaThreeIndividual, fmeasure fitness, attr 1: "
+							+ fitValues[1]);
+			System.out
+					.println("wekaThreeIndividual, fmeasure fitness, attr 2: "
+							+ fitValues[2]);
+		}
+		
+		assertTrue(fitValues[0] == (2 * (16d / 19) * (16d / 21) / ((16d / 19) + (16d / 21))));
+		assertTrue(fitValues[1] == (2 * (58d / 62) * (58d / 62) / ((58d / 62) + (58d / 62))));
+		assertTrue(fitValues[2] == (2 * (16d / 19) * (16d / 17) / ((16d / 19) + (16d / 17))));		
+	}
+	
 }

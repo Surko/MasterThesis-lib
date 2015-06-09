@@ -16,6 +16,7 @@ import genlib.locales.TextResource;
 public class ParetoFitnessComparator<T extends Individual> extends
 		FitnessComparator<T> {
 	/** Logger */
+	@SuppressWarnings("unused")
 	private static final Logger LOG = Logger
 			.getLogger(ParetoFitnessComparator.class.getName());
 	/** for serialization */

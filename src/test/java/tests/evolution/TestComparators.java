@@ -4,6 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.fitness.comparators.FitnessComparator;
+import genlib.evolution.fitness.comparators.ParetoFitnessComparator;
 import genlib.evolution.fitness.comparators.PriorityFitnessComparator;
 import genlib.evolution.fitness.comparators.SingleFitnessComparator;
 import genlib.evolution.fitness.comparators.WeightedFitnessComparator;
@@ -197,6 +198,26 @@ public class TestComparators {
 		assertTrue(individuals.get(0) == transIndividual);
 		assertTrue(individuals.get(1) == testIndividual);
 		assertTrue(individuals.get(2) == wekaIndividual);
+	}
+
+	@Test(expected = UnsupportedOperationException.class)
+	public void testParetoComparator() {
+		FitnessComparator<TreeIndividual> comp = new ParetoFitnessComparator<>();
+
+		FitnessFunction<TreeIndividual> accFunction = new TreeAccuracyFitness();
+		accFunction.setIndex(0);
+		accFunction.setData(wekaData);
+		FitnessFunction<TreeIndividual> depthFunction = new TreeSizeFitness();
+		depthFunction.setIndex(1);
+
+		ArrayList<FitnessFunction<TreeIndividual>> fitFuncs = new ArrayList<>();
+		fitFuncs.add(accFunction);
+		fitFuncs.add(depthFunction);
+		FitnessFunction.registeredFunctions = fitFuncs.size();
+
+		comp.setFitFuncs(fitFuncs);
+		
+		comp.compare(null, null);
 	}
 
 	@Test
