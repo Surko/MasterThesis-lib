@@ -1,9 +1,7 @@
 package genlib.classifier.popinit;
 
 import genlib.classifier.gens.DummyTreeGenerator;
-import genlib.classifier.gens.SimpleStumpGenerator;
 import genlib.classifier.gens.TreeGenerator;
-import genlib.classifier.splitting.InformationGainCriteria;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.locales.PermMessages;
 import genlib.locales.TextResource;

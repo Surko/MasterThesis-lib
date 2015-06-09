@@ -27,6 +27,7 @@ public class TextKeys {
 	public static final String eConsistencyStumpGen = "eConsistencyStumpGen";
 	public static final String eSelFormat = "eSelFormat";
 	public static final String eOperFormat = "eOperFormat";
+	public static final String eGenFormat = "eGenFormat";
 	public static final String ePopTypeFormat = "ePopTypeFormat";
 	public static final String eFitnessFormat = "eFitnessFormat";
 	public static final String eFitCompFormat = "eFitCompFormat";
@@ -38,6 +39,7 @@ public class TextKeys {
 	public static final String eBadTypeConversion = "eBadTypeConversion"; 
 	public static final String eWrongData = "eWrongData";
 	public static final String eWekaCompatibility = "eWekaCompatibility";
+	public static final String eWekaDependency = "eWekaDependency";
 	public static final String eNumericHandle = "eNumericHandle";
 	public static final String eNotImplemented = "eNotImplemented";
 	// Info keys

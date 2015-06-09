@@ -319,9 +319,11 @@ public class Population<T extends Individual> implements Serializable, IPopulati
 		}		
 		
 		offspring.setFitnessComparator(comparator);
+		IPopulation<T> parents = this;
 		
 		for (Operator<T> o : crossOperators) {			
-			o.execute(this, offspring);			
+			o.execute(parents, offspring);
+			parents = offspring;			
 		}
 
 		for (Operator<T> o : mutationOperators) {

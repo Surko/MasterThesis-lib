@@ -76,7 +76,7 @@ public class EvolutionTreeClassifier implements Serializable,
 	@Override
 	public void buildClassifier(Instances data) throws Exception {
 		theBestIndividual = null;
-		
+
 		random.setSeed(c.getSeed());
 		// making properties from string
 		makePropsFromString(data.classAttribute().isNumeric());
@@ -87,6 +87,29 @@ public class EvolutionTreeClassifier implements Serializable,
 		// setting additional params for created fields
 		setAdditionalParams(workData);
 
+		commonBuildClassifier(workData);
+	}
+
+	@Override
+	public void buildClassifier(GenLibInstances data) throws Exception {
+		theBestIndividual = null;
+
+		random.setSeed(c.getSeed());
+		// making properties from string
+		makePropsFromString(data.numClasses() == -1);
+
+		// Shuffle data
+		data.randomize(random);
+		// create adapter Data around instances
+		Data workData = new Data(data);
+		// setting additional params for created fields
+		setAdditionalParams(workData);
+
+		commonBuildClassifier(workData);
+
+	}
+
+	private void commonBuildClassifier(Data workData) throws Exception {
 		popInit.setRandomGenerator(new Random(random.nextLong()));
 		popInit.setInstances(workData);
 		popInit.initPopulation();
@@ -119,11 +142,6 @@ public class EvolutionTreeClassifier implements Serializable,
 		ea.run();
 
 		theBestIndividual = population.getBestIndividual();
-	}
-
-	@Override
-	public void buildClassifier(GenLibInstances data) throws Exception {
-
 	}
 
 	public void setAdditionalParams(Data data) {
@@ -160,7 +178,7 @@ public class EvolutionTreeClassifier implements Serializable,
 			makeEnvSelectorSet();
 		}
 	}
-	
+
 	public IPopulation<TreeIndividual> makePopulation() throws Exception {
 		String[] parameters = c.getPopulationType().split(Utils.oDELIM);
 
@@ -175,15 +193,15 @@ public class EvolutionTreeClassifier implements Serializable,
 		}
 
 		@SuppressWarnings("rawtypes")
-		Class<? extends IPopulation> iPopClass = IPopulation.populationTypes.get(parameters[0]);
+		Class<? extends IPopulation> iPopClass = IPopulation.populationTypes
+				.get(parameters[0]);
 
 		if (iPopClass != null) {
 			IPopulation<?> population = iPopClass.newInstance();
 			return population.makeNewInstance();
 		}
-		
-		return new Population<>(popInit.getPopulation(),
-				c.getPopulationSize());
+
+		return new Population<>(popInit.getPopulation(), c.getPopulationSize());
 	}
 
 	private void makeSelectorSet() throws Exception {
@@ -253,7 +271,7 @@ public class EvolutionTreeClassifier implements Serializable,
 
 		FitCompare fitCompare = FitCompare.valueOf(parameters[0]);
 
-		switch (fitCompare) {	
+		switch (fitCompare) {
 		case PARETO:
 			fitComp = new ParetoFitnessComparator<>();
 			break;
@@ -320,8 +338,25 @@ public class EvolutionTreeClassifier implements Serializable,
 	}
 
 	/**
+	 * Method accessed only from this method that parses parameter xover-set
+	 * which contains information about crossover operators. Method makes the
+	 * crossover operators set. They are created from config property file.
+	 * <ul>
+	 * <li>If there is some problem with initialization than the excepcion is
+	 * thrown.</li>
+	 * <li>If the crossover is dependent on weka and we are not using weka than
+	 * exception is thrown.</li>
+	 * <li>If the crossover isn't compatible with weka and we are using weka
+	 * than exception is thrown.</li>
+	 * </ul>
 	 * 
-	 * @param param
+	 * @throws OperatorStringFormatException
+	 *             if there is bad format for operators
+	 * @throws NotDefClassException
+	 *             if there isn't mutation operator for config
+	 * @throws CompatibleWekaException
+	 *             if the mutation operator is dependent on weka or isn't
+	 *             compatible with weka when we use weka.
 	 */
 	private void makeXoverOperatorSet() throws Exception {
 		String param = c.getXoverOperators();
@@ -343,11 +378,63 @@ public class EvolutionTreeClassifier implements Serializable,
 			}
 
 			// inner error
-			Operator<TreeIndividual> func = h.get(parameters[i]).newInstance();
-			xoverSet.add(func);
+			Class<Operator<TreeIndividual>> xOperClass = h.get(parameters[i]);
+
+			if (xOperClass == null) {
+				LOG.log(Level.SEVERE, String.format(
+						TextResource.getString(TextKeys.eNotDefClass),
+						parameters[0]));
+				// not defined class for pop init
+				throw new NotDefClassException(String.format(
+						TextResource.getString(TextKeys.eNotDefClass),
+						parameters[0]));
+			}
+
+			Operator<TreeIndividual> xOper = xOperClass.newInstance();
+
+			if (xOper.isWekaDependent() && !isWeka) {
+				LOG.log(Level.SEVERE, String.format(
+						TextResource.getString(TextKeys.eWekaDependency),
+						xOperClass.getName()));
+				throw new CompatibleWekaException(String.format(
+						TextResource.getString(TextKeys.eWekaDependency),
+						xOperClass.getName()));
+			}
+
+			if (!xOper.isWekaCompatible() && isWeka) {
+				LOG.log(Level.SEVERE, String.format(
+						TextResource.getString(TextKeys.eWekaCompatibility),
+						xOperClass.getName()));
+				throw new CompatibleWekaException(String.format(
+						TextResource.getString(TextKeys.eWekaCompatibility),
+						xOperClass.getName()));
+			}
+
+			xoverSet.add(xOper);
 		}
 	}
 
+	/**
+	 * Method accessed only from this method that parses parameter mut-set which
+	 * contains information about mutation operators. Method makes the mutation
+	 * operators set. They are created from config property file.
+	 * <ul>
+	 * <li>If there is some problem with initialization than the excepcion is
+	 * thrown.</li>
+	 * <li>If the mutation is dependent on weka and we are not using weka than
+	 * exception is thrown.</li>
+	 * <li>If the mutation isn't compatible with weka and we are using weka than
+	 * exception is thrown.</li>
+	 * </ul>
+	 * 
+	 * @throws OperatorStringFormatException
+	 *             if there is bad format for operators
+	 * @throws NotDefClassException
+	 *             if there isn't crossover operator for config
+	 * @throws CompatibleWekaException
+	 *             if the crossover operator is dependent on weka or isn't
+	 *             compatible with weka when we use weka.
+	 */
 	private void makeMutationOperatorSet() throws Exception {
 		String param = c.getMutationOperators();
 		mutSet.clear();
@@ -368,8 +455,39 @@ public class EvolutionTreeClassifier implements Serializable,
 			}
 
 			// inner error
-			Operator<TreeIndividual> func = h.get(parameters[i]).newInstance();
-			mutSet.add(func);
+			Class<Operator<TreeIndividual>> mutOperClass = h.get(parameters[i]);
+
+			if (mutOperClass == null) {
+				LOG.log(Level.SEVERE, String.format(
+						TextResource.getString(TextKeys.eNotDefClass),
+						parameters[0]));
+				// not defined class for pop init
+				throw new NotDefClassException(String.format(
+						TextResource.getString(TextKeys.eNotDefClass),
+						parameters[0]));
+			}
+
+			Operator<TreeIndividual> mutOper = mutOperClass.newInstance();
+
+			if (mutOper.isWekaDependent() && !isWeka) {
+				LOG.log(Level.SEVERE, String.format(
+						TextResource.getString(TextKeys.eWekaDependency),
+						mutOperClass.getName()));
+				throw new CompatibleWekaException(String.format(
+						TextResource.getString(TextKeys.eWekaDependency),
+						mutOperClass.getName()));
+			}
+
+			if (!mutOper.isWekaCompatible() && isWeka) {
+				LOG.log(Level.SEVERE, String.format(
+						TextResource.getString(TextKeys.eWekaCompatibility),
+						mutOperClass.getName()));
+				throw new CompatibleWekaException(String.format(
+						TextResource.getString(TextKeys.eWekaCompatibility),
+						mutOperClass.getName()));
+			}
+
+			mutSet.add(mutOper);
 		}
 	}
 
@@ -440,6 +558,23 @@ public class EvolutionTreeClassifier implements Serializable,
 		popInit.setNumOfThreads(c.getGenNumOfThreads());
 	}
 
+	/**
+	 * 
+	 * Method accessed only from this method that parses parameter ind-gen which
+	 * contains information about initial generators. Parameters are transferred
+	 * into generator list and then set into population initializator.
+	 * 
+	 * @throws PopulationInitStringFormatException
+	 *             if there is bad format for population initializator
+	 * @throws NotDefClassException
+	 *             if there isn't population initializator for config
+	 * @throws IllegalAccessException
+	 *             if there is problem with access to class
+	 * @throws InstantiationException
+	 *             if there is problem with instancing of class
+	 * @throws CompatibleWekaException
+	 *             if the generator is dependent on weka
+	 */
 	private void makeGenerators() throws Exception {
 		String indGen = c.getPopulationInit();
 		String[] parameters = indGen.split(Utils.oDELIM);
@@ -459,11 +594,24 @@ public class EvolutionTreeClassifier implements Serializable,
 			if (parameters[i] == "") {
 				// bad format
 				throw new PopulationInitStringFormatException(
-						TextResource.getString("eOperFormat"));
+						TextResource.getString(TextKeys.eGenFormat));
 			}
 
 			// inner error
-			TreeGenerator generator = h.get(parameters[i]).newInstance();
+			Class<? extends TreeGenerator> genClass = h.get(parameters[i]);
+
+			if (genClass == null) {
+				LOG.log(Level.SEVERE, String.format(
+						TextResource.getString(TextKeys.eNotDefClass),
+						parameters[0]));
+				// not defined class for pop init
+				throw new NotDefClassException(String.format(
+						TextResource.getString(TextKeys.eNotDefClass),
+						parameters[0]));
+			}
+
+			TreeGenerator generator = genClass.newInstance();
+
 			if (generator.isWekaDependent() && !isWeka) {
 				LOG.log(Level.SEVERE, String.format(
 						TextResource.getString(TextKeys.eWekaCompatibility),
@@ -572,7 +720,7 @@ public class EvolutionTreeClassifier implements Serializable,
 	public TreeIndividual getBestIndividual() {
 		return theBestIndividual;
 	}
-	
+
 	/**
 	 * Set seed for this run of classifier. Seed is further set from
 	 * buildClassifier function into Random object. It even serves purpose of

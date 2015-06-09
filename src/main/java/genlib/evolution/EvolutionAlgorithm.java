@@ -70,29 +70,21 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable, Seria
 	
 	public void setCrossOperators(ArrayList<Operator<T>> crossOperators) {
 		this.crossOperators = crossOperators;
-		for (Operator<T> operator : crossOperators) {
-			operator.setEvolutionAlgorithm(this);
-		}
 	}
 
 	public void addCrossOperator(Operator<T> operator) {
 		if (crossOperators == null)
 			crossOperators = new ArrayList<Operator<T>>();
-		operator.setEvolutionAlgorithm(this);
 		crossOperators.add(operator);
 	}
 
 	public void setMutationOperators(ArrayList<Operator<T>> mutationOperators) {
 		this.mutationOperators = mutationOperators;
-		for (Operator<T> operator : mutationOperators) {
-			operator.setEvolutionAlgorithm(this);
-		}
 	}
 
 	public void addMutationOperator(Operator<T> operator) {
 		if (mutationOperators == null)
-			mutationOperators = new ArrayList<Operator<T>>();
-		operator.setEvolutionAlgorithm(this);		
+			mutationOperators = new ArrayList<Operator<T>>();		
 		mutationOperators.add(operator);
 	}
 

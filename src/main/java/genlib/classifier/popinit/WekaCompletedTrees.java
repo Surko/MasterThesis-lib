@@ -4,9 +4,7 @@ import genlib.classifier.gens.TreeGenerator;
 import genlib.classifier.gens.WekaJ48TreeGenerator;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.locales.PermMessages;
-import genlib.utils.WekaUtils;
 
-import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -25,8 +23,7 @@ public class WekaCompletedTrees extends CompletedTrees {
 	public WekaCompletedTrees(int popSize, int divideParam, boolean resample) {
 		super(popSize, divideParam, resample);
 	}
-	
-	@SuppressWarnings("unchecked")
+		
 	private void initPopulation(Instances data) throws Exception {
 		if (gen == null) {
 			this.gen = new WekaJ48TreeGenerator(new String[] {"-C","0.25","-M","2"});
