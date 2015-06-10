@@ -5,6 +5,7 @@ import java.util.Random;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.population.IPopulation;
 import genlib.locales.PermMessages;
+import genlib.structures.Data;
 
 /**
  * Default Tree Crossover is simple class with very simple functionality. It
@@ -14,7 +15,7 @@ import genlib.locales.PermMessages;
  * @author Lukas Surin
  *
  */
-public class DefaultTreeCrossover extends Operator<TreeIndividual> {
+public class DefaultTreeCrossover implements Operator<TreeIndividual> {
 
 	/** for serialization */
 	private static final long serialVersionUID = -7572230936501803000L;
@@ -64,6 +65,14 @@ public class DefaultTreeCrossover extends Operator<TreeIndividual> {
 
 	/**
 	 * {@inheritDoc}
+	 * </p>
+	 * This operator does not set the Data object.
+	 */
+	@Override
+	public void setData(Data data) {}
+	
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	public String objectInfo() {
@@ -80,5 +89,6 @@ public class DefaultTreeCrossover extends Operator<TreeIndividual> {
 		// TODO Auto-generated method stub
 		
 	}
+
 
 }

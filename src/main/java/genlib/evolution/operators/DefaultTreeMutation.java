@@ -5,6 +5,7 @@ import java.util.Random;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.population.IPopulation;
 import genlib.locales.PermMessages;
+import genlib.structures.Data;
 
 /**
  * Default Tree Mutation is simple class with very simple functionality. It just
@@ -14,7 +15,7 @@ import genlib.locales.PermMessages;
  * @author Lukas Surin
  *
  */
-public class DefaultTreeMutation extends Operator<TreeIndividual> {
+public class DefaultTreeMutation implements Operator<TreeIndividual> {
 
 	/** for serialization */
 	private static final long serialVersionUID = -3461868874024321660L;
@@ -64,6 +65,14 @@ public class DefaultTreeMutation extends Operator<TreeIndividual> {
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * </p>
+	 * This operator does not set the Data object.
+	 */
+	@Override
+	public void setData(Data data) {}
+	
 	/**
 	 * {@inheritDoc}
 	 */

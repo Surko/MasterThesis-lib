@@ -586,6 +586,178 @@ public class Utils {
 		return getNodes(root, new ArrayList<Node>());
 	}
 
+	public static double getFilteredInstancesRegression(GenLibInstances instances, Node root) {		
+
+		if (instances.numClasses() != -1) {
+			return Double.MIN_VALUE;
+		}
+
+		double value = 0d;
+		int numOfFiltered = 0;
+
+		Enumeration<GenLibInstance> enumeration = instances.getInstances();
+		while (enumeration.hasMoreElements()) {
+			GenLibInstance instance = enumeration.nextElement();
+
+			Node node = root;
+			boolean shouldAdd = true;
+			while (node.getParent() != null) {
+				node = node.getParent();
+
+				switch (node.getSign()) {
+				case EQUALS:
+					if (Double.compare(
+							instance.getValueOfAttribute(node.getAttribute()),
+							node.getValue()) != 0) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case GREATEQ:
+					if (Double.compare(
+							instance.getValueOfAttribute(node.getAttribute()),
+							node.getValue()) == -1) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case GREATER:
+					if (Double.compare(
+							instance.getValueOfAttribute(node.getAttribute()),
+							node.getValue()) != 1) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case LESS:
+					if (Double.compare(
+							instance.getValueOfAttribute(node.getAttribute()),
+							node.getValue()) != -1) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case LESSEQ:
+					if (Double.compare(
+							instance.getValueOfAttribute(node.getAttribute()),
+							node.getValue()) == 1) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case NEQUALS:
+					if (Double.compare(
+							instance.getValueOfAttribute(node.getAttribute()),
+							node.getValue()) == 0) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				default:
+					break;
+				}
+
+				if (!shouldAdd) {
+					break;
+				}
+
+			}
+
+			if (shouldAdd) {
+				numOfFiltered++;
+				value += instance.getValueOfClass();
+			}
+
+		}
+		
+		return value / numOfFiltered;
+	}
+	
+	public static double[] getFilteredInstancesClasses(GenLibInstances instances, Node root) {		
+
+		if (instances.numClasses() == -1) {
+			return empty_double_array;
+		}
+
+		double[] classes = new double[instances.numClasses()];
+
+		Enumeration<GenLibInstance> enumeration = instances.getInstances();
+		while (enumeration.hasMoreElements()) {
+			GenLibInstance instance = enumeration.nextElement();
+
+			Node node = root;
+			boolean shouldAdd = true;
+			while (node.getParent() != null) {
+				node = node.getParent();
+
+				switch (node.getSign()) {
+				case EQUALS:
+					if (Double.compare(
+							instance.getValueOfAttribute(node.getAttribute()),
+							node.getValue()) != 0) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case GREATEQ:
+					if (Double.compare(
+							instance.getValueOfAttribute(node.getAttribute()),
+							node.getValue()) == -1) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case GREATER:
+					if (Double.compare(
+							instance.getValueOfAttribute(node.getAttribute()),
+							node.getValue()) != 1) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case LESS:
+					if (Double.compare(
+							instance.getValueOfAttribute(node.getAttribute()),
+							node.getValue()) != -1) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case LESSEQ:
+					if (Double.compare(
+							instance.getValueOfAttribute(node.getAttribute()),
+							node.getValue()) == 1) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case NEQUALS:
+					if (Double.compare(
+							instance.getValueOfAttribute(node.getAttribute()),
+							node.getValue()) == 0) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				default:
+					break;
+				}
+
+				if (!shouldAdd) {
+					break;
+				}
+
+			}
+
+			if (shouldAdd) {
+				classes[(int) instance.getValueOfClass()]++;
+			}
+
+		}
+		
+		return classes;
+	}
+	
 	/**
 	 * NOT IMPLEMENTED YET
 	 * 

@@ -156,6 +156,7 @@ public class MultiWayNode implements Node, SizeExtension {
 		this.treeSize = 1;
 		for (MultiWayNode node : this.childs) {
 			treeSize += node.treeSize;
+			node.setParent(this);
 		}
 	}
 

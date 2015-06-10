@@ -177,6 +177,169 @@ public class WekaUtils {
 		return treeInd;
 	}
 
+	public static double getFilteredInstancesRegression(Instances instances,
+			Node root) {
+
+		if (instances.numClasses() > 1) {
+			return Double.MIN_VALUE;
+		}
+
+		double value = 0d;
+		int numOfFiltered = 0;
+
+		@SuppressWarnings("unchecked")
+		Enumeration<Instance> enumeration = (Enumeration<Instance>) instances;
+		while (enumeration.hasMoreElements()) {
+			Instance instance = enumeration.nextElement();
+
+			Node node = root;
+			boolean shouldAdd = true;
+			while (node.getParent() != null) {
+				node = node.getParent();
+
+				switch (node.getSign()) {
+				case EQUALS:
+					if (Double.compare(instance.value(node.getAttribute()),
+							node.getValue()) != 0) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case GREATEQ:
+					if (Double.compare(instance.value(node.getAttribute()),
+							node.getValue()) == -1) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case GREATER:
+					if (Double.compare(instance.value(node.getAttribute()),
+							node.getValue()) != 1) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case LESS:
+					if (Double.compare(instance.value(node.getAttribute()),
+							node.getValue()) != -1) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case LESSEQ:
+					if (Double.compare(instance.value(node.getAttribute()),
+							node.getValue()) == 1) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case NEQUALS:
+					if (Double.compare(instance.value(node.getAttribute()),
+							node.getValue()) == 0) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				default:
+					break;
+				}
+
+				if (!shouldAdd) {
+					break;
+				}
+
+			}
+
+			if (shouldAdd) {
+				numOfFiltered++;
+				value += instance.classValue();
+			}
+
+		}
+
+		return value / numOfFiltered;
+	}
+
+	public static double[] getFilteredInstancesClasses(Instances instances,
+			Node root) {
+		if (instances.numClasses() <= 1) {
+			return Utils.empty_double_array;
+		}
+
+		double[] classes = new double[instances.numClasses()];
+
+		@SuppressWarnings("unchecked")
+		Enumeration<Instance> enumeration = (Enumeration<Instance>) instances
+				.enumerateInstances();
+		while (enumeration.hasMoreElements()) {
+			Instance instance = enumeration.nextElement();
+
+			Node node = root;
+			boolean shouldAdd = true;
+			while (node.getParent() != null) {
+				node = node.getParent();
+
+				switch (node.getSign()) {
+				case EQUALS:
+					if (Double.compare(instance.value(node.getAttribute()),
+							node.getValue()) != 0) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case GREATEQ:
+					if (Double.compare(instance.value(node.getAttribute()),
+							node.getValue()) == -1) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case GREATER:
+					if (Double.compare(instance.value(node.getAttribute()),
+							node.getValue()) != 1) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case LESS:
+					if (Double.compare(instance.value(node.getAttribute()),
+							node.getValue()) != -1) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case LESSEQ:
+					if (Double.compare(instance.value(node.getAttribute()),
+							node.getValue()) == 1) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				case NEQUALS:
+					if (Double.compare(instance.value(node.getAttribute()),
+							node.getValue()) == 0) {
+						shouldAdd = false;
+						break;
+					}
+					break;
+				default:
+					break;
+				}
+
+				if (!shouldAdd) {
+					break;
+				}
+
+			}
+
+			if (shouldAdd) {
+				classes[(int) instance.classValue()]++;
+			}
+
+		}
+		return classes;
+	}
+
 	public static HashMap<String, Integer> makeAttrIndexMap(Instances data) {
 		HashMap<String, Integer> retHashMap = new HashMap<String, Integer>();
 		for (int i = 0; i < data.numAttributes(); i++) {

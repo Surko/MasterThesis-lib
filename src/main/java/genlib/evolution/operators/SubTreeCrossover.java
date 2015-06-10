@@ -5,6 +5,7 @@ import java.util.Random;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.population.IPopulation;
 import genlib.locales.PermMessages;
+import genlib.structures.Data;
 import genlib.structures.extensions.SizeExtension;
 import genlib.structures.trees.Node;
 import genlib.utils.Utils;
@@ -19,7 +20,7 @@ import genlib.utils.Utils;
  * @author Lukas Surin
  *
  */
-public class SubTreeCrossover extends Operator<TreeIndividual> {
+public class SubTreeCrossover implements Operator<TreeIndividual> {
 
 	/** for serialization */
 	private static final long serialVersionUID = -8132560526319441150L;
@@ -153,6 +154,14 @@ public class SubTreeCrossover extends Operator<TreeIndividual> {
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * </p>
+	 * This operator does not set the Data object.
+	 */
+	@Override
+	public void setData(Data data) {}
+	
 	/**
 	 * {@inheritDoc}
 	 */

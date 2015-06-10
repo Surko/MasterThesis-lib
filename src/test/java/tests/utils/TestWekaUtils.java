@@ -1,4 +1,4 @@
-package tests.wekastuff;
+package tests.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -9,6 +9,7 @@ import genlib.structures.Data;
 import genlib.structures.data.GenLibInstances;
 import genlib.structures.extensions.HeightExtension;
 import genlib.structures.trees.MultiWayDepthNode;
+import genlib.structures.trees.MultiWayNode;
 import genlib.structures.trees.Node;
 import genlib.utils.Utils;
 import genlib.utils.Utils.Sign;
@@ -25,9 +26,9 @@ import weka.datagenerators.classifiers.classification.RDG1;
 
 public class TestWekaUtils {
 
-	@Test
-	public void testAttrMaps() throws Exception {
-		Instances wekaData = null;
+	private static Instances wekaData, regData;
+	
+	static {
 		try {
 			// binary class problem
 			String[] options = new String[] {
@@ -39,11 +40,25 @@ public class TestWekaUtils {
 			rdg.setOptions(options);
 			rdg.defineDataFormat();
 			wekaData = rdg.generateExamples();
+			
+			options = new String[] {
+					"-r",
+					"weka.datagenerators.classifiers.classification.RDG1-S_1_-n_100_-a_10_-c_2_-N_0_-I_0_-M_1_-R_10",
+					"-S", "1", "-n", "100", "-a", "10", "-c", "2", "-N", "0",
+					"-I", "0", "-M", "1", "-R", "10" };
+			
+			rdg = new RDG1();
+			rdg.setOptions(options);
+			rdg.defineDataFormat();
+			regData = rdg.generateExamples();
 
 		} catch (Exception e) {
 
 		}
-
+	}
+	
+	@Test
+	public void testAttrMaps() throws Exception {				
 		HashMap<String, Integer> attrIndexMap = WekaUtils
 				.makeAttrIndexMap(wekaData);
 		HashMap<String, Integer>[] attrValueIndexMap = WekaUtils
@@ -58,24 +73,7 @@ public class TestWekaUtils {
 	}
 
 	@Test
-	public void testWekaToNodeConversion() throws Exception {
-		Instances wekaData = null;
-		try {
-			// binary class problem
-			String[] options = new String[] {
-					"-r",
-					"weka.datagenerators.classifiers.classification.RDG1-S_1_-n_100_-a_10_-c_2_-N_0_-I_0_-M_1_-R_10",
-					"-S", "1", "-n", "100", "-a", "10", "-c", "2", "-N", "0",
-					"-I", "0", "-M", "1", "-R", "10" };
-			RDG1 rdg = new RDG1();
-			rdg.setOptions(options);
-			rdg.defineDataFormat();
-			wekaData = rdg.generateExamples();
-
-		} catch (Exception e) {
-
-		}
-
+	public void testWekaToNodeConversion() throws Exception {		
 		HashMap<String, Integer> attrIndexMap = WekaUtils
 				.makeAttrIndexMap(wekaData);
 		HashMap<String, Integer>[] attrValueIndexMap = WekaUtils
@@ -172,21 +170,10 @@ public class TestWekaUtils {
 	@Test
 	public void testConfusionMatrixCreation() {
 
-		Instances wekaData = null,wekaDataThree = null;
+		Instances wekaDataThree = null;
 		TreeIndividual wekaIndividual = null, testIndividual = null, wekaThreeIndividual = null;
 
-		try {
-			// binary class problem
-			String[] options = new String[] {
-					"-r",
-					"weka.datagenerators.classifiers.classification.RDG1-S_1_-n_100_-a_10_-c_2_-N_0_-I_0_-M_1_-R_10",
-					"-S", "1", "-n", "100", "-a", "10", "-c", "2", "-N", "0",
-					"-I", "0", "-M", "1", "-R", "10" };
-			RDG1 rdg = new RDG1();
-			rdg.setOptions(options);
-			rdg.defineDataFormat();
-			wekaData = rdg.generateExamples();
-
+		try {			
 			HashMap<String, Integer> attrIndexMap = WekaUtils
 					.makeAttrIndexMap(wekaData);
 			HashMap<String, Integer>[] attrValueIndexMap = WekaUtils
@@ -249,12 +236,12 @@ public class TestWekaUtils {
 			testIndividual = new TreeIndividual(root);
 
 			// ternary class problem
-			options = new String[] {
+			String[] options = new String[] {
 					"-r",
 					"weka.datagenerators.classifiers.classification.RDG1-S_1_-n_100_-a_10_-c_2_-N_0_-I_0_-M_1_-R_10",
 					"-S", "1", "-n", "100", "-a", "10", "-c", "3", "-N", "0",
 					"-I", "0", "-M", "1", "-R", "10" };
-			rdg = new RDG1();
+			RDG1 rdg = new RDG1();
 			rdg.setOptions(options);
 			rdg.defineDataFormat();
 			wekaDataThree = rdg.generateExamples();
@@ -395,4 +382,21 @@ public class TestWekaUtils {
 		assertTrue(confusionMatrix[2][2] == 16.0);
 	}
 
+	@Test
+	public void testFiltering() {
+		MultiWayDepthNode root = MultiWayDepthNode.makeNode(2, 1,
+				Sign.LESS, 1d);
+		MultiWayDepthNode[] childs = new MultiWayDepthNode[2];
+		childs[0] = MultiWayDepthNode.makeLeaf(1);
+		childs[1] = MultiWayDepthNode.makeLeaf(0);
+		root.setChilds(childs);		
+		
+		double[] filtered = WekaUtils.getFilteredInstancesClasses(wekaData, MultiWayNode.makeLeaf(2));
+		System.out.println(filtered[0] + " " + filtered[1]);
+		assertTrue(filtered.length == 2);
+		filtered = WekaUtils.getFilteredInstancesClasses(wekaData, root.getChildAt(0));
+		System.out.println(filtered[0] + " " + filtered[1]);
+		assertTrue(filtered.length == 2);
+	}
+	
 }
