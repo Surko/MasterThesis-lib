@@ -97,7 +97,7 @@ public class RouletteWheelSelector implements Selector {
 			for (int j = 0; j < fitnesses.length; j++) {
 				fitSum += fitnesses[j];
 				if (fitSum > roulette) {
-					dest.add((T)origin.getIndividual(j).copy());
+					dest.add(origin.getIndividual(j));
 					break;
 				}
 			}

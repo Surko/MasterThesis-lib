@@ -1,16 +1,19 @@
 @genlib.annotations.GenAnnot(
 			toInjectNames = {
 					genlib.classifier.gens.WekaSimpleStumpGenerator.initName,
-					genlib.classifier.gens.WekaJ48TreeGenerator.initName		
+					genlib.classifier.gens.WekaJ48TreeGenerator.initName,
+					genlib.classifier.gens.WekaTreeGenerator.initName
 			},
 			toInjectClasses = { 
 					genlib.classifier.gens.WekaSimpleStumpGenerator.class,
-					genlib.classifier.gens.WekaJ48TreeGenerator.class
+					genlib.classifier.gens.WekaJ48TreeGenerator.class,
+					genlib.classifier.gens.WekaTreeGenerator.class
 			},
 			toInjectField = "treeGens",
 			toInjectClass = TreeGenerator.class,
 			wekaCompatibility = {
 				true,		
+				true,
 				true
 			}
 		)

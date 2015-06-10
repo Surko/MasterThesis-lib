@@ -5,6 +5,7 @@ import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.population.Population;
 import genlib.structures.data.GenLibInstance;
 import genlib.structures.data.GenLibInstances;
+import genlib.structures.extensions.SizeExtension;
 import genlib.structures.trees.MultiWayDepthNode;
 import genlib.structures.trees.Node;
 
@@ -14,6 +15,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Stack;
 
 /**
  * Class that contains a lot of static methods for computing different often
@@ -26,8 +28,8 @@ public class Utils {
 	/** empty double arrray to return instead of null */
 	public static final double[] empty_double_array = new double[0];
 	/** empty int array to return instead of null */
-	public static final int[] empty_int_array = new int[0];	
-	
+	public static final int[] empty_int_array = new int[0];
+
 	/** delimiter for global use when delimiting different types of object */
 	public static final String oDELIM = "(;|[ ]+)";
 	/** delimiter for global use when delimiting parameters */
@@ -356,6 +358,94 @@ public class Utils {
 		}
 
 		return size;
+	}
+
+	/**
+	 * Method that finds the the node with index i1. Search is done in preorder.
+	 * Version of this method is for SizeExtension nodes. It utilizes the saved
+	 * values of tree sizes to search for node. It is faster than
+	 * the counterpart ({@link #getNode(Node, int)}).
+	 * 
+	 * @param root
+	 *            Node from which we start
+	 * @param i1
+	 *            index of node that we search for
+	 * @return node with index i1
+	 */
+	public static Node getExtensionNode(Node root, int i1) {
+		if (root == null) {
+			return null;
+		}
+
+		if (i1 == 0) {
+			return root;
+		}
+
+		if (!(root instanceof SizeExtension)) {
+			return null;
+		}
+
+		i1--;
+		while (root.getChilds() != null) {
+			int size = 0;
+			for (Node child : root.getChilds()) {
+				size = ((SizeExtension) child).getTreeSize();
+
+				if (i1 < size) {
+					root = child;
+					break;
+				} else {
+					i1 -= size;
+				}
+			}
+
+			if (i1 == 0) {
+				return root;
+			}
+
+			i1--;
+		}
+		throw new IndexOutOfBoundsException();
+
+	}
+
+	/**
+	 * Method that finds the the node with index i1. Search is done in preorder.
+	 * This is the version for nodes without SizeExtension (little bit slower
+	 * from the counterpart {@link #getExtensionNode(Node, int)})
+	 * 
+	 * @param root
+	 *            Node from which we start
+	 * @param i1
+	 *            index of node that we search for
+	 * @return node with index i1
+	 */
+	public static Node getNode(Node root, int i1) {
+		if (root == null) {
+			return null;
+		}
+
+		if (i1 == 0) {
+			return root;
+		}
+
+		Stack<Node> stack = new Stack<Node>();
+		stack.push(root);
+
+		while (!stack.empty()) {
+			Node node = stack.pop();
+			if (i1 == 0) {
+				return node;
+			}
+
+			for (int i = node.getChildCount() - 1; i >= 0; i--) {
+				stack.push(node.getChildAt(i));
+			}
+
+			i1--;
+		}
+
+		throw new IndexOutOfBoundsException();
 	}
 
 	/**

@@ -275,6 +275,10 @@ public class MultiWayNode implements Node, SizeExtension {
 	 * @return amount of children nodes
 	 */
 	public int getChildCount() {
+		if (childs == null) {
+			return 0;
+		}
+		
 		return childs.length;
 	}
 

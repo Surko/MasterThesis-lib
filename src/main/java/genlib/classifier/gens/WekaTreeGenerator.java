@@ -46,30 +46,6 @@ public class WekaTreeGenerator extends TreeGenerator  {
 		return individuals;
 	}
 	
-	public void setOptions(String[] options) throws Exception{
-		String classifierName = "";
-		ArrayList<String> otherOptions = new ArrayList<>();
-		for (int i = 0; i < options.length; i++) {
-			if (options[i].equals(_type)) {
-				classifierName = options[i+1];
-				i++;
-				continue;
-			}
-			
-			otherOptions.add(options[i]);
-		}			
-		
-		classifier = Classifier.forName(classifierName,
-				(String[])otherOptions.toArray());
-		if (!(classifier instanceof Drawable)) {
-			throw new Exception();
-		}
-		
-		if (!(classifier instanceof AdditionalMeasureProducer)) {
-			throw new Exception();
-		}
-	}
-	
 	@Override
 	public TreeGenerator copy() {
 		return null;
@@ -99,7 +75,30 @@ public class WekaTreeGenerator extends TreeGenerator  {
 	}
 
 	public void setParam(String param) throws Exception {
-		this.setOptions(param.split(Utils.pDELIM));
+		String[] options = param.split(Utils.pDELIM);
+		
+		String classifierName = "";
+		ArrayList<String> otherOptions = new ArrayList<>();
+		for (int i = 0; i < options.length; i++) {
+			if (options[i].equals(_type)) {
+				classifierName = options[i+1];
+				i++;
+				continue;
+			}
+			
+			otherOptions.add(options[i]);
+		}			
+		
+		classifier = Classifier.forName(classifierName,
+				otherOptions.toArray(new String[otherOptions.size()]));
+		if (!(classifier instanceof Drawable)) {
+			throw new Exception();
+		}
+		
+		if (!(classifier instanceof AdditionalMeasureProducer)) {
+			throw new Exception();
+		}
+		
 	}
 	
 }

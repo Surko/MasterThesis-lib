@@ -1,6 +1,5 @@
 package tests.evolution;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.fitness.TestFit;
@@ -44,69 +43,6 @@ public class TestSelectors {
 		individuals.add(ind1);
 		for (int i = 0; i < 19; i++)
 			individuals.add(new TreeIndividual(ind1));
-	}
-
-	@Test
-	public void testRouletteSelectorUniqueness() {
-		RouletteWheelSelector selector = new RouletteWheelSelector();
-		selector.setRandomGenerator(new Random(0));
-		IPopulation<TreeIndividual> selectedPopulation = selector.select(
-				individuals, 5);
-		assertTrue(selectedPopulation.getActualPopSize() == 5);
-		for (int i = 0; i < 5; i++) {
-			TreeIndividual ind = selectedPopulation.getIndividual(i);
-
-			for (int j = 0; j < individuals.getActualPopSize(); j++) {
-				assertFalse(ind == individuals.getIndividual(j));
-				assertFalse(ind.getRootNode() == individuals.getIndividual(j)
-						.getRootNode());
-			}
-		}
-
-		for (int j = 0; j < individuals.getActualPopSize(); j++) {
-			individuals.getIndividual(j).setComplexFitness(20);
-		}
-
-		for (int i = 0; i < 5; i++) {
-			TreeIndividual ind = selectedPopulation.getIndividual(i);
-			assertTrue(ind.getComplexFitness() == 0);
-		}
-
-		for (int j = 0; j < individuals.getActualPopSize(); j++) {
-			individuals.getIndividual(j).setComplexFitness(0);
-		}
-	}
-
-	@Test
-	public void testTournamentSelectorUniqueness() {
-		TournamentSelector selector = new TournamentSelector();
-		selector.setRandomGenerator(new Random(0));
-		IPopulation<TreeIndividual> selectedPopulation = selector.select(
-				individuals, 5);
-		assertTrue(selectedPopulation.getActualPopSize() == 5);
-
-		for (int i = 0; i < 5; i++) {
-			TreeIndividual ind = selectedPopulation.getIndividual(i);
-
-			for (int j = 0; j < individuals.getActualPopSize(); j++) {
-				assertFalse(ind == individuals.getIndividual(j));
-				assertFalse(ind.getRootNode() == individuals.getIndividual(j)
-						.getRootNode());
-			}
-		}
-
-		for (int j = 0; j < individuals.getActualPopSize(); j++) {
-			individuals.getIndividual(j).setComplexFitness(20);
-		}
-
-		for (int i = 0; i < 5; i++) {
-			TreeIndividual ind = selectedPopulation.getIndividual(i);
-			assertTrue(ind.getComplexFitness() == 0);
-		}
-
-		for (int j = 0; j < individuals.getActualPopSize(); j++) {
-			individuals.getIndividual(j).setComplexFitness(0);
-		}
 	}
 
 	@Test

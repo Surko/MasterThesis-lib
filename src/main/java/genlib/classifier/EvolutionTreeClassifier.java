@@ -204,6 +204,16 @@ public class EvolutionTreeClassifier implements Serializable,
 		return new Population<>(popInit.getPopulation(), c.getPopulationSize());
 	}
 
+	/**
+	 * Method accessed only from this method that parses parameter selector-set
+	 * which contains information about selectors. Method makes the selector
+	 * set. Definition is taken from config property file.
+	 * 
+	 * @throws SelectorStringFormatException
+	 *             if there is bad format for selectors
+	 * @throws NotDefClassException
+	 *             if there isn't config for selectors
+	 */
 	private void makeSelectorSet() throws Exception {
 		String param = c.getSelectors();
 		selectors.clear();
@@ -223,7 +233,20 @@ public class EvolutionTreeClassifier implements Serializable,
 				throw new Exception();
 			}
 
-			Selector selector = h.get(parameters[i]).newInstance();
+			Class<Selector> selectorClass = h.get(parameters[i]);
+
+			if (selectorClass == null) {
+				LOG.log(Level.SEVERE, String.format(
+						TextResource.getString(TextKeys.eNotDefClass),
+						parameters[0]));
+				// not defined class for pop init
+				throw new NotDefClassException(String.format(
+						TextResource.getString(TextKeys.eNotDefClass),
+						parameters[0]));
+			}
+
+			Selector selector = selectorClass.newInstance();
+
 			selector.setRandomGenerator(new Random(random.nextLong()));
 			selector.setParam(parameters[i + 1]);
 
@@ -231,6 +254,17 @@ public class EvolutionTreeClassifier implements Serializable,
 		}
 	}
 
+	/**
+	 * Method accessed only from this method that parses parameter
+	 * envselector-set which contains information about environmental set.
+	 * Method makes the environmental selector set. Definition is taken from
+	 * config property file.
+	 * 
+	 * @throws SelectorStringFormatException
+	 *             if there is bad format for env selectors
+	 * @throws NotDefClassException
+	 *             if there isn't config for env selectors
+	 */
 	private void makeEnvSelectorSet() throws Exception {
 		String param = c.getEnvSelectors();
 		envSelectors.clear();
@@ -250,7 +284,19 @@ public class EvolutionTreeClassifier implements Serializable,
 				throw new Exception();
 			}
 
-			Selector selector = h.get(parameters[i]).newInstance();
+			Class<Selector> selectorClass = h.get(parameters[i]);
+
+			if (selectorClass == null) {
+				LOG.log(Level.SEVERE, String.format(
+						TextResource.getString(TextKeys.eNotDefClass),
+						parameters[0]));
+				// not defined class for pop init
+				throw new NotDefClassException(String.format(
+						TextResource.getString(TextKeys.eNotDefClass),
+						parameters[0]));
+			}
+
+			Selector selector = selectorClass.newInstance();
 			selector.setRandomGenerator(new Random(random.nextLong()));
 			selector.setParam(parameters[i + 1]);
 
@@ -410,6 +456,7 @@ public class EvolutionTreeClassifier implements Serializable,
 						xOperClass.getName()));
 			}
 
+			xOper.setRandomGenerator(new Random(random.nextLong()));
 			xoverSet.add(xOper);
 		}
 	}
@@ -487,6 +534,7 @@ public class EvolutionTreeClassifier implements Serializable,
 						mutOperClass.getName()));
 			}
 
+			mutOper.setRandomGenerator(new Random(random.nextLong()));
 			mutSet.add(mutOper);
 		}
 	}

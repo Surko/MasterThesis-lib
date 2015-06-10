@@ -9,7 +9,6 @@ import genlib.evolution.operators.Operator;
 import genlib.evolution.population.IPopulation;
 import genlib.evolution.population.Population;
 import genlib.evolution.selectors.Selector;
-import genlib.exceptions.EmptyConfigParamException;
 import genlib.locales.TextResource;
 import genlib.structures.Data;
 
@@ -178,6 +177,8 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable, Seria
 		// change actual population with newly created generation.
 		actualPopulation = finalPopulation;
 		
+		// update of population, can be decreasing of max size or other
+		// types of variable size of population GAVaPS, PRoFIGA
 		actualPopulation.update();
 	}
 

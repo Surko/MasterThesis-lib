@@ -22,7 +22,7 @@ public interface Node extends Serializable {
 	public Node getParent();
 	public void setParent(Node parent);
 	public boolean isLeaf();
-	public void makeLeaf();
+	public void makeLeaf();	
 	public Node copy();
 	
 	

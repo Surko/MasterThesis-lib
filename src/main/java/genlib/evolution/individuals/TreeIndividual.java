@@ -2,6 +2,7 @@ package genlib.evolution.individuals;
 
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.structures.extensions.HeightExtension;
+import genlib.structures.extensions.NodeCountExtension;
 import genlib.structures.extensions.SizeExtension;
 import genlib.structures.trees.BinaryDepthNode;
 import genlib.structures.trees.BinaryNode;
@@ -74,13 +75,24 @@ public class TreeIndividual extends Individual {
 	}
 	
 	public int getNumNodes() {
-		return 0;
+		if (root instanceof SizeExtension) {
+			return ((SizeExtension)root).getTreeSize();
+		} else {
+			return Utils.computeNumNodes(root);
+		}		
 	}
 	
 	public int getNumLeaves() {
+		if (root instanceof SizeExtension && root instanceof NodeCountExtension) {
+			return ((SizeExtension)root).getTreeSize() - ((NodeCountExtension)root).getNumNodes(); 
+		}
 		return 0;
 	}
 
+	public void setRoot(Node root) {
+		this.root = root;
+	}
+	
 	@Override
 	public boolean equals(Object obj) {		
 		if (obj == null) {

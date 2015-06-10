@@ -29,11 +29,11 @@ public class TestPlugins {
 	public void testInternalPlugins() {		
 		PluginManager.initPlugins();
 
-		assertTrue(TreeGenerator.treeGens.size() == 2);
+		assertTrue(TreeGenerator.treeGens.size() == 3);
 		assertTrue(TreePopulationInitializator.treePopInits.size() == 4);		
 		assertTrue(FitnessFunction.tFitFuncs.size() == 13);
 		assertTrue(Operator.tMOper.size() == 1);
-		assertTrue(Operator.tXOper.size() == 1);
+		assertTrue(Operator.tXOper.size() == 2);
 		assertTrue(Selector.envSelectors.size() == 2);
 		assertTrue(Selector.selectors.size() == 2);
 	}

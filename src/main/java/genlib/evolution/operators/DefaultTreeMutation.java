@@ -1,5 +1,7 @@
 package genlib.evolution.operators;
 
+import java.util.Random;
+
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.population.IPopulation;
 import genlib.locales.PermMessages;
@@ -69,5 +71,13 @@ public class DefaultTreeMutation extends Operator<TreeIndividual> {
 	public String objectInfo() {
 		return String.format(PermMessages._fit_format, initName, 1.0);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * <\p>
+	 * This operator does not set the Random object.
+	 */
+	@Override
+	public void setRandomGenerator(Random random) {}
 
 }

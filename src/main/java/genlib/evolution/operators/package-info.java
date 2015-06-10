@@ -1,9 +1,11 @@
 @genlib.annotations.XOperatorAnnot(
 		toInjectNames = {
-				genlib.evolution.operators.DefaultTreeCrossover.initName
+				genlib.evolution.operators.DefaultTreeCrossover.initName,
+				genlib.evolution.operators.SubTreeCrossover.initName
 		},
 		toInjectClasses = {
 				genlib.evolution.operators.DefaultTreeCrossover.class,
+				genlib.evolution.operators.SubTreeCrossover.class
 		},
 		toInjectField = "tXOper",
 		toInjectClass = Operator.class
