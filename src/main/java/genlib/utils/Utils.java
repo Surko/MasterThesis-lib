@@ -11,6 +11,7 @@ import genlib.structures.trees.Node;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -363,8 +364,8 @@ public class Utils {
 	/**
 	 * Method that finds the the node with index i1. Search is done in preorder.
 	 * Version of this method is for SizeExtension nodes. It utilizes the saved
-	 * values of tree sizes to search for node. It is faster than
-	 * the counterpart ({@link #getNode(Node, int)}).
+	 * values of tree sizes to search for node. It is faster than the
+	 * counterpart ({@link #getNode(Node, int)}).
 	 * 
 	 * @param root
 	 *            Node from which we start
@@ -446,6 +447,143 @@ public class Utils {
 		}
 
 		throw new IndexOutOfBoundsException();
+	}
+
+	/**
+	 * Method count the number of leaves in tree (recursively).
+	 * 
+	 * @param root
+	 *            root from which we start
+	 * @param leaves
+	 *            list where we add leaves
+	 * @return list with leaves
+	 */
+	public static ArrayList<Node> getLeavesRecursive(Node root,
+			ArrayList<Node> leaves) {
+
+		if (root.isLeaf()) {
+			leaves.add(root);
+			return leaves;
+		}
+
+		for (Node child : root.getChilds()) {
+			if (child != null && child.isLeaf()) {
+				leaves.add(child);
+			} else {
+				getLeavesRecursive(child, leaves);
+			}
+
+		}
+
+		return leaves;
+	}
+
+	/**
+	 * Method count the number of nodes in tree (recursively).
+	 * 
+	 * @param root
+	 *            root from which we start
+	 * @param leaves
+	 *            list where we add nodes (not leaves)
+	 * @return list with nodes (not leaves)
+	 */
+	public static ArrayList<Node> getNodesRecursive(Node root,
+			ArrayList<Node> nodes) {
+
+		if (!root.isLeaf()) {
+			nodes.add(root);
+
+			for (Node child : root.getChilds()) {
+				if (child != null) {
+					getNodesRecursive(child, nodes);
+				}
+			}
+		}
+
+		return nodes;
+	}
+
+	/**
+	 * Method count the number of leaves in tree (with stack).
+	 * 
+	 * @param root
+	 *            root from which we start
+	 * @param leaves
+	 *            list where we add leaves
+	 * @return list with leaves
+	 */
+	public static ArrayList<Node> getLeaves(Node root, ArrayList<Node> leaves) {
+		Stack<Node> stack = new Stack<Node>();
+		stack.push(root);
+
+		while (!stack.empty()) {
+			Node node = stack.pop();
+
+			if (node != null) {
+				if (!node.isLeaf()) {
+					for (int i = node.getChildCount() - 1; i >= 0; i--) {
+						stack.push(node.getChildAt(i));
+					}
+				} else {
+					leaves.add(node);
+				}
+			}
+		}
+
+		return leaves;
+	}
+
+	/**
+	 * Method count the number of leaves in tree (with stack). It calls
+	 * {@link #getLeaves(Node, ArrayList)}.
+	 * 
+	 * @param root
+	 *            root from which we start
+	 * @return list with leaves
+	 */
+	public static ArrayList<Node> getLeaves(Node root) {
+		return getLeaves(root, new ArrayList<Node>());
+	}
+
+	/**
+	 * Method count the number of nodes in tree (with stack).
+	 * 
+	 * @param root
+	 *            root from which we start
+	 * @param leaves
+	 *            list where we add nodes (not leaves)
+	 * @return list with nodes (not leaves)
+	 */
+	public static ArrayList<Node> getNodes(Node root, ArrayList<Node> nodes) {
+		Stack<Node> stack = new Stack<Node>();
+		stack.push(root);
+
+		while (!stack.empty()) {
+			Node node = stack.pop();
+
+			if (node != null) {
+				if (!node.isLeaf()) {
+					nodes.add(node);
+					for (int i = node.getChildCount() - 1; i >= 0; i--) {
+						stack.push(node.getChildAt(i));
+					}
+				}
+			}
+		}
+
+		return nodes;
+	}
+
+	/**
+	 * Method count the number of nodes in tree (with stack). It calls
+	 * {@link #getNodes(Node, ArrayList)}.
+	 * 
+	 * @param root
+	 *            root from which we start
+	 * @return list with nodes (not leaves)
+	 */
+	public static ArrayList<Node> getNodes(Node root) {
+		return getNodes(root, new ArrayList<Node>());
 	}
 
 	/**

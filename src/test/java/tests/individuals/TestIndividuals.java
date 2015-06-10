@@ -12,6 +12,7 @@ import genlib.utils.Utils;
 import genlib.utils.Utils.Sign;
 import genlib.utils.WekaUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -250,7 +251,67 @@ public class TestIndividuals {
 	}
 
 	@Test
-	public void testRegression() {
+	public void testLeaves() {
+		TreeIndividual t1Copy = t1.copy();		
+		
+		ArrayList<Node> leaves1 = null;		
+		leaves1 = Utils.getLeaves(t1Copy.getRootNode());			
+		
+		ArrayList<Node> leaves2 = new ArrayList<>();
+		Utils.getLeavesRecursive(t1Copy.getRootNode(), leaves2);
+		
+		System.out.println("stack leaves count " + leaves1.size());
+		System.out.println("recursive leaves count " + leaves2.size());
+		
+		assertTrue(leaves1.size() == leaves2.size());
+		assertTrue(leaves1.equals(leaves2));
+		
+		leaves1 = new ArrayList<>();		
+		leaves1 = Utils.getLeaves(t1Copy.getRootNode(), leaves1);
+		
+		leaves2 = new ArrayList<>();
+		Utils.getLeavesRecursive(t1Copy.getRootNode(), leaves2);
+		
+		System.out.println("stack leaves count " + leaves1.size());
+		System.out.println("recursive leaves count " + leaves2.size());
+		
+		assertTrue(leaves1.size() == leaves2.size());
+		assertTrue(leaves1.equals(leaves2));
+		
+	}
+	
+	@Test
+	public void testNodes() {
+		TreeIndividual t1Copy = t1.copy();		
+				
+		ArrayList<Node> nodes1 = null;		
+		nodes1 = Utils.getNodes(t1Copy.getRootNode());			
+		
+		ArrayList<Node> nodes2 = new ArrayList<>();
+		Utils.getNodesRecursive(t1Copy.getRootNode(), nodes2);
+		
+		System.out.println("stack nodes count " + nodes1.size());
+		System.out.println("recursive nodes count " + nodes2.size());
+		
+		assertTrue(nodes1.size() == nodes2.size());
+		assertTrue(nodes1.equals(nodes2));
+		
+		nodes1 = new ArrayList<>();		
+		nodes1 = Utils.getNodes(t1Copy.getRootNode(), nodes1);
+		
+		nodes2 = new ArrayList<>();
+		Utils.getNodesRecursive(t1Copy.getRootNode(), nodes2);
+		
+		System.out.println("stack nodes count " + nodes1.size());
+		System.out.println("recursive nodes count " + nodes2.size());
+		
+		assertTrue(nodes1.size() == nodes2.size());
+		assertTrue(nodes1.equals(nodes2));
+		
+	}
+	
+	@Test
+	public void testRegression1() {
 		Random random = new Random(0L);
 		TreeIndividual t1Copy = t1.copy();
 
@@ -267,7 +328,7 @@ public class TestIndividuals {
 		}
 		long end1 = System.nanoTime();
 
-		System.out.println("Not Optimized " + (end1 - start1));
+		System.out.println("TreeSize Not Optimized " + (end1 - start1));
 
 		long start2 = System.nanoTime();
 		for (int i = 0; i < 100000; i++) {
@@ -276,8 +337,62 @@ public class TestIndividuals {
 		}
 		long end2 = System.nanoTime();
 
-		System.out.println("Optimized " + (end2 - start2));
+		System.out.println("TreeSize Optimized " + (end2 - start2));
 
 		assertTrue((end2 - start2) < (end1 - start1));
+	}
+	
+	@Test
+	public void testRegression2() {		
+		TreeIndividual t1Copy = t1.copy();		
+			
+		long start1 = System.nanoTime();
+		ArrayList<Node> leaves1 = new ArrayList<>();
+		for (int i = 0; i < 100000; i++) {			
+			leaves1 = Utils.getLeaves(t1Copy.getRootNode(), leaves1);
+			leaves1.clear();
+		}
+		long end1 = System.nanoTime();
+
+		System.out.println("Leaf count Not Optimized " + (end1 - start1));
+
+		long start2 = System.nanoTime();
+		ArrayList<Node> leaves2 = new ArrayList<>();
+		for (int i = 0; i < 100000; i++) {			
+			Utils.getLeavesRecursive(t1Copy.getRootNode(), leaves2);
+			leaves2.clear();
+		}
+		long end2 = System.nanoTime();
+
+		System.out.println("Leaf count Optimized " + (end2 - start2));
+
+		//assertTrue((end2 - start2) < (end1 - start1));
+	}
+	
+	@Test
+	public void testRegression3() {		
+		TreeIndividual t1Copy = t1.copy();		
+			
+		long start1 = System.nanoTime();
+		ArrayList<Node> nodes1 = new ArrayList<>();
+		for (int i = 0; i < 100000; i++) {			
+			nodes1 = Utils.getNodes(t1Copy.getRootNode(), nodes1);
+			nodes1.clear();
+		}
+		long end1 = System.nanoTime();
+
+		System.out.println("Node count Not Optimized " + (end1 - start1));
+
+		long start2 = System.nanoTime();
+		ArrayList<Node> nodes2 = new ArrayList<>();
+		for (int i = 0; i < 100000; i++) {			
+			Utils.getNodesRecursive(t1Copy.getRootNode(), nodes2);
+			nodes2.clear();
+		}
+		long end2 = System.nanoTime();
+
+		System.out.println("Node count Optimized " + (end2 - start2));
+
+		//assertTrue((end2 - start2) < (end1 - start1));
 	}
 }
