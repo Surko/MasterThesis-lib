@@ -6,9 +6,6 @@ import genlib.GenLib;
 import genlib.annotations.PopInitAnnot;
 import genlib.classifier.popinit.CompletedTrees;
 import genlib.classifier.popinit.PopulationInitializator;
-import genlib.evolution.fitness.FitnessFunction;
-import genlib.evolution.fitness.tree.confusion.TreeConfusionFitness;
-import genlib.evolution.individuals.Individual;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.population.IPopulation;
 import genlib.evolution.population.Population;
@@ -57,6 +54,7 @@ public class TestDummy {
 
 		try {
 			s = System.nanoTime();
+			@SuppressWarnings("unused")
 			CompletedTrees c1 = s1.get("comp").newInstance();
 			System.out.println(System.nanoTime() - s);
 		} catch (Exception e) {
@@ -64,6 +62,7 @@ public class TestDummy {
 
 		try {
 			s = System.nanoTime();
+			@SuppressWarnings("unused")
 			CompletedTrees c1 = s2.get("comp").getClass().newInstance();
 			System.out.println(System.nanoTime() - s);
 		} catch (Exception e) {
@@ -87,7 +86,7 @@ public class TestDummy {
 			try {
 				Field f = anot.toInjectClass().getField(anot.toInjectField());
 				// it's static map, so null object as parameter is adequate
-				@SuppressWarnings("unchecked")
+				@SuppressWarnings({ "unused", "unchecked" })
 				HashMap<String, Class<? extends PopulationInitializator<?>>> h = (HashMap<String, Class<? extends PopulationInitializator<?>>>) f
 						.get(null);
 			} catch (Exception e) {

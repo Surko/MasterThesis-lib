@@ -5,8 +5,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.individuals.TreeIndividual;
-import genlib.structures.Data;
-import genlib.structures.data.GenLibInstances;
 import genlib.structures.extensions.HeightExtension;
 import genlib.structures.trees.MultiWayDepthNode;
 import genlib.structures.trees.MultiWayNode;
@@ -20,13 +18,12 @@ import java.util.HashMap;
 import org.junit.Test;
 
 import tests.TestProperties;
-import weka.classifiers.trees.J48;
 import weka.core.Instances;
 import weka.datagenerators.classifiers.classification.RDG1;
 
 public class TestWekaUtils {
 
-	private static Instances wekaData, regData;
+	private static Instances wekaData;
 	
 	static {
 		try {
@@ -39,18 +36,7 @@ public class TestWekaUtils {
 			RDG1 rdg = new RDG1();
 			rdg.setOptions(options);
 			rdg.defineDataFormat();
-			wekaData = rdg.generateExamples();
-			
-			options = new String[] {
-					"-r",
-					"weka.datagenerators.classifiers.classification.RDG1-S_1_-n_100_-a_10_-c_2_-N_0_-I_0_-M_1_-R_10",
-					"-S", "1", "-n", "100", "-a", "10", "-c", "2", "-N", "0",
-					"-I", "0", "-M", "1", "-R", "10" };
-			
-			rdg = new RDG1();
-			rdg.setOptions(options);
-			rdg.defineDataFormat();
-			regData = rdg.generateExamples();
+			wekaData = rdg.generateExamples();						
 
 		} catch (Exception e) {
 

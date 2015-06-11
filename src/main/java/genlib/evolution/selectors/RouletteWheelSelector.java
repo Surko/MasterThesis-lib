@@ -63,8 +63,7 @@ public class RouletteWheelSelector implements Selector {
 	public <T extends Individual> IPopulation<T> select(IPopulation<T> origin, int count) {
 		return select(origin,null,count);
 	}
-	
-	@SuppressWarnings("unchecked")
+		
 	public <T extends Individual> IPopulation<T> select(IPopulation<T> origin, IPopulation<T> dest, int count) {
 		if (dest == null) {
 			dest = origin.createNewInstance();

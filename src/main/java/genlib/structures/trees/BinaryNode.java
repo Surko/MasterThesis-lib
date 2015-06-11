@@ -133,6 +133,8 @@ public class BinaryNode implements Node, SizeExtension {
 
 	public void setChilds(Node[] childs) {
 		this.childs = (BinaryNode[]) childs;
+		this.childs[0].setParent(this);
+		this.childs[1].setParent(this);
 		this.treeSize = 1 + this.childs[0].treeSize + this.childs[1].treeSize;
 	}
 

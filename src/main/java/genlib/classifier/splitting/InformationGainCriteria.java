@@ -15,8 +15,7 @@ public class InformationGainCriteria extends EntropyBasedCriteria {
 	private static final long serialVersionUID = -7729464952878929743L;
 
 	/**
-	 * Copy Constructor
-	 * @param igc Object to copy
+	 * Default Constructor
 	 */
 	public InformationGainCriteria() {
 		this.criteriaValue = 0d;

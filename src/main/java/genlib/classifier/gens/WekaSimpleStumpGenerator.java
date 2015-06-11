@@ -1,9 +1,11 @@
 package genlib.classifier.gens;
 
+import genlib.classifier.splitting.InformationGainCriteria;
 import genlib.classifier.splitting.SplitCriteria;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.structures.trees.MultiWayNode;
 import weka.classifiers.trees.j48.Distribution;
+import weka.classifiers.trees.j48.InfoGainSplitCrit;
 import weka.core.Attribute;
 import weka.core.Instances;
 
@@ -27,13 +29,13 @@ public class WekaSimpleStumpGenerator extends SimpleStumpGenerator {
 
 	private TreeIndividual[] createPopulation(Instances data) throws Exception {
 		individuals = new TreeIndividual[data.numAttributes()-1];		
-		individualCount = 0;
+		individualCount = 0;							
 		
 		for (int attrIndex = 0; attrIndex < individuals.length; attrIndex++) {			
 			Attribute cAttr = data.attribute(attrIndex);
 			if (cAttr.isNominal()) {
 				// generate not binary child for each attribute
-				TreeIndividual attrIndividual = new TreeIndividual(false,treeInit.getAutoDepth());
+				TreeIndividual attrIndividual = new TreeIndividual(false, autoDepth);
 				individuals[attrIndex] = attrIndividual;
 				MultiWayNode rootNode = (MultiWayNode)attrIndividual.getRootNode();
 				// configure root node with attribute and count of child nodes
@@ -47,11 +49,11 @@ public class WekaSimpleStumpGenerator extends SimpleStumpGenerator {
 					classNode.setValue(distribution.maxClass(bagIndex));						
 					childs[bagIndex] =  classNode;
 				}
-				rootNode.setCriteriaValue(splitCriteria.computeCriteria(distribution));
+				// rootNode.setCriteriaValue(splitCriteria.computeCriteria(distribution));
 			}
 			if (cAttr.isNumeric()) {
 				// generate not binary child for each attribute
-				TreeIndividual attrIndividual = new TreeIndividual(false,treeInit.getAutoDepth());
+				TreeIndividual attrIndividual = new TreeIndividual(false, autoDepth);
 				individuals[attrIndex] = attrIndividual;
 				MultiWayNode rootNode = (MultiWayNode)attrIndividual.getRootNode();
 				// configure of root node with attribute and count of child nodes
@@ -67,7 +69,7 @@ public class WekaSimpleStumpGenerator extends SimpleStumpGenerator {
 				childs[0].setValue(distribution.maxClass(0));				
 				childs[1].setValue(distribution.maxClass(1));
 				rootNode.setValue(splitCriteria.getSplitPoint());																
-				rootNode.setCriteriaValue(splitCriteria.getCriteriaValue());
+				// rootNode.setCriteriaValue(splitCriteria.getCriteriaValue());
 			}
 			individualCount++;
 		}
@@ -80,7 +82,7 @@ public class WekaSimpleStumpGenerator extends SimpleStumpGenerator {
 		if (data instanceof Instances) {
 			return createPopulation((Instances)data);
 		} else {
-			throw new Exception("Bad type of instances");
+			throw new RuntimeException("Bad type of instances");
 		}
 	}
 

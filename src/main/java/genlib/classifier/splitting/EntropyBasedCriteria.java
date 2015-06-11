@@ -20,11 +20,11 @@ public abstract class EntropyBasedCriteria implements SplitCriteria {
 	@Override
 	public <I,D> D handleEnumeratedAttribute(I dataPart, int attIndex, int complexity) 
 		throws Exception {
-		if (dataPart instanceof Instances) {
-			return (D)wEnumHandling((Instances)dataPart, attIndex, complexity);
-		}
 		if (dataPart instanceof GenLibInstances) 
 			return (D)enumHandling((GenLibInstances)dataPart, attIndex, complexity);
+		if (dataPart instanceof Instances) {
+			return (D)wEnumHandling((Instances)dataPart, attIndex, complexity);
+		}		
 		throw new Exception("No proper type of parameter dataPart");
 	}
 	

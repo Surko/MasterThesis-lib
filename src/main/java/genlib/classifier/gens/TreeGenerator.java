@@ -35,7 +35,9 @@ public abstract class TreeGenerator implements PopGenerator<TreeIndividual> {
 	/** Generator where all individuals will gather */
 	protected TreeGenerator gatherGen; 
 	/** Count of individuals in array */
-	protected int individualCount = 0;		
+	protected int individualCount = 0;	
+	/** autoDepth nodes*/
+	protected boolean autoDepth = true;
 	/** Population initializator associated with this generator*/ 
 	protected TreePopulationInitializator treeInit;
 	
@@ -45,6 +47,9 @@ public abstract class TreeGenerator implements PopGenerator<TreeIndividual> {
 	
 	public void setPopulationInitializator(TreePopulationInitializator treeInit) {
 		this.treeInit = treeInit;
+		if (treeInit != null) {
+			this.autoDepth = treeInit.getAutoDepth();
+		}
 	}
 	
 	@Override
@@ -76,6 +81,10 @@ public abstract class TreeGenerator implements PopGenerator<TreeIndividual> {
 		return individuals;
 	}		
 	
+	public boolean isAutoDepth() {
+		return autoDepth;
+	}
+	
 	@Override
 	public void setGatherGen(PopGenerator<TreeIndividual> gatherGen) {
 		if (gatherGen instanceof TreeGenerator)
@@ -84,6 +93,10 @@ public abstract class TreeGenerator implements PopGenerator<TreeIndividual> {
 
 	public void setIndividuals(TreeIndividual[] individuals) {
 		this.individuals = individuals;
+	}
+	
+	public void setAutoDepth(boolean autoDepth) {
+		this.autoDepth = autoDepth;
 	}
 	
 	protected synchronized int incCountOfIndividuals(int count) {

@@ -18,10 +18,10 @@ public class GainCriteria extends EntropyBasedCriteria {
 	@Override
 	public <I,D> D handleNumericAttribute(I dataPart, int attIndex, int complexity) 
 			throws Exception {
-		if (dataPart instanceof Instances) 
-			return (D)wNumHandling((Instances)dataPart, attIndex, complexity);		
 		if (dataPart instanceof GenLibInstances) 
 			return (D)numHandling((GenLibInstances)dataPart, attIndex, complexity);
+		if (dataPart instanceof Instances) 
+			return (D)wNumHandling((Instances)dataPart, attIndex, complexity);				
 		throw new Exception("No proper type of parameter dataPart");
 	} 
 	
