@@ -47,7 +47,12 @@ public final class PermMessages {
 	// selector init
 	public static final String _s_selinit="Loading of available selectors";		
 	public static final String _selclass_loaded="Class with selector %s is recognized. Usage parameter registered as %s.";
-	
+	// split init
+	public static final String _s_splitinit="Loading of available split criterias";		
+	public static final String _splitclass_loaded="Class with splitcriteria %s is recognized. Usage parameter registered as %s.";
+	// population container init
+	public static final String _s_popcontinit="Loading of available population containers";		
+	public static final String _populationcontainer_loaded="Class with population container %s is recognized. Usage parameter registered as %s.";
 	// formats	
 	public static final String _blank_param = "x";
 	public static final String _param_format= "%s,%s";

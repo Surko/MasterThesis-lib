@@ -1,11 +1,11 @@
 package genlib.classifier.gens;
 
-import java.util.HashMap;
-
 import genlib.classifier.popinit.PopulationInitializator;
 import genlib.classifier.popinit.TreePopulationInitializator;
 import genlib.classifier.splitting.SplitCriteria;
 import genlib.evolution.individuals.TreeIndividual;
+
+import java.util.HashMap;
 
 public abstract class TreeGenerator implements PopGenerator<TreeIndividual> {
 	
@@ -23,9 +23,7 @@ public abstract class TreeGenerator implements PopGenerator<TreeIndividual> {
 		SSGEN,
 		J48;
 	}
-	
-	/** Splitting criteria at nodes for attributes, computes information gain, etc... */
-	protected SplitCriteria splitCriteria;
+		
 	/** Max depth of the generated trees. for example simple stumps have depth = 1 */
 	protected int genHeight;
 	/** Individuals created with this generator */
@@ -35,9 +33,9 @@ public abstract class TreeGenerator implements PopGenerator<TreeIndividual> {
 	/** Generator where all individuals will gather */
 	protected TreeGenerator gatherGen; 
 	/** Count of individuals in array */
-	protected int individualCount = 0;	
+	protected int individualCount = 0;
 	/** autoDepth nodes*/
-	protected boolean autoDepth = true;
+	protected boolean autoHeight = false;
 	/** Population initializator associated with this generator*/ 
 	protected TreePopulationInitializator treeInit;
 	
@@ -48,7 +46,7 @@ public abstract class TreeGenerator implements PopGenerator<TreeIndividual> {
 	public void setPopulationInitializator(TreePopulationInitializator treeInit) {
 		this.treeInit = treeInit;
 		if (treeInit != null) {
-			this.autoDepth = treeInit.getAutoDepth();
+			this.autoHeight = treeInit.getAutoHeight();
 		}
 	}
 	
@@ -65,24 +63,12 @@ public abstract class TreeGenerator implements PopGenerator<TreeIndividual> {
 		return genHeight;
 	}
 	
-	public SplitCriteria getSplitCriteria() {
-		return splitCriteria;
-	}
-	
-	public void setSplitCriteria(SplitCriteria splitCriteria) {
-		this.splitCriteria = splitCriteria;		
-	}
-	
-	public boolean hasSplitCriteria() {
-		return splitCriteria != null;
-	}		
-	
 	public TreeIndividual[] getIndividuals() {
 		return individuals;
 	}		
 	
-	public boolean isAutoDepth() {
-		return autoDepth;
+	public boolean isAutoHeight() {
+		return autoHeight;
 	}
 	
 	@Override
@@ -95,8 +81,8 @@ public abstract class TreeGenerator implements PopGenerator<TreeIndividual> {
 		this.individuals = individuals;
 	}
 	
-	public void setAutoDepth(boolean autoDepth) {
-		this.autoDepth = autoDepth;
+	public void setAutoHeight(boolean autoHeight) {
+		this.autoHeight = autoHeight;
 	}
 	
 	protected synchronized int incCountOfIndividuals(int count) {
@@ -105,7 +91,8 @@ public abstract class TreeGenerator implements PopGenerator<TreeIndividual> {
 		return returnValue;
 	}
 	
-	public abstract TreeGenerator copy();
+	public abstract void setSplitCriteria(SplitCriteria<?,?> splitCriteria);
+	public abstract TreeGenerator copy() throws Exception;
 	/**
 	 * Default run method for TreeGenerator that is executed with ExecutorService from PopInitializator.
 	 * Its work is to createPopulation from provided instances. After that TreeIndividuals will be set 

@@ -10,7 +10,7 @@ import genlib.evolution.population.IPopulation;
 import genlib.evolution.population.Population;
 import genlib.evolution.selectors.RouletteWheelSelector;
 import genlib.evolution.selectors.TournamentSelector;
-import genlib.structures.trees.MultiWayDepthNode;
+import genlib.structures.trees.MultiWayHeightNode;
 import genlib.utils.Utils.Sign;
 
 import java.util.ArrayList;
@@ -33,11 +33,11 @@ public class TestSelectors {
 		fitComp.setFitFuncs(fitFuncs);
 		fitComp.setParam("0");
 		individuals.setFitnessComparator(fitComp);
-		MultiWayDepthNode root = MultiWayDepthNode.makeNode(2, 1, Sign.LESS,
+		MultiWayHeightNode root = MultiWayHeightNode.makeNode(2, 1, Sign.LESS,
 				20d);
-		MultiWayDepthNode[] childs = new MultiWayDepthNode[2];
-		childs[0] = MultiWayDepthNode.makeLeaf(1);
-		childs[1] = MultiWayDepthNode.makeLeaf(0);
+		MultiWayHeightNode[] childs = new MultiWayHeightNode[2];
+		childs[0] = MultiWayHeightNode.makeLeaf(1);
+		childs[1] = MultiWayHeightNode.makeLeaf(0);
 		root.setChilds(childs);
 		TreeIndividual ind1 = new TreeIndividual(root);
 		individuals.add(ind1);

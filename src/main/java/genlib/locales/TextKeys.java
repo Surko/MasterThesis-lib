@@ -35,6 +35,7 @@ public class TextKeys {
 	public static final String eEmptyInputParams = "eEmptyInputParams";	
 	public static final String eMissParam = "eMissParam";
 	public static final String eNotDefClass = "eNotDefClass";
+	public static final String eNotDefParam = "eNotDefParam";
 	public static final String eNullInputEvolution = "eNullInputEvolution";	
 	public static final String eBadTypeConversion = "eBadTypeConversion"; 
 	public static final String eWrongData = "eWrongData";

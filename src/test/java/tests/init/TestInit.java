@@ -5,9 +5,20 @@ import static org.junit.Assert.*;
 import java.io.File;
 
 import genlib.GenLib;
+import genlib.classifier.EvolutionTreeClassifier;
+import genlib.classifier.gens.WekaJ48TreeGenerator;
+import genlib.classifier.popinit.TreePopulationInitializator;
 import genlib.configurations.Config;
 import genlib.configurations.PathManager;
+import genlib.evolution.fitness.FitnessFunction;
+import genlib.evolution.fitness.comparators.SingleFitnessComparator;
+import genlib.evolution.fitness.tree.TreeAccuracyFitness;
+import genlib.evolution.operators.DefaultTreeCrossover;
+import genlib.evolution.operators.DefaultTreeMutation;
+import genlib.evolution.operators.Operator;
+import genlib.evolution.selectors.Selector;
 import genlib.locales.TextResource;
+import genlib.plugins.PluginManager;
 
 import org.junit.Test;
 
@@ -44,7 +55,7 @@ public class TestInit {
 		assertTrue(c.getGenNumOfThreads() == 1);
 		assertEquals(c.getSelectors(), "Tmt x");
 		assertEquals(c.getEnvSelectors(), "Tmt x");
-		assertEquals(c.getPopulationInit(), "CompTree depth,2");
+		assertEquals(c.getPopulationInit(), "CompTree MAXHEIGHT,2");
 		assertTrue(c.getSeed() == 28041991);
 		assertTrue(c.getPopulationSize() == 100);
 		
@@ -102,4 +113,35 @@ public class TestInit {
 		assertTrue(TextResource.reinit());
 	}
 
+	@Test
+	public void testEvolutionTreeClassifierInit() throws Exception {
+		PluginManager.initPlugins();
+		
+		EvolutionTreeClassifier etc = new EvolutionTreeClassifier(true);
+		etc.makePropsFromString(false);			
+				
+		assertTrue(FitnessFunction.tFitFuncs.size() == 13);
+		assertTrue(Operator.tMOper.size() == 4);
+		assertTrue(Operator.tXOper.size() == 2);
+		assertTrue(Selector.selectors.size() == 2);
+		assertTrue(Selector.envSelectors.size() == 2);
+		
+		assertTrue(etc.getFitnessComparator() != null);
+		assertTrue(etc.getFitnessComparator() instanceof SingleFitnessComparator); 
+		assertTrue(etc.getFitnessFunctions().size() == 1);
+		assertTrue(etc.getFitnessFunctions().get(0) instanceof TreeAccuracyFitness);
+		assertTrue(etc.getMutSet().size() == 1);
+		assertTrue(etc.getMutSet().get(0) instanceof DefaultTreeMutation);
+		assertTrue(Double.compare(etc.getMutSet().get(0).getOperatorProbability(), 1) == 0);
+		assertTrue(etc.getXoverSet().size() == 1);
+		assertTrue(etc.getXoverSet().get(0) instanceof DefaultTreeCrossover);
+		assertTrue(Double.compare(etc.getXoverSet().get(0).getOperatorProbability(), 1) == 0);
+		assertTrue(etc.getPopInitializator() != null);
+		assertTrue(etc.getPopInitializator() instanceof TreePopulationInitializator);
+		assertTrue(etc.getPopInitializator().getMaxHeight() == 2);
+		assertTrue(etc.getPopInitializator().getGenerator() != null);
+		assertTrue(etc.getPopInitializator().getGenerator() instanceof WekaJ48TreeGenerator);
+		
+	}
+	
 }

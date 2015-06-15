@@ -8,7 +8,7 @@ import genlib.evolution.individuals.TreeIndividual;
 import genlib.structures.Data;
 import genlib.structures.data.GenLibInstances;
 import genlib.structures.extensions.HeightExtension;
-import genlib.structures.trees.MultiWayDepthNode;
+import genlib.structures.trees.MultiWayHeightNode;
 import genlib.structures.trees.Node;
 import genlib.utils.Utils;
 import genlib.utils.Utils.Sign;

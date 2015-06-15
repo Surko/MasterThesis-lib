@@ -117,11 +117,11 @@ public class Config implements Serializable {
 	/**
 	 * Path to config.properties file.
 	 */
-	private transient String sFile;
+	private String sFile;
 	/**
 	 * Properties field with loaded configurations
 	 */
-	private transient Properties prop;	
+	private Properties prop;	
 	
 	/**
 	 * Factory method of this class which returns unique instance of Config
@@ -143,6 +143,8 @@ public class Config implements Serializable {
 		return instance;
 	}
 
+	private Config() {}
+	
 	/**
 	 * Method that resets all the saved configs/properties and sets
 	 * default values.
@@ -214,7 +216,7 @@ public class Config implements Serializable {
 		putIfAbsent(NUM_OF_GEN, "10");
 		putIfAbsent(SELECTORS, "Tmt x");
 		putIfAbsent(ENV_SELECTORS, "Tmt x");
-		putIfAbsent(POP_INIT, "CompTree depth,2");
+		putIfAbsent(POP_INIT, "CompTree MAXHEIGHT,2");
 		putIfAbsent(IND_GEN, "wJ48Gen -C,0.25,-M,2");
 		putIfAbsent(POP_SIZE, "100");
 		putIfAbsent(SEED, "28041991");

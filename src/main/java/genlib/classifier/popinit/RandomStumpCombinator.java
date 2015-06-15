@@ -43,7 +43,7 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 	
 	public RandomStumpCombinator(int popSize, int maxDepth, int divideParam,
 			boolean resample, TreeGenerator gen) {
-		this.maxDepth = maxDepth;
+		this.maxHeight = maxDepth;
 		this.divideParam = divideParam;
 		this.resample = resample;
 		this.gen = gen;
@@ -54,7 +54,7 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 
 	public RandomStumpCombinator(int popSize, int maxDepth, int divideParam,
 			boolean resample) {
-		this.maxDepth = maxDepth;
+		this.maxHeight = maxDepth;
 		this.divideParam = divideParam;
 		this.resample = resample;		
 		this.popSize = popSize;
@@ -164,7 +164,7 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 			combPopulation[j] = combined;
 
 			// we already have trees in stumppopulation with needed depth
-			if (maxDepth == 2)
+			if (maxHeight == 2)
 				continue;
 
 			combineAtNode(combined.getRootNode());
@@ -182,7 +182,7 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 			childs[childIndex].setParent(node);
 		}
 		// Can do because we know that we are combining stumps with depth = 1
-		combineNodes(childs, maxDepth - 2);		
+		combineNodes(childs, maxHeight - 2);		
 	}
 
 	private void combineNodes(Node[] nodes, int d) {
@@ -221,7 +221,7 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 		return String.format("type %s;gen %s;depth %s;divide %s;resample %s;threads %s", 
 				initName,
 				gen.getGenName(),
-				maxDepth,
+				maxHeight,
 				divideParam,
 				resample,
 				nThreads);

@@ -26,7 +26,7 @@ public class TreeHeightFitness extends FitnessFunction<TreeIndividual> {
 		}
 
 		double height = individual.getTreeHeight();
-		individual.setFitnessValue(index, height == 0 ? 2 : 1 / height);
+		individual.setFitnessValue(index, height == 0 ? 1 : 1 / height);
 		return individual.getFitnessValue(index);
 	}
 

@@ -1,5 +1,6 @@
 package genlib.classifier.gens;
 
+import genlib.classifier.splitting.SplitCriteria;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.utils.Utils;
 import genlib.utils.WekaUtils;
@@ -38,18 +39,13 @@ public class WekaJ48TreeGenerator extends TreeGenerator  {
 		j48Tree.buildClassifier(data);		
 		String sTree = j48Tree.graph();
 		individuals[0] = WekaUtils.constructTreeIndividual(sTree, j48Tree.measureTreeSize(), data.numInstances(), treeInit.getAttrIndexMap(),
-				treeInit.getAttrValueIndexMap(), treeInit.getAutoDepth());		
+				treeInit.getAttrValueIndexMap(), treeInit.getAutoHeight());		
 		return individuals;
 	}
 	
 	public void setOptions(String[] options) throws Exception{
 		this.j48Tree.setOptions(options);
-	}
-	
-	@Override
-	public TreeGenerator copy() {
-		return null;
-	}
+	}	
 
 	public J48 getJ48() {
 		return j48Tree;
@@ -78,4 +74,11 @@ public class WekaJ48TreeGenerator extends TreeGenerator  {
 		this.j48Tree.setOptions(param.split(Utils.pDELIM));
 	}
 	
+	@Override
+	public void setSplitCriteria(SplitCriteria<?,?> splitCriteria) {}
+	
+	@Override
+	public TreeGenerator copy() throws Exception {		
+		return new WekaJ48TreeGenerator(j48Tree.getOptions());		
+	}
 }

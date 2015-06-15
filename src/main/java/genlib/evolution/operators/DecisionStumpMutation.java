@@ -4,14 +4,13 @@ import genlib.classifier.gens.WekaSimpleStumpGenerator;
 import genlib.classifier.splitting.InformationGainCriteria;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.population.IPopulation;
+import genlib.exceptions.PopulationInitializationException;
 import genlib.locales.PermMessages;
 import genlib.structures.Data;
-import genlib.structures.extensions.HeightExtension;
-import genlib.structures.trees.MultiWayDepthNode;
+import genlib.structures.trees.MultiWayHeightNode;
 import genlib.structures.trees.MultiWayNode;
 import genlib.structures.trees.Node;
 import genlib.utils.Utils;
-import genlib.utils.WekaUtils;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -30,11 +29,11 @@ public class DecisionStumpMutation implements Operator<TreeIndividual> {
 	/** for serialization */
 	private static final long serialVersionUID = -2553678098269930119L;
 	/** name of this operator */
-	public static final String initName = "dSM";
+	public static final String initName = "wekaDSM";
 	/** random object for this operator */
 	private Random random;
 	/** probability of this operator */
-	private double mProb;
+	private double mProb = 0d;
 	/** data from which we take the most frequent class */
 	private TreeIndividual[] stumps;
 	/** data from which we create stumps */
@@ -71,7 +70,7 @@ public class DecisionStumpMutation implements Operator<TreeIndividual> {
 				}
 
 				Node root = child.getRootNode();
-				Utils.getNodes(root, leaves);
+				Utils.getLeavesRecursive(root, leaves);
 
 				int lIndex = random.nextInt(leaves.size());
 				int sIndex = random.nextInt(stumps.length);
@@ -86,28 +85,37 @@ public class DecisionStumpMutation implements Operator<TreeIndividual> {
 						break;
 					}
 				}
-
+				// change to recompute fitness
+				child.change();
 			}
+			
 			leaves.clear();
+		}
+		
+		if (childs != null) {
+			childs.addAll(parents);
 		}
 	}
 
 	private void createStumps(Node node) {
 		WekaSimpleStumpGenerator wekaSSGen = new WekaSimpleStumpGenerator();
-		wekaSSGen.setInstances(data);
-		wekaSSGen.setSplitCriteria(new InformationGainCriteria());
+		wekaSSGen.setInstances(data.toInstances());
+		wekaSSGen.setSplitCriteria(InformationGainCriteria.getInstance());
 		if (node instanceof MultiWayNode) {
-			wekaSSGen.setAutoDepth(false);
+			wekaSSGen.setAutoHeight(false);
 		}
 
-		if (node instanceof MultiWayDepthNode) {
-			wekaSSGen.setAutoDepth(true);
+		if (node instanceof MultiWayHeightNode) {
+			wekaSSGen.setAutoHeight(true);
 		}
-		
+
 		try {
 			this.stumps = wekaSSGen.createPopulation();
 		} catch (Exception e) {
-
+			if (e instanceof RuntimeException) {
+				throw (RuntimeException)e;
+			}
+			throw new PopulationInitializationException(e.getMessage());
 		}
 	}
 
@@ -124,7 +132,7 @@ public class DecisionStumpMutation implements Operator<TreeIndividual> {
 	 */
 	@Override
 	public boolean isWekaDependent() {
-		return false;
+		return true;
 	}
 
 	/**
@@ -141,7 +149,7 @@ public class DecisionStumpMutation implements Operator<TreeIndividual> {
 	 */
 	@Override
 	public String objectInfo() {
-		return String.format(PermMessages._fit_format, initName, 1.0);
+		return String.format(PermMessages._fit_format, initName, mProb);
 	}
 
 	/**

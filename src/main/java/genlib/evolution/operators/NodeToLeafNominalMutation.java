@@ -29,7 +29,7 @@ public class NodeToLeafNominalMutation implements Operator<TreeIndividual> {
 	/** random object for this operator */
 	private Random random;
 	/** probability of this operator */
-	private double mProb;
+	private double mProb = 0d;
 	/** data from which we take the most frequent class */
 	private Data data;
 
@@ -62,8 +62,14 @@ public class NodeToLeafNominalMutation implements Operator<TreeIndividual> {
 				Node root = child.getRootNode();
 				Utils.getNodes(root, nodes);
 				mutateNode(nodes);
+				// change to recompute fitness
+				child.change();
 			}
 			nodes.clear();
+		}		
+		
+		if (childs != null) {
+			childs.addAll(parents);
 		}
 
 	}
@@ -93,6 +99,7 @@ public class NodeToLeafNominalMutation implements Operator<TreeIndividual> {
 			}
 		}
 		
+		toMutate.makeLeaf();
 		toMutate.setValue(maxIndex);
 
 	}
@@ -126,7 +133,7 @@ public class NodeToLeafNominalMutation implements Operator<TreeIndividual> {
 	 */
 	@Override
 	public String objectInfo() {
-		return String.format(PermMessages._fit_format, initName, 1.0);
+		return String.format(PermMessages._fit_format, initName, mProb);
 	}
 
 	/**

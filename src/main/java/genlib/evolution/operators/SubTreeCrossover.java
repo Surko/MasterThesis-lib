@@ -61,18 +61,18 @@ public class SubTreeCrossover implements Operator<TreeIndividual> {
 			TreeIndividual parent1 = parents.getIndividual(2 * i);
 			TreeIndividual parent2 = parents.getIndividual(2 * i + 1);
 
+			TreeIndividual child1 = parent1.copy();
+			TreeIndividual child2 = parent2.copy();
+			
 			if (random.nextDouble() < xProb) {
-				TreeIndividual child1 = parent1.copy();
-				TreeIndividual child2 = parent2.copy();
-
 				crossIndividuals(child1, child2);
 
-				childs.add(child1);
-				childs.add(child2);
-			} else {
-				childs.add(parent1);
-				childs.add(parent2);
+				child1.change();
+				child2.change();								
 			}
+			
+			childs.add(child1);
+			childs.add(child2);
 		}
 	}
 

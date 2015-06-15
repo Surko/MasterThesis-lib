@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.structures.data.GenLibInstances;
-import genlib.structures.trees.MultiWayDepthNode;
+import genlib.structures.trees.MultiWayHeightNode;
 import genlib.structures.trees.Node;
 import genlib.utils.Utils;
 import genlib.utils.Utils.Sign;
@@ -94,11 +94,11 @@ public class TestIndividuals {
 
 	@Test
 	public void testIndividualCreation() {
-		MultiWayDepthNode root = MultiWayDepthNode.makeNode(2, 1, Sign.LESS,
+		MultiWayHeightNode root = MultiWayHeightNode.makeNode(2, 1, Sign.LESS,
 				20d);
-		MultiWayDepthNode[] childs = new MultiWayDepthNode[2];
-		childs[0] = MultiWayDepthNode.makeLeaf(1);
-		childs[1] = MultiWayDepthNode.makeLeaf(0);
+		MultiWayHeightNode[] childs = new MultiWayHeightNode[2];
+		childs[0] = MultiWayHeightNode.makeLeaf(1);
+		childs[1] = MultiWayHeightNode.makeLeaf(0);
 		root.setChilds(childs);
 		TreeIndividual ind1 = new TreeIndividual(root);
 		TreeIndividual[] testing = new TreeIndividual[10];

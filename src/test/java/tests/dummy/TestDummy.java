@@ -1,15 +1,18 @@
 package tests.dummy;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import genlib.GenLib;
 import genlib.annotations.PopInitAnnot;
 import genlib.classifier.popinit.CompletedTrees;
 import genlib.classifier.popinit.PopulationInitializator;
+import genlib.classifier.splitting.InformationGainCriteria;
+import genlib.classifier.splitting.SplitCriteria;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.population.IPopulation;
 import genlib.evolution.population.Population;
-import genlib.structures.trees.MultiWayDepthNode;
+import genlib.structures.trees.MultiWayHeightNode;
 import genlib.structures.trees.MultiWayNode;
 
 import java.lang.annotation.Annotation;
@@ -17,6 +20,9 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 
 import org.junit.Test;
+
+import weka.classifiers.trees.j48.Distribution;
+import weka.core.Instances;
 
 public class TestDummy {
 
@@ -33,10 +39,10 @@ public class TestDummy {
 	@Test
 	public void test2() {
 		TreeIndividual individual = new TreeIndividual(false, true);
-		MultiWayDepthNode node = (MultiWayDepthNode) individual.getRootNode();
+		MultiWayHeightNode node = (MultiWayHeightNode) individual.getRootNode();
 		node.setChildCount(2);
 		MultiWayNode[] multi = node.getChilds();
-		multi[0] = new MultiWayDepthNode();
+		multi[0] = new MultiWayHeightNode();
 
 		assertTrue(multi[0] == node.getChildAt(0));
 		assertTrue(node.getChildAt(1) == null);
@@ -90,7 +96,6 @@ public class TestDummy {
 				HashMap<String, Class<? extends PopulationInitializator<?>>> h = (HashMap<String, Class<? extends PopulationInitializator<?>>>) f
 						.get(null);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -105,19 +110,28 @@ public class TestDummy {
 	@Test
 	public void test6() {
 		IPopulation.populationTypes.put("test", Population.class);
-		try {			
-			IPopulation<?> iPop = IPopulation.populationTypes.get("test").newInstance();
-			
+		try {
+			IPopulation<?> iPop = IPopulation.populationTypes.get("test")
+					.newInstance();
+
 			IPopulation<TreeIndividual> ind = iPop.makeNewInstance();
 			ind.add(new TreeIndividual(false, false));
 			System.out.println(ind);
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
+	public void test7() {
+		SplitCriteria.splitCriterias.put("test",
+				InformationGainCriteria.getInstance());
+
+		@SuppressWarnings("unchecked")
+		SplitCriteria<Instances, Distribution> splitCriteria = (SplitCriteria<Instances, Distribution>) SplitCriteria.splitCriterias
+				.get("test");
+
+		assertNotNull(splitCriteria);
+	}
 }

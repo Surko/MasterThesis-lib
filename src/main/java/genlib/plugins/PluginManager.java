@@ -9,10 +9,13 @@ import genlib.annotations.PopInitAnnot;
 import genlib.annotations.XOperatorAnnot;
 import genlib.classifier.gens.PopGenerator;
 import genlib.classifier.popinit.PopulationInitializator;
+import genlib.classifier.splitting.InformationGainCriteria;
+import genlib.classifier.splitting.SplitCriteria;
 import genlib.configurations.PathManager;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.operators.Operator;
 import genlib.evolution.population.IPopulation;
+import genlib.evolution.population.Population;
 import genlib.evolution.selectors.Selector;
 import genlib.locales.PermMessages;
 import genlib.utils.Utils;
@@ -51,21 +54,83 @@ public class PluginManager {
 		initOperatorPlugins();
 		initSelectorPlugins();
 		initPopulationPlugins();
+		initSplitCritPlugins();
+	}
+
+	private static void initSplitCritPlugins() {
+		LOG.log(Level.INFO,
+				String.format(PermMessages._s_splitinit,
+						IPopulation.class.getName()));
+		int classLoaded = 0;
+		int plugLoaded = 0;
+
+		SplitCriteria.splitCriterias.put(InformationGainCriteria.initName,
+				InformationGainCriteria.getInstance());
+		LOG.log(Level.INFO, String.format(PermMessages._splitclass_loaded,
+				InformationGainCriteria.class.getName(),
+				InformationGainCriteria.initName));
+		classLoaded++;
+
+		// loading jar plugins inside plugin directory
+		PathManager pm = PathManager.getInstance();
+		File populationPluginPath = new File(pm.getPluginPath(),
+				"splitcriterias");
+		if (populationPluginPath.exists() && populationPluginPath.isDirectory()) {
+
+			for (File plugFile : populationPluginPath
+					.listFiles(Utils.jarFilter)) {
+				try {
+					URLClassLoader authorizedLoader = URLClassLoader
+							.newInstance(new URL[] { plugFile.toURI().toURL() });
+					URL url = authorizedLoader
+							.findResource("META-INF/MANIFEST.MF");
+					Manifest mf = new Manifest(url.openStream());
+					Attributes mfAttributes = mf.getMainAttributes();
+					SplitCriteriaPlugin plugin = (SplitCriteriaPlugin) authorizedLoader
+							.loadClass(mfAttributes.getValue(pluginClassTag))
+							.newInstance();
+					plugin.initCriterias();
+					plugLoaded++;
+				} catch (ClassCastException cce) {
+					LOG.log(Level.WARNING,
+							String.format(PermMessages._plug_type_err,
+									plugFile.getName()));
+				} catch (Exception e) {
+					LOG.log(Level.SEVERE, e.toString());
+				}
+			}
+		}
+
+		String sSplitCrit = "splitcriterias";
+		LOG.log(Level.INFO, String.format(PermMessages._c_class_loaded,
+				sSplitCrit, classLoaded));
+		LOG.log(Level.INFO, String.format(PermMessages._c_plug_loaded,
+				sSplitCrit, plugLoaded));
+
 	}
 
 	private static void initPopulationPlugins() {
 		LOG.log(Level.INFO,
-				String.format(PermMessages._s_fitinit,
+				String.format(PermMessages._s_popcontinit,
 						IPopulation.class.getName()));
-		int plugLoaded = 0;		
+		int classLoaded = 0;
+		int plugLoaded = 0;
 
+		IPopulation.populationTypes.put(Population.initName,
+				Population.class);
+		LOG.log(Level.INFO, String.format(PermMessages._populationcontainer_loaded,
+				Population.class.getName(),
+				Population.initName));
+		classLoaded++;
+		
 		// loading jar plugins inside plugin directory
 		PathManager pm = PathManager.getInstance();
 		File populationPluginPath = new File(pm.getPluginPath(), "population");
 
 		if (populationPluginPath.exists() && populationPluginPath.isDirectory()) {
 
-			for (File plugFile : populationPluginPath.listFiles(Utils.jarFilter)) {
+			for (File plugFile : populationPluginPath
+					.listFiles(Utils.jarFilter)) {
 				try {
 					URLClassLoader authorizedLoader = URLClassLoader
 							.newInstance(new URL[] { plugFile.toURI().toURL() });
@@ -88,12 +153,14 @@ public class PluginManager {
 			}
 		}
 
-		String sPopInit = "population types";		
+		String sPopInit = "population containers";
+		LOG.log(Level.INFO, String.format(PermMessages._c_class_loaded,
+				sPopInit, classLoaded));
 		LOG.log(Level.INFO, String.format(PermMessages._c_plug_loaded,
 				sPopInit, plugLoaded));
 
 	}
-	
+
 	private static void initPopInitPlugins() {
 		LOG.log(Level.INFO, String.format(PermMessages._s_popinit,
 				PopulationInitializator.class.getName()));

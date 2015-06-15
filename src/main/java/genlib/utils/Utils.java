@@ -6,7 +6,7 @@ import genlib.evolution.population.Population;
 import genlib.structures.data.GenLibInstance;
 import genlib.structures.data.GenLibInstances;
 import genlib.structures.extensions.SizeExtension;
-import genlib.structures.trees.MultiWayDepthNode;
+import genlib.structures.trees.MultiWayHeightNode;
 import genlib.structures.trees.Node;
 
 import java.io.File;
@@ -44,17 +44,19 @@ public class Utils {
 	 *
 	 */
 	public enum Sign {
-		LESS(0), GREATER(1), EQUALS(2), NEQUALS(3), LESSEQ(4), GREATEQ(5);
+		LESS("<"), GREATER(">"), EQUALS("="), NEQUALS("!="), LESSEQ("<="), GREATEQ(
+				">=");
 
-		private int n;
+		private final String repr;
 
-		private Sign(int n) {
-			this.n = n;
+		private Sign(String repr) {
+			this.repr = repr;
+		}
+		
+		public String getValue() {
+			return repr;
 		}
 
-		public int getValue() {
-			return n;
-		}
 	}
 
 	/** Random object which is used from all over the application */
@@ -362,7 +364,7 @@ public class Utils {
 	}
 
 	/**
-	 * Method that finds the the node with index i1. Search is done in preorder.
+	 * Method that finds the node with index i1. Search is done in preorder.
 	 * Version of this method is for SizeExtension nodes. It utilizes the saved
 	 * values of tree sizes to search for node. It is faster than the
 	 * counterpart ({@link #getNode(Node, int)}).
@@ -411,7 +413,7 @@ public class Utils {
 	}
 
 	/**
-	 * Method that finds the the node with index i1. Search is done in preorder.
+	 * Method that finds the node with index i1. Search is done in preorder.
 	 * This is the version for nodes without SizeExtension (little bit slower
 	 * from the counterpart {@link #getExtensionNode(Node, int)})
 	 * 
@@ -504,7 +506,8 @@ public class Utils {
 	}
 
 	/**
-	 * Method count the number of leaves in tree (with stack).
+	 * Method count the number of leaves in tree (with stack). Better to use
+	 * {@link #getLeavesRecursive(Node, ArrayList)} because it's faster.
 	 * 
 	 * @param root
 	 *            root from which we start
@@ -535,7 +538,8 @@ public class Utils {
 
 	/**
 	 * Method count the number of leaves in tree (with stack). It calls
-	 * {@link #getLeaves(Node, ArrayList)}.
+	 * {@link #getLeaves(Node, ArrayList)}. Better to use
+	 * {@link #getLeavesRecursive(Node, ArrayList)} because it's faster.
 	 * 
 	 * @param root
 	 *            root from which we start
@@ -546,7 +550,8 @@ public class Utils {
 	}
 
 	/**
-	 * Method count the number of nodes in tree (with stack).
+	 * Method count the number of nodes in tree (with stack). Better to use
+	 * {@link #getNodesRecursive(Node, ArrayList)} because it's faster.
 	 * 
 	 * @param root
 	 *            root from which we start
@@ -576,7 +581,8 @@ public class Utils {
 
 	/**
 	 * Method count the number of nodes in tree (with stack). It calls
-	 * {@link #getNodes(Node, ArrayList)}.
+	 * {@link #getNodes(Node, ArrayList)}. Better to use
+	 * {@link #getNodesRecursive(Node, ArrayList)} because it's faster.
 	 * 
 	 * @param root
 	 *            root from which we start
@@ -586,7 +592,8 @@ public class Utils {
 		return getNodes(root, new ArrayList<Node>());
 	}
 
-	public static double getFilteredInstancesRegression(GenLibInstances instances, Node root) {		
+	public static double getFilteredInstancesRegression(
+			GenLibInstances instances, Node root) {
 
 		if (instances.numClasses() != -1) {
 			return Double.MIN_VALUE;
@@ -669,11 +676,12 @@ public class Utils {
 			}
 
 		}
-		
+
 		return value / numOfFiltered;
 	}
-	
-	public static double[] getFilteredInstancesClasses(GenLibInstances instances, Node root) {		
+
+	public static double[] getFilteredInstancesClasses(
+			GenLibInstances instances, Node root) {
 
 		if (instances.numClasses() == -1) {
 			return empty_double_array;
@@ -754,10 +762,10 @@ public class Utils {
 			}
 
 		}
-		
+
 		return classes;
 	}
-	
+
 	/**
 	 * NOT IMPLEMENTED YET
 	 * 
@@ -819,11 +827,11 @@ public class Utils {
 	 */
 	public static Population<TreeIndividual> debugTreePopulation() {
 		Population<TreeIndividual> individuals = new Population<>();
-		MultiWayDepthNode root = MultiWayDepthNode.makeNode(2, 1, Sign.LESS,
+		MultiWayHeightNode root = MultiWayHeightNode.makeNode(2, 1, Sign.LESS,
 				20d);
-		MultiWayDepthNode[] childs = new MultiWayDepthNode[2];
-		childs[0] = MultiWayDepthNode.makeLeaf(1);
-		childs[1] = MultiWayDepthNode.makeLeaf(0);
+		MultiWayHeightNode[] childs = new MultiWayHeightNode[2];
+		childs[0] = MultiWayHeightNode.makeLeaf(1);
+		childs[1] = MultiWayHeightNode.makeLeaf(0);
 		root.setChilds(childs);
 		TreeIndividual testIndividual = new TreeIndividual(root);
 		individuals.add(testIndividual);

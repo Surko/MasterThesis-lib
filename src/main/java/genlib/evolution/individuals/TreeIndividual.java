@@ -1,12 +1,14 @@
 package genlib.evolution.individuals;
 
+import java.util.Arrays;
+
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.structures.extensions.HeightExtension;
 import genlib.structures.extensions.NodeCountExtension;
 import genlib.structures.extensions.SizeExtension;
-import genlib.structures.trees.BinaryDepthNode;
+import genlib.structures.trees.BinaryHeightNode;
 import genlib.structures.trees.BinaryNode;
-import genlib.structures.trees.MultiWayDepthNode;
+import genlib.structures.trees.MultiWayHeightNode;
 import genlib.structures.trees.MultiWayNode;
 import genlib.structures.trees.Node;
 import genlib.utils.Utils;
@@ -19,6 +21,7 @@ public class TreeIndividual extends Individual {
 
 	public TreeIndividual(TreeIndividual toCopy) {
 		this.root = toCopy.root.copy();
+		this.hasChanged = toCopy.hasChanged;
 		this.complexFitness = toCopy.complexFitness;
 		this.fitness = new double[toCopy.fitness.length];
 		System.arraycopy(toCopy.fitness, 0, this.fitness, 0, this.fitness.length);
@@ -29,16 +32,16 @@ public class TreeIndividual extends Individual {
 		this.fitness = new double[FitnessFunction.registeredFunctions];
 	}
 	
-	public TreeIndividual(boolean binary, boolean countDepth) {
+	public TreeIndividual(boolean binary, boolean autoHeight) {
 		if (binary) {
-			if (countDepth) {
-				this.root = new BinaryDepthNode();
+			if (autoHeight) {
+				this.root = new BinaryHeightNode();
 			} else {
 				this.root = new BinaryNode();
 			}
 		} else {
-			if (countDepth) {
-				this.root = new MultiWayDepthNode();
+			if (autoHeight) {
+				this.root = new MultiWayHeightNode();
 			} else {
 				this.root = new MultiWayNode();
 			}
@@ -91,6 +94,14 @@ public class TreeIndividual extends Individual {
 
 	public void setRoot(Node root) {
 		this.root = root;
+	}
+	
+	public String toString() {
+		String format = Arrays.toString(fitness);		
+		if (root != null) {
+			format = String.format("%s;%s", format, root.toString());
+		}
+		return format;
 	}
 	
 	@Override

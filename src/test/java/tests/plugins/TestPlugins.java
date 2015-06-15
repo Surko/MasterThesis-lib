@@ -8,8 +8,10 @@ import java.util.logging.Logger;
 import genlib.GenLib;
 import genlib.classifier.gens.TreeGenerator;
 import genlib.classifier.popinit.TreePopulationInitializator;
+import genlib.classifier.splitting.SplitCriteria;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.operators.Operator;
+import genlib.evolution.population.Population;
 import genlib.evolution.selectors.Selector;
 import genlib.plugins.PluginManager;
 
@@ -32,10 +34,12 @@ public class TestPlugins {
 		assertTrue(TreeGenerator.treeGens.size() == 3);
 		assertTrue(TreePopulationInitializator.treePopInits.size() == 4);		
 		assertTrue(FitnessFunction.tFitFuncs.size() == 13);
-		assertTrue(Operator.tMOper.size() == 1);
+		assertTrue(Operator.tMOper.size() == 4);
 		assertTrue(Operator.tXOper.size() == 2);
 		assertTrue(Selector.envSelectors.size() == 2);
 		assertTrue(Selector.selectors.size() == 2);
+		assertTrue(Population.populationTypes.size() == 1);
+		assertTrue(SplitCriteria.splitCriterias.size() == 1);
 	}
 
 	@Test

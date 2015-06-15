@@ -245,6 +245,8 @@ public class MultiWayNode implements Node, SizeExtension {
 	 * Make this node a leaf.
 	 */
 	public void makeLeaf() {
+		this.sign = null;
+		this.treeSize = 1;
 		this.attribute = -1;
 		this.childs = null;
 	}
@@ -323,6 +325,10 @@ public class MultiWayNode implements Node, SizeExtension {
 		return new MultiWayNode(this);
 	}
 
+	public MultiWayNode newInstance() {
+		return new MultiWayNode();
+	}
+	
 	/**
 	 * Equal method for this type of instances which provide correct comparison
 	 * which was intended for it. There is the comparison of main fields such as
@@ -360,4 +366,21 @@ public class MultiWayNode implements Node, SizeExtension {
 
 	}
 
+	@Override
+	public String toString() {
+		if (isLeaf()) {
+			return String.format("c%s", value);
+		}
+		
+		String done = "";
+		for (Node child : childs) {
+			if (done.isEmpty()) {
+				done = child.toString();
+				continue;
+			}
+			done = String.format("%s,%s", done, child == null ? null : child.toString());				
+		}
+		return String.format("(%s)a%s%s%s", done, attribute, sign == null ? "" : sign.getValue(), sign == null ? "" : value);		
+	}
+	
 }

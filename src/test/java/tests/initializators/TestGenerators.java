@@ -1,7 +1,10 @@
 package tests.initializators;
 
 import genlib.classifier.gens.WekaJ48TreeGenerator;
+import genlib.classifier.gens.WekaSimpleStumpGenerator;
 import genlib.classifier.gens.WekaTreeGenerator;
+import genlib.classifier.splitting.InformationGainCriteria;
+import genlib.classifier.splitting.SplitCriteria;
 import genlib.structures.data.GenLibInstances;
 
 import org.junit.Test;
@@ -68,4 +71,18 @@ public class TestGenerators {
 		genParam.getClassifier().buildClassifier(wekaData);		
 	}
 	
+	@Test
+	public void testWekaSimpleStumpGenerator() throws Exception  {
+		SplitCriteria.splitCriterias.put(InformationGainCriteria.initName, InformationGainCriteria.getInstance());
+		WekaSimpleStumpGenerator wssg = new WekaSimpleStumpGenerator();
+		assertTrue(wssg.getGeneratorHeight() == 1);
+		assertNull(wssg.getSplitCriteria());
+		assertFalse(wssg.isAutoHeight());
+		assertNull(wssg.getPopulationInitializator());
+		wssg.setParam("SPLIT,infoGain");
+		assertNotNull(wssg.getSplitCriteria());
+		assertTrue(wssg.getSplitCriteria() == InformationGainCriteria.getInstance());
+		wssg.setAutoHeight(true);
+		assertTrue(wssg.isAutoHeight());		
+	}
 }

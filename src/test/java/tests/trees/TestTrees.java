@@ -7,8 +7,8 @@ import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.structures.Data;
 import genlib.structures.extensions.HeightExtension;
-import genlib.structures.trees.BinaryDepthNode;
-import genlib.structures.trees.MultiWayDepthNode;
+import genlib.structures.trees.BinaryHeightNode;
+import genlib.structures.trees.MultiWayHeightNode;
 import genlib.utils.Utils;
 import genlib.utils.WekaUtils;
 import genlib.utils.Utils.Sign;
@@ -95,7 +95,7 @@ public class TestTrees {
 	
 	@Test
 	public void testNodeCreation() {
-		BinaryDepthNode bn = new BinaryDepthNode();
+		BinaryHeightNode bn = new BinaryHeightNode();
 		assertTrue(bn instanceof HeightExtension);
 		assertTrue(bn.getTreeHeight() == 0);
 		assertTrue(bn.getAttribute() == -1);
@@ -104,7 +104,7 @@ public class TestTrees {
 		assertTrue(bn.getSign() == null);
 		assertTrue(bn.isLeaf());
 		assertTrue(bn.getParent() == null);
-		bn = BinaryDepthNode.makeLeaf(1.234d);
+		bn = BinaryHeightNode.makeLeaf(1.234d);
 		assertTrue(bn instanceof HeightExtension);
 		assertTrue(bn.getTreeHeight() == 0);
 		assertTrue(bn.getAttribute() == -1);
@@ -113,7 +113,7 @@ public class TestTrees {
 		assertTrue(bn.getSign() == null);
 		assertTrue(bn.isLeaf());
 		assertTrue(bn.getParent() == null);
-		bn = BinaryDepthNode.makeNode(0, Sign.EQUALS, 1.234d);
+		bn = BinaryHeightNode.makeNode(0, Sign.EQUALS, 1.234d);
 		assertTrue(bn instanceof HeightExtension);
 		assertTrue(bn.getTreeHeight() == 0);
 		assertTrue(bn.getAttribute() == 0);
@@ -122,7 +122,7 @@ public class TestTrees {
 		assertTrue(bn.getSign() == Sign.EQUALS);
 		assertTrue(!bn.isLeaf());
 		assertTrue(bn.getParent() == null);
-		MultiWayDepthNode mn = new MultiWayDepthNode();
+		MultiWayHeightNode mn = new MultiWayHeightNode();
 		assertTrue(mn instanceof HeightExtension);
 		assertTrue(mn.getTreeHeight() == 0);
 		assertTrue(mn.getAttribute() == -1);
@@ -131,7 +131,7 @@ public class TestTrees {
 		assertTrue(mn.getSign() == null);
 		assertTrue(mn.isLeaf());
 		assertTrue(mn.getParent() == null);
-		mn = MultiWayDepthNode.makeLeaf(1.234d);
+		mn = MultiWayHeightNode.makeLeaf(1.234d);
 		assertTrue(mn instanceof HeightExtension);
 		assertTrue(mn.getTreeHeight() == 0);
 		assertTrue(mn.getAttribute() == -1);
@@ -140,7 +140,7 @@ public class TestTrees {
 		assertTrue(mn.getSign() == null);
 		assertTrue(mn.isLeaf());
 		assertTrue(mn.getParent() == null);
-		mn = MultiWayDepthNode.makeNode(5, 0, Sign.EQUALS, 1.234d);
+		mn = MultiWayHeightNode.makeNode(5, 0, Sign.EQUALS, 1.234d);
 		assertTrue(mn instanceof HeightExtension);
 		assertTrue(mn.getTreeHeight() == 0);
 		assertTrue(mn.getAttribute() == 0);
@@ -160,87 +160,87 @@ public class TestTrees {
 
 	@Test
 	public void testNodeHeight() {
-		BinaryDepthNode bn = BinaryDepthNode.makeNode(0, null, Integer.MIN_VALUE);
+		BinaryHeightNode bn = BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE);
 		assertTrue(bn.getTreeHeight() == 0);
-		bn.setChildAt(0, BinaryDepthNode.makeNode(0, null, Integer.MIN_VALUE));
+		bn.setChildAt(0, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));
 		assertTrue(bn.getTreeHeight() == 1);
-		bn.setChildAt(1, BinaryDepthNode.makeNode(0, null, Integer.MIN_VALUE));
+		bn.setChildAt(1, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));
 		assertTrue(bn.getTreeHeight() == 1);
 		assertTrue(bn.getChildAt(0).getParent() == bn);
-		bn.getChildAt(0).setChildAt(0, new BinaryDepthNode());
+		bn.getChildAt(0).setChildAt(0, new BinaryHeightNode());
 		assertTrue(bn.getTreeHeight() == 2);
-		bn.getChildAt(1).setChildAt(1, new BinaryDepthNode());
+		bn.getChildAt(1).setChildAt(1, new BinaryHeightNode());
 		assertTrue(bn.getTreeHeight() == 2);
 		bn.clearChilds();
 		assertTrue(bn.getTreeHeight() == 0);
 		assertTrue(bn.getChildAt(0) == null && bn.getChildAt(1) == null);
 
-		MultiWayDepthNode mn = new MultiWayDepthNode(5);		
+		MultiWayHeightNode mn = new MultiWayHeightNode(5);		
 		assertTrue(mn.getTreeHeight() == 0);
-		mn.setChildAt(0, new MultiWayDepthNode(2));		
+		mn.setChildAt(0, new MultiWayHeightNode(2));		
 		assertTrue(mn.getTreeHeight() == 1);
-		mn.setChildAt(1, new MultiWayDepthNode(3));
+		mn.setChildAt(1, new MultiWayHeightNode(3));
 		assertTrue(mn.getTreeHeight() == 1);
 		assertTrue(mn.getChildAt(0).getParent() == mn);
-		mn.getChildAt(0).setChildAt(0, new MultiWayDepthNode());
+		mn.getChildAt(0).setChildAt(0, new MultiWayHeightNode());
 		assertTrue(mn.getTreeHeight() == 2);
-		mn.getChildAt(1).setChildAt(2, new MultiWayDepthNode());
+		mn.getChildAt(1).setChildAt(2, new MultiWayHeightNode());
 		assertTrue(mn.getTreeHeight() == 2);
 		mn.clearChilds();
 		assertTrue(mn.getTreeHeight() == 0);
 		assertTrue(mn.getChildAt(0) == null && mn.getChildAt(1) == null);	
 		
-		mn = (MultiWayDepthNode)wekaIndividual.getRootNode();
+		mn = (MultiWayHeightNode)wekaIndividual.getRootNode();
 		assertTrue(mn.getTreeHeight() == 6);		
 	}
 	
 	@Test
 	public void testNodeHeightComputing() {
-		BinaryDepthNode bn = BinaryDepthNode.makeNode(0, null, Integer.MIN_VALUE);		
-		bn.setChildAt(0, BinaryDepthNode.makeNode(0, null, Integer.MIN_VALUE));
-		bn.setChildAt(1, BinaryDepthNode.makeNode(0, null, Integer.MIN_VALUE));				
-		bn.getChildAt(0).setChildAt(0, new BinaryDepthNode());
-		bn.getChildAt(1).setChildAt(1, new BinaryDepthNode());		
+		BinaryHeightNode bn = BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE);		
+		bn.setChildAt(0, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));
+		bn.setChildAt(1, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));				
+		bn.getChildAt(0).setChildAt(0, new BinaryHeightNode());
+		bn.getChildAt(1).setChildAt(1, new BinaryHeightNode());		
 		assertTrue(Utils.computeHeight(bn) == 2);
 		
-		MultiWayDepthNode mn = new MultiWayDepthNode(5);
+		MultiWayHeightNode mn = new MultiWayHeightNode(5);
 		mn.setAttribute(0);
-		mn.setChildAt(0, new MultiWayDepthNode(2));
-		mn.setChildAt(1, new MultiWayDepthNode(3));
+		mn.setChildAt(0, new MultiWayHeightNode(2));
+		mn.setChildAt(1, new MultiWayHeightNode(3));
 		mn.getChildAt(0).setAttribute(0);
 		mn.getChildAt(1).setAttribute(0);
-		mn.getChildAt(0).setChildAt(0, new MultiWayDepthNode());
-		mn.getChildAt(1).setChildAt(2, new MultiWayDepthNode());		
+		mn.getChildAt(0).setChildAt(0, new MultiWayHeightNode());
+		mn.getChildAt(1).setChildAt(2, new MultiWayHeightNode());		
 		assertTrue(Utils.computeHeight(mn) == 2);	
 		
-		mn = (MultiWayDepthNode)wekaIndividual.getRootNode();
+		mn = (MultiWayHeightNode)wekaIndividual.getRootNode();
 		assertTrue(Utils.computeHeight(mn) == 6);	
 	}
 	
 	@Test
 	public void testTreeSize() {
-		BinaryDepthNode bn = BinaryDepthNode.makeNode(0, null, Integer.MIN_VALUE);
+		BinaryHeightNode bn = BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE);
 		assertTrue(bn.getTreeSize() == 1);
-		bn.setChildAt(0, BinaryDepthNode.makeNode(0, null, Integer.MIN_VALUE));
+		bn.setChildAt(0, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));
 		assertTrue(bn.getTreeSize() == 2);
-		bn.setChildAt(1, BinaryDepthNode.makeNode(0, null, Integer.MIN_VALUE));
+		bn.setChildAt(1, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));
 		assertTrue(bn.getTreeSize() == 3);
 		assertTrue(bn.getChildAt(0).getParent() == bn);
 		assertTrue(bn.getChildAt(1).getParent() == bn);
 		assertTrue(bn.getChildAt(0).getTreeSize() == 1);
 		assertTrue(bn.getChildAt(1).getTreeSize() == 1);
-		bn.getChildAt(0).setChildAt(0, new BinaryDepthNode());
+		bn.getChildAt(0).setChildAt(0, new BinaryHeightNode());
 		assertTrue(bn.getTreeSize() == 4);
-		bn.getChildAt(1).setChildAt(1, new BinaryDepthNode());
+		bn.getChildAt(1).setChildAt(1, new BinaryHeightNode());
 		assertTrue(bn.getTreeSize() == 5);
 		bn.clearChilds();
 		assertTrue(bn.getTreeSize() == 1);		
 
-		MultiWayDepthNode mn = new MultiWayDepthNode(5);		
+		MultiWayHeightNode mn = new MultiWayHeightNode(5);		
 		assertTrue(mn.getTreeSize() == 1);
-		mn.setChildAt(0, new MultiWayDepthNode(2));		
+		mn.setChildAt(0, new MultiWayHeightNode(2));		
 		assertTrue(mn.getTreeSize() == 2);
-		mn.setChildAt(1, new MultiWayDepthNode(3));
+		mn.setChildAt(1, new MultiWayHeightNode(3));
 		assertTrue(mn.getTreeSize() == 3);
 		assertTrue(mn.getChildAt(0).getParent() == mn);
 		assertTrue(mn.getChildAt(1).getParent() == mn);
@@ -249,59 +249,59 @@ public class TestTrees {
 		assertTrue(mn.getChildAt(4) == null);
 		assertTrue(mn.getChildAt(0).getTreeSize() == 1);
 		assertTrue(mn.getChildAt(1).getTreeSize() == 1);
-		mn.getChildAt(0).setChildAt(0, new MultiWayDepthNode());
+		mn.getChildAt(0).setChildAt(0, new MultiWayHeightNode());
 		assertTrue(mn.getTreeSize() == 4);
-		mn.getChildAt(1).setChildAt(2, new MultiWayDepthNode());
+		mn.getChildAt(1).setChildAt(2, new MultiWayHeightNode());
 		assertTrue(mn.getTreeSize() == 5);
 		mn.clearChilds();
 		assertTrue(mn.getTreeSize() == 1);
 		
-		mn = (MultiWayDepthNode)wekaIndividual.getRootNode();
+		mn = (MultiWayHeightNode)wekaIndividual.getRootNode();
 		assertTrue(mn.getTreeSize() == 21);			
 		assertTrue(Utils.computeSize(mn) == 21);	
 	}
 
 	@Test
 	public void testTreeSizeComputing() {
-		BinaryDepthNode bn = BinaryDepthNode.makeNode(0, null, Integer.MIN_VALUE);		
-		bn.setChildAt(0, BinaryDepthNode.makeNode(0, null, Integer.MIN_VALUE));
-		bn.setChildAt(1, BinaryDepthNode.makeNode(0, null, Integer.MIN_VALUE));				
-		bn.getChildAt(0).setChildAt(0, new BinaryDepthNode());
-		bn.getChildAt(1).setChildAt(1, new BinaryDepthNode());		
+		BinaryHeightNode bn = BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE);		
+		bn.setChildAt(0, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));
+		bn.setChildAt(1, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));				
+		bn.getChildAt(0).setChildAt(0, new BinaryHeightNode());
+		bn.getChildAt(1).setChildAt(1, new BinaryHeightNode());		
 		assertTrue(Utils.computeSize(bn) == 5);
 		
-		MultiWayDepthNode mn = new MultiWayDepthNode(5);
+		MultiWayHeightNode mn = new MultiWayHeightNode(5);
 		mn.setAttribute(0);
-		mn.setChildAt(0, new MultiWayDepthNode(2));
-		mn.setChildAt(1, new MultiWayDepthNode(3));
+		mn.setChildAt(0, new MultiWayHeightNode(2));
+		mn.setChildAt(1, new MultiWayHeightNode(3));
 		mn.getChildAt(0).setAttribute(0);
 		mn.getChildAt(1).setAttribute(0);
-		mn.getChildAt(0).setChildAt(0, new MultiWayDepthNode());
-		mn.getChildAt(1).setChildAt(2, new MultiWayDepthNode());		
+		mn.getChildAt(0).setChildAt(0, new MultiWayHeightNode());
+		mn.getChildAt(1).setChildAt(2, new MultiWayHeightNode());		
 		assertTrue(Utils.computeSize(mn) == 5);
 		
 	}
 	
 	@Test
 	public void testNumNodesComputing() {
-		BinaryDepthNode bn = BinaryDepthNode.makeNode(0, null, Integer.MIN_VALUE);		
-		bn.setChildAt(0, BinaryDepthNode.makeNode(0, null, Integer.MIN_VALUE));
-		bn.setChildAt(1, BinaryDepthNode.makeNode(0, null, Integer.MIN_VALUE));				
-		bn.getChildAt(0).setChildAt(0, new BinaryDepthNode());
-		bn.getChildAt(1).setChildAt(1, new BinaryDepthNode());		
+		BinaryHeightNode bn = BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE);		
+		bn.setChildAt(0, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));
+		bn.setChildAt(1, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));				
+		bn.getChildAt(0).setChildAt(0, new BinaryHeightNode());
+		bn.getChildAt(1).setChildAt(1, new BinaryHeightNode());		
 		assertTrue(Utils.computeNumNodes(bn) == 3);
 		
-		MultiWayDepthNode mn = new MultiWayDepthNode(5);
+		MultiWayHeightNode mn = new MultiWayHeightNode(5);
 		mn.setAttribute(0);
-		mn.setChildAt(0, new MultiWayDepthNode(2));
-		mn.setChildAt(1, new MultiWayDepthNode(3));
+		mn.setChildAt(0, new MultiWayHeightNode(2));
+		mn.setChildAt(1, new MultiWayHeightNode(3));
 		mn.getChildAt(0).setAttribute(0);
 		mn.getChildAt(1).setAttribute(0);
-		mn.getChildAt(0).setChildAt(0, new MultiWayDepthNode());
-		mn.getChildAt(1).setChildAt(2, new MultiWayDepthNode());		
+		mn.getChildAt(0).setChildAt(0, new MultiWayHeightNode());
+		mn.getChildAt(1).setChildAt(2, new MultiWayHeightNode());		
 		assertTrue(Utils.computeNumNodes(mn) == 3);
 		
-		mn = (MultiWayDepthNode)wekaIndividual.getRootNode();		
+		mn = (MultiWayHeightNode)wekaIndividual.getRootNode();		
 		assertTrue(Utils.computeNumNodes(mn) == 10);	
 	}
 	

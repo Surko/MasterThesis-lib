@@ -199,6 +199,8 @@ public class BinaryNode implements Node, SizeExtension {
 	 * Make this node a leaf.
 	 */
 	public void makeLeaf() {
+		this.sign = null;
+		this.treeSize = 1;
 		this.attribute = -1;
 		this.childs = null;
 	}
@@ -216,6 +218,10 @@ public class BinaryNode implements Node, SizeExtension {
 
 	public BinaryNode copy() {
 		return new BinaryNode(this);
+	}
+
+	public BinaryNode newInstance() {
+		return new BinaryNode();
 	}
 
 	@Override
@@ -255,4 +261,21 @@ public class BinaryNode implements Node, SizeExtension {
 		}
 	}
 
+	@Override
+	public String toString() {
+		if (isLeaf()) {
+			return String.format("c%s", value);
+		}
+		
+		String done = "";
+		for (Node child : childs) {
+			if (done.isEmpty()) {
+				done = child.toString();
+				continue;
+			}
+			done = String.format("%s,%s", done, child == null ? null : child.toString());				
+		}
+		return String.format("(%s)a%s%s%s", done, attribute, sign == null ? "" : sign.getValue(), sign == null ? "" : value);		
+	}
+	
 }

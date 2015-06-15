@@ -1,15 +1,14 @@
 package genlib.structures.trees;
 
 import genlib.exceptions.NodeCreationException;
-import genlib.exceptions.NotInitializedFieldException;
 import genlib.locales.TextResource;
 import genlib.structures.extensions.HeightExtension;
 import genlib.utils.Utils.Sign;
 
-public class MultiWayDepthNode extends MultiWayNode implements HeightExtension {
-	/** for serialization */
-	private static final long serialVersionUID = 6475434862235450574L;
+public class BinaryHeightNode extends BinaryNode implements HeightExtension {
 
+	/** for serialization */
+	private static final long serialVersionUID = -5699769468571434662L;
 	protected int treeHeight = 0;
 
 	/**
@@ -20,15 +19,15 @@ public class MultiWayDepthNode extends MultiWayNode implements HeightExtension {
 	 *            value of classification
 	 * @return node leaf
 	 */
-	public static MultiWayDepthNode makeLeaf(double value) {
-		MultiWayDepthNode leaf = new MultiWayDepthNode();
+	public static BinaryHeightNode makeLeaf(double value) {
+		BinaryHeightNode leaf = new BinaryHeightNode();
 		leaf.value = value;
 		return leaf;
 	}
 
 	/**
-	 * Static factory that creates node with childs, attribute on which to split
-	 * sign of split and value of attribute on which to split
+	 * Static factory that creates node with two childs, attribute on which to
+	 * split sign of split and value of attribute on which to split
 	 * 
 	 * @param childCount
 	 *            number of childs
@@ -40,20 +39,15 @@ public class MultiWayDepthNode extends MultiWayNode implements HeightExtension {
 	 *            split value of attribute
 	 * @return node
 	 */
-	public static MultiWayDepthNode makeNode(int childCount, int attribute,
-			Sign sign, double value) {
+	public static BinaryHeightNode makeNode(int attribute, Sign sign,
+			double value) {
 		if (attribute == -1) {
 			throw new NodeCreationException(String.format(
 					TextResource.getString("eNodeCreation"), "attribute"));
 		}
 
-		if (childCount <= 0) {
-			throw new NodeCreationException(String.format(
-					TextResource.getString("eNodeCreation"), "childCount"));
-		}
-
-		MultiWayDepthNode node = new MultiWayDepthNode();
-		node.childs = new MultiWayDepthNode[childCount];
+		BinaryHeightNode node = new BinaryHeightNode();
+		node.childs = new BinaryHeightNode[2];
 		node.sign = sign;
 		node.attribute = attribute;
 		node.value = value;
@@ -63,59 +57,40 @@ public class MultiWayDepthNode extends MultiWayNode implements HeightExtension {
 	/**
 	 * Parameterless constructor for serialization and static methods
 	 */
-	public MultiWayDepthNode() {
+	public BinaryHeightNode() {
 	}
 
-	public MultiWayDepthNode(MultiWayDepthNode toCopy) {
+	public BinaryHeightNode(BinaryHeightNode toCopy) {
 		this.attribute = toCopy.attribute;
 		this.value = toCopy.value;
 		this.treeHeight = toCopy.treeHeight;
-		this.treeSize = toCopy.treeSize;
-		this.sign = toCopy.sign;
 		if (!toCopy.isLeaf()) {
-			this.childs = new MultiWayDepthNode[toCopy.childs.length];
-			for (int i = 0; i < toCopy.childs.length; i++) {
-				childs[i] = toCopy.childs[i].copy();
-				childs[i].setParent(this);
-			}
+			this.childs = new BinaryHeightNode[2];
+			this.childs[0] = new BinaryHeightNode(
+					(BinaryHeightNode) toCopy.childs[0]);
+			this.childs[1] = new BinaryHeightNode(
+					(BinaryHeightNode) toCopy.childs[1]);
+			this.childs[0].parent = this;
+			this.childs[1].parent = this;
 		}
 	}
 
-	public MultiWayDepthNode(int childCount) {
-		this(childCount, 0, null, Integer.MIN_VALUE);
-	}
-	
-	public MultiWayDepthNode(int childCount, int attribute, Sign sign,
-			double value) {
-		if (childCount > 0 && attribute != -1) {
-			this.childs = new MultiWayDepthNode[childCount];
-			this.sign = sign;
-			this.attribute = attribute;
-		}
-
-		this.value = value;
+	public BinaryHeightNode(int attribute, Sign sign, double value) {
+		super(attribute, sign, value);
 	}
 
 	// GETTERS
-	/**
-	 * Getter which provides treeHeight of this tree.
-	 * 
-	 * @return height of tree
-	 */
-	@Override
 	public int getTreeHeight() {
 		return treeHeight;
 	}
 
 	// SETTERS
+	@Override
 	public void setChildAt(int index, Node node) {
 		super.setChildAt(index, node);
 
 		int nodeExtendDepth = ((HeightExtension) node).getTreeHeight() + 1;
-
 		if (childs[index] == null) {
-			// set the child
-			childs[index] = (MultiWayDepthNode) node;
 			// set the parent of a child
 			node.setParent(this);
 			// only if node depth is bigger than up to now
@@ -127,30 +102,16 @@ public class MultiWayDepthNode extends MultiWayNode implements HeightExtension {
 					((HeightExtension) parent).updateTreeHeight(treeHeight + 1);
 			}
 		} else {
-			// set the child
-			childs[index] = (MultiWayDepthNode) node;
 			// set the parent of a child
 			node.setParent(this);
+
 			// node depth has to be different
 			if (nodeExtendDepth != treeHeight) {
 				updateTreeHeight(nodeExtendDepth);
 			}
 		}
-
 	}
 
-	public void setChilds(Node[] childs) {
-		super.setChilds(childs);
-		updateTreeHeight(0);
-	}
-
-	public void setChildCount(int count) {
-		if (count > 0) {
-			this.childs = new MultiWayDepthNode[count];
-		}
-	}
-
-	// OTHER METHODS
 	/**
 	 * Reconfigure/recounts actual depth of a tree from its childs.
 	 */
@@ -162,12 +123,16 @@ public class MultiWayDepthNode extends MultiWayNode implements HeightExtension {
 			}
 			return;
 		}
+
 		int max = -1;
-		for (MultiWayDepthNode node : (MultiWayDepthNode[]) childs) {
-			if (node == null)
-				continue;
-			max = node.treeHeight > max ? node.treeHeight : max;
+		if (childs[0] != null) {
+			max = ((BinaryHeightNode) childs[0]).treeHeight;
 		}
+
+		if (childs[1] != null) {
+			max = Math.max(max, ((BinaryHeightNode) childs[0]).treeHeight);
+		}
+
 		max++;
 		if (max != this.treeHeight) {
 			this.treeHeight = max;
@@ -177,12 +142,29 @@ public class MultiWayDepthNode extends MultiWayNode implements HeightExtension {
 		}
 	}
 
+	@Override
+	public void setChilds(Node[] childs) {
+		super.setChilds(childs);
+		updateTreeHeight(0);
+	}
+
+	// OTHER METHODS
+
+	/**
+	 * {@inheritDoc}. Calling method {@link BinaryNode#makeLeaf()}
+	 */
+	public void makeLeaf() {
+		super.makeLeaf();
+		this.treeHeight = 0;
+	}
+
 	/**
 	 * Method which will clear the childs in this node. Treeheight of this node
 	 * will be reseted to zero (it behaves as normal leaf). UpdateTreeHeight for
 	 * this parent will be called.
 	 * 
 	 */
+	@Override
 	public void clearChilds() {
 		super.clearChilds();
 		treeHeight = 0;
@@ -190,29 +172,18 @@ public class MultiWayDepthNode extends MultiWayNode implements HeightExtension {
 			((HeightExtension) parent).updateTreeHeight(1);
 	}
 
-	/**
-	 * {@inheritDoc}. Calling method {@link MultiWayNode#makeLeaf()}
-	 */
-	public void makeLeaf() {
-		super.makeLeaf();
-		this.treeHeight = 0;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	public MultiWayDepthNode copy() {
-		return new MultiWayDepthNode(this);
+	public BinaryHeightNode copy() {
+		return new BinaryHeightNode(this);
 	}
 
-	/**
-	 * {@inheritDoc} </br> In addition to parent class it provides comparison of
-	 * treeHeight that this extended class automatically compute.
-	 */
+	public BinaryHeightNode newInstance() {
+		return new BinaryHeightNode();
+	}
+
 	@Override
 	public boolean equals(Object obj) {
-		return (((MultiWayDepthNode) obj).treeHeight == this.treeHeight)
+		// NO HASH COMPUTING
+		return (((BinaryHeightNode) obj).treeHeight == this.treeHeight)
 				&& super.equals(obj);
 	}
 

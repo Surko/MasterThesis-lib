@@ -1,14 +1,14 @@
 package genlib.structures.extensions;
 
-import genlib.structures.trees.BinaryDepthNode;
-import genlib.structures.trees.MultiWayDepthNode;
+import genlib.structures.trees.BinaryHeightNode;
+import genlib.structures.trees.MultiWayHeightNode;
 
 /**
  * Simple, almost blank interface that distincts Nodes from being automated in
  * node counting and being dependent on manually counting.
  * 
- * @see BinaryDepthNode
- * @see MultiWayDepthNode
+ * @see BinaryHeightNode
+ * @see MultiWayHeightNode
  *
  */
 public interface NodeCountExtension {

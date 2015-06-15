@@ -3,6 +3,7 @@ package genlib.evolution.fitness.tree.confusion;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.exceptions.MissingParamException;
+import genlib.exceptions.NotDefParamException;
 import genlib.locales.PermMessages;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
@@ -139,6 +140,12 @@ public abstract class TreeConfusionFitness extends
 		this.data = data;
 	}
 
+	/**
+	 * 
+	 * @param paramLabel
+	 * @param paramValue
+	 * @return true iff the parameters had been initialized
+	 */
 	protected boolean parseParamLabels(String paramLabel, String paramValue) {				
 		ConfusionEnum confusionEnum = ConfusionEnum.value(paramLabel);
 

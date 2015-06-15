@@ -8,7 +8,7 @@ import genlib.evolution.fitness.tree.TreeAccuracyFitness;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.population.Population;
 import genlib.structures.Data;
-import genlib.structures.trees.MultiWayDepthNode;
+import genlib.structures.trees.MultiWayHeightNode;
 import genlib.utils.Utils;
 import genlib.utils.Utils.Sign;
 
@@ -40,11 +40,11 @@ public class TestPopulation {
 		}
 
 		FitnessFunction.registeredFunctions = 2;
-		MultiWayDepthNode root = MultiWayDepthNode.makeNode(2, 1, Sign.LESS,
+		MultiWayHeightNode root = MultiWayHeightNode.makeNode(2, 1, Sign.LESS,
 				20d);
-		MultiWayDepthNode[] childs = new MultiWayDepthNode[2];
-		childs[0] = MultiWayDepthNode.makeLeaf(1);
-		childs[1] = MultiWayDepthNode.makeLeaf(0);
+		MultiWayHeightNode[] childs = new MultiWayHeightNode[2];
+		childs[0] = MultiWayHeightNode.makeLeaf(1);
+		childs[1] = MultiWayHeightNode.makeLeaf(0);
 		root.setChilds(childs);
 		testIndividual = new TreeIndividual(root);
 		individuals = Utils.debugPopulationFrom(testIndividual);

@@ -1,14 +1,12 @@
 package genlib.classifier.popinit;
 
 import genlib.classifier.gens.DummyTreeGenerator;
-import genlib.classifier.gens.SimpleStumpGenerator;
 import genlib.classifier.gens.TreeGenerator;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.locales.PermMessages;
 import genlib.structures.data.GenLibInstances;
 import genlib.utils.Utils;
 
-import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,8 +26,7 @@ public class CompletedTrees extends TreePopulationInitializator {
 		this.resample = resample;
 		this.random = Utils.randomGen;
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	private void initPopulation(GenLibInstances data) throws Exception {
 		if (gen == null) {
 			this.gen = new DummyTreeGenerator();
@@ -135,7 +132,7 @@ public class CompletedTrees extends TreePopulationInitializator {
 	public String objectInfo() {
 		return String.format(
 				"type %s;gen %s;depth %s;divide %s;resample %s;threads %s",
-				initName, gen.getGenName(), maxDepth, divideParam, resample,
+				initName, gen.getGenName(), maxHeight, divideParam, resample,
 				nThreads);
 	}
 

@@ -1,7 +1,7 @@
 package genlib.utils;
 
 import genlib.evolution.individuals.TreeIndividual;
-import genlib.structures.trees.MultiWayDepthNode;
+import genlib.structures.trees.MultiWayHeightNode;
 import genlib.structures.trees.MultiWayNode;
 import genlib.structures.trees.Node;
 import genlib.utils.Utils.Sign;
@@ -97,7 +97,7 @@ public class WekaUtils {
 			if (m.matches()) {
 				Node node = null;
 				if (autoDepth) {
-					node = new MultiWayDepthNode();
+					node = new MultiWayHeightNode();
 				} else {
 					node = new MultiWayNode();
 				}
@@ -116,7 +116,7 @@ public class WekaUtils {
 			if (m.matches()) {
 				Node node = null;
 				if (autoDepth) {
-					node = new MultiWayDepthNode();
+					node = new MultiWayHeightNode();
 				} else {
 					node = new MultiWayNode();
 				}
@@ -140,20 +140,23 @@ public class WekaUtils {
 				int edgeIndex = Integer.parseInt(m.group(1));
 				int edgeNodeIndex = 0;
 				if (attrValueIndexMap[nodes[edgeIndex].getAttribute()] == null) {
+					// numeric case
 					if (nodes[edgeIndex].getValue() == Integer.MIN_VALUE) {
+						// already set the node, we should not reconfig it
 						nodes[edgeIndex]
 								.setValue(Double.parseDouble(m.group(4)));
-						edges[edgeIndex][0] = Integer.parseInt(m.group(2));
-						nodes[edgeIndex].setSign(makeSign(m.group(3)));
-					} else {
+						edges[edgeIndex][0] = Integer.parseInt(m.group(2));						
+						nodes[edgeIndex].setSign(makeSign(m.group(3)));						
+					} else {						
 						edges[edgeIndex][1] = Integer.parseInt(m.group(2));
 					}
 				} else {
+					// nominal case, sign is not set here
 					edgeNodeIndex = attrValueIndexMap[nodes[edgeIndex]
 							.getAttribute()].get(m.group(4));
 					edges[edgeIndex][edgeNodeIndex] = Integer.parseInt(m
 							.group(2));
-					nodes[edgeIndex].setSign(makeSign(m.group(3)));
+					//nodes[edgeIndex].setSign(makeSign(m.group(3)));
 				}
 
 			}
@@ -193,49 +196,70 @@ public class WekaUtils {
 			Instance instance = enumeration.nextElement();
 
 			Node node = root;
+
 			boolean shouldAdd = true;
 			while (node.getParent() != null) {
-				node = node.getParent();
+				int nodeIndex = 0;
+				for (Node child : node.getParent().getChilds()) {
+					if (child == node) {
+						break;
+					}
+					nodeIndex++;
+				}
+				
+				node = node.getParent();				
 
 				switch (node.getSign()) {
 				case EQUALS:
-					if (Double.compare(instance.value(node.getAttribute()),
-							node.getValue()) != 0) {
+					if (nodeIndex == 0
+							^ Double.compare(
+									instance.value(node.getAttribute()),
+									node.getValue()) == 0) {
 						shouldAdd = false;
 						break;
 					}
 					break;
 				case GREATEQ:
-					if (Double.compare(instance.value(node.getAttribute()),
-							node.getValue()) == -1) {
+					if (nodeIndex == 0
+							^ Double.compare(
+									instance.value(node.getAttribute()),
+									node.getValue()) == 1) {
 						shouldAdd = false;
 						break;
 					}
 					break;
 				case GREATER:
-					if (Double.compare(instance.value(node.getAttribute()),
-							node.getValue()) != 1) {
+					if (nodeIndex == 0
+							^ Double.compare(
+									instance.value(node.getAttribute()),
+									node.getValue()) != -1) {
 						shouldAdd = false;
 						break;
 					}
 					break;
 				case LESS:
-					if (Double.compare(instance.value(node.getAttribute()),
-							node.getValue()) != -1) {
+					if (nodeIndex == 0
+							^ Double.compare(
+									instance.value(node.getAttribute()),
+									node.getValue()) == -1) {
 						shouldAdd = false;
 						break;
 					}
 					break;
 				case LESSEQ:
-					if (Double.compare(instance.value(node.getAttribute()),
-							node.getValue()) == 1) {
+					if (nodeIndex == 0
+							^ Double.compare(
+									instance.value(node.getAttribute()),
+									node.getValue()) != 1) {
 						shouldAdd = false;
 						break;
 					}
 					break;
 				case NEQUALS:
-					if (Double.compare(instance.value(node.getAttribute()),
-							node.getValue()) == 0) {
+					if (nodeIndex == 0
+							^ Double.compare(
+									instance.value(node.getAttribute()),
+									node.getValue()) != 0) {
 						shouldAdd = false;
 						break;
 					}
@@ -277,47 +301,67 @@ public class WekaUtils {
 			Node node = root;
 			boolean shouldAdd = true;
 			while (node.getParent() != null) {
-				node = node.getParent();
+				int nodeIndex = 0;
+				for (Node child : node.getParent().getChilds()) {
+					if (child == node) {
+						break;
+					}
+					nodeIndex++;
+				}
+				
+				node = node.getParent();				
 
 				switch (node.getSign()) {
 				case EQUALS:
-					if (Double.compare(instance.value(node.getAttribute()),
-							node.getValue()) != 0) {
+					if (nodeIndex == 0
+							^ Double.compare(
+									instance.value(node.getAttribute()),
+									node.getValue()) == 0) {
 						shouldAdd = false;
 						break;
 					}
 					break;
 				case GREATEQ:
-					if (Double.compare(instance.value(node.getAttribute()),
-							node.getValue()) == -1) {
+					if (nodeIndex == 0
+							^ Double.compare(
+									instance.value(node.getAttribute()),
+									node.getValue()) == 1) {
 						shouldAdd = false;
 						break;
 					}
 					break;
 				case GREATER:
-					if (Double.compare(instance.value(node.getAttribute()),
-							node.getValue()) != 1) {
+					if (nodeIndex == 0
+							^ Double.compare(
+									instance.value(node.getAttribute()),
+									node.getValue()) != -1) {
 						shouldAdd = false;
 						break;
 					}
 					break;
 				case LESS:
-					if (Double.compare(instance.value(node.getAttribute()),
-							node.getValue()) != -1) {
+					if (nodeIndex == 0
+							^ Double.compare(
+									instance.value(node.getAttribute()),
+									node.getValue()) == -1) {
 						shouldAdd = false;
 						break;
 					}
 					break;
 				case LESSEQ:
-					if (Double.compare(instance.value(node.getAttribute()),
-							node.getValue()) == 1) {
+					if (nodeIndex == 0
+							^ Double.compare(
+									instance.value(node.getAttribute()),
+									node.getValue()) != 1) {
 						shouldAdd = false;
 						break;
 					}
 					break;
 				case NEQUALS:
-					if (Double.compare(instance.value(node.getAttribute()),
-							node.getValue()) == 0) {
+					if (nodeIndex == 0
+							^ Double.compare(
+									instance.value(node.getAttribute()),
+									node.getValue()) != 0) {
 						shouldAdd = false;
 						break;
 					}

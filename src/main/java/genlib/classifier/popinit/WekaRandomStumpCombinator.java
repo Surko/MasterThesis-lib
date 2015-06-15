@@ -2,7 +2,6 @@ package genlib.classifier.popinit;
 
 import genlib.classifier.gens.TreeGenerator;
 import genlib.classifier.gens.WekaSimpleStumpGenerator;
-import genlib.classifier.splitting.InformationGainCriteria;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.locales.PermMessages;
 import genlib.locales.TextResource;
@@ -21,14 +20,15 @@ import weka.core.Instances;
  * @see RandomStumpCombinator
  */
 public class WekaRandomStumpCombinator extends RandomStumpCombinator {
-	
+
 	/** for serialization */
 	private static final long serialVersionUID = 3949778932252091677L;
 	/** name of this initializator */
 	public static final String initName = "wRanStump";
-	
-	public WekaRandomStumpCombinator() {}
-	
+
+	public WekaRandomStumpCombinator() {
+	}
+
 	public WekaRandomStumpCombinator(int popSize, int depth, int divideParam,
 			boolean resample) {
 		super(popSize, depth, divideParam, resample);
@@ -41,8 +41,7 @@ public class WekaRandomStumpCombinator extends RandomStumpCombinator {
 
 	private void initPopulation(Instances data) throws Exception {
 		if (gen == null) {
-			this.gen = new WekaSimpleStumpGenerator(
-					new InformationGainCriteria());
+			this.gen = new WekaSimpleStumpGenerator();
 			this.gen.setPopulationInitializator(this);
 		}
 
@@ -50,7 +49,8 @@ public class WekaRandomStumpCombinator extends RandomStumpCombinator {
 		// exception
 		if (gen.getGeneratorHeight() != 1)
 			throw new Exception(String.format(TextResource
-					.getString("eConsistencyStumpGen"), gen.getClass().getName()));
+					.getString("eConsistencyStumpGen"), gen.getClass()
+					.getName()));
 
 		int n_attr = data.numAttributes() - 1;
 		population = new TreeIndividual[n_attr * divideParam];
@@ -83,7 +83,7 @@ public class WekaRandomStumpCombinator extends RandomStumpCombinator {
 			try {
 				es.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
-				
+
 			}
 
 			population = gen.getIndividuals();
@@ -101,10 +101,11 @@ public class WekaRandomStumpCombinator extends RandomStumpCombinator {
 
 				gen.setInstances(dataPart);
 
-				System.arraycopy(gen.createPopulation(), 0, population, i * n_attr,
-						n_attr);
+				System.arraycopy(gen.createPopulation(), 0, population, i
+						* n_attr, n_attr);
 			}
-			// Saving of generated stumps that are further used for example as a mutation element
+			// Saving of generated stumps that are further used for example as a
+			// mutation element
 			gen.setIndividuals(population);
 		}
 
@@ -135,14 +136,11 @@ public class WekaRandomStumpCombinator extends RandomStumpCombinator {
 	public String getInitName() {
 		return initName;
 	}
-	
+
 	public String objectInfo() {
-		return String.format("type %s;gen %s;depth %s;divide %s;resample %s;threads %s", 
-				initName,
-				gen.getGenName(),
-				maxDepth,
-				divideParam,
-				resample,
+		return String.format(
+				"type %s;gen %s;depth %s;divide %s;resample %s;threads %s",
+				initName, gen.getGenName(), maxHeight, divideParam, resample,
 				nThreads);
 	}
 }

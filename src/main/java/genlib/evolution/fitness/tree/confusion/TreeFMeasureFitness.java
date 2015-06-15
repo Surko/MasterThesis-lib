@@ -86,7 +86,7 @@ public class TreeFMeasureFitness extends TreeConfusionFitness {
 
 		switch (fMeasureEnum) {
 		case BETA:
-			this.doubleBeta = Double.valueOf(paramValue);	
+			this.doubleBeta = Double.valueOf(paramValue);
 			this.doubleBeta *= this.doubleBeta;
 			break;
 		default:
@@ -138,7 +138,8 @@ public class TreeFMeasureFitness extends TreeConfusionFitness {
 						FMeasureEnum.BETA, Math.sqrt(doubleBeta));
 			} else {
 				paramString = String.format(PermMessages._param_format,
-						paramString, FMeasureEnum.BETA + "," + Math.sqrt(doubleBeta));
+						paramString,
+						FMeasureEnum.BETA + "," + Math.sqrt(doubleBeta));
 			}
 		}
 
@@ -156,7 +157,7 @@ public class TreeFMeasureFitness extends TreeConfusionFitness {
 	 */
 	@Override
 	protected double attributeConfusionValue(GenLibInstances instances,
-			TreeIndividual individual) {				
+			TreeIndividual individual) {
 		Node root = individual.getRootNode();
 		double tp = 0, top = 0;
 
@@ -175,7 +176,7 @@ public class TreeFMeasureFitness extends TreeConfusionFitness {
 					root = root.getChildAt((int) instance
 							.getValueOfAttribute(root.getAttribute()));
 				}
-			}			
+			}
 
 			int pClass = (int) root.getValue();
 			if (pClass != attrIndex) {
@@ -195,8 +196,9 @@ public class TreeFMeasureFitness extends TreeConfusionFitness {
 
 		double precision = tp / top;
 		double recall = tp / data.getClassCounts()[attrIndex];
-		
-		return (1 + doubleBeta) * precision * recall / (doubleBeta * precision + recall);
+
+		return (1 + doubleBeta) * precision * recall
+				/ (doubleBeta * precision + recall);
 	}
 
 	/**
@@ -208,7 +210,7 @@ public class TreeFMeasureFitness extends TreeConfusionFitness {
 		Node root = individual.getRootNode();
 		double[] precisionArray = new double[instances.numClasses()];
 		double[] recallArray = new double[instances.numClasses()];
-		// in the end will serve the purpose of f-measure array 
+		// in the end will serve the purpose of f-measure array
 		double[] topArray = new double[instances.numClasses()];
 
 		Enumeration<GenLibInstance> eInstances = instances.getInstances();
@@ -226,7 +228,7 @@ public class TreeFMeasureFitness extends TreeConfusionFitness {
 					root = root.getChildAt((int) instance
 							.getValueOfAttribute(root.getAttribute()));
 				}
-			}			
+			}
 
 			int tClass = (int) instance.getValueOfClass();
 			int pClass = (int) root.getValue();
@@ -234,25 +236,25 @@ public class TreeFMeasureFitness extends TreeConfusionFitness {
 				// add true positives for attribute
 				precisionArray[tClass] += 1;
 			}
-			
+
 			topArray[pClass] += 1;
 			root = individual.getRootNode();
 		}
-		
-		double[] classCounts = data.getClassCounts(); 
+
+		double[] classCounts = data.getClassCounts();
 		for (int i = 0; i < precisionArray.length; i++) {
-			// divide true positives (saved in precision array) 
+			// divide true positives (saved in precision array)
 			// with all the positives will give recall
 			recallArray[i] = precisionArray[i] / classCounts[i];
 			// divide with all the test positives will give precision
-			precisionArray[i] /= topArray[i]; 
+			precisionArray[i] /= topArray[i];
 			// compute f-measure into top-array
-			topArray[i] = (1 + doubleBeta) * precisionArray[i] * recallArray[i] / 
-					(doubleBeta * precisionArray[i] + recallArray[i]);
+			topArray[i] = (1 + doubleBeta) * precisionArray[i] * recallArray[i]
+					/ (doubleBeta * precisionArray[i] + recallArray[i]);
 		}
 
 		return topArray;
-		
+
 	}
 
 	/**
@@ -279,7 +281,7 @@ public class TreeFMeasureFitness extends TreeConfusionFitness {
 					root = root.getChildAt((int) instance.value(root
 							.getAttribute()));
 				}
-			}			
+			}
 
 			int pClass = (int) root.getValue();
 			if (pClass != attrIndex) {
@@ -298,8 +300,9 @@ public class TreeFMeasureFitness extends TreeConfusionFitness {
 
 		double precision = tp / top;
 		double recall = tp / data.getClassCounts()[attrIndex];
-		
-		return (1 + doubleBeta) * precision * recall / (doubleBeta * precision + recall);
+
+		return (1 + doubleBeta) * precision * recall
+				/ (doubleBeta * precision + recall);
 	}
 
 	/**
@@ -312,7 +315,7 @@ public class TreeFMeasureFitness extends TreeConfusionFitness {
 		Node root = individual.getRootNode();
 		double[] precisionArray = new double[instances.numClasses()];
 		double[] recallArray = new double[instances.numClasses()];
-		// in the end will serve the purpose of f-measure array 
+		// in the end will serve the purpose of f-measure array
 		double[] topArray = new double[instances.numClasses()];
 
 		Enumeration<Instance> eInstances = instances.enumerateInstances();
@@ -336,21 +339,21 @@ public class TreeFMeasureFitness extends TreeConfusionFitness {
 			if (tClass == pClass) {
 				precisionArray[tClass] += 1;
 			}
-			
+
 			topArray[pClass] += 1;
 			root = individual.getRootNode();
 		}
-		
-		double[] classCounts = data.getClassCounts(); 
+
+		double[] classCounts = data.getClassCounts();
 		for (int i = 0; i < precisionArray.length; i++) {
-			// divide true positives (saved in precision array) 
+			// divide true positives (saved in precision array)
 			// with all the positives will give recall
 			recallArray[i] = precisionArray[i] / classCounts[i];
 			// divide with all the test positives will give precision
-			precisionArray[i] /= topArray[i];			
+			precisionArray[i] /= topArray[i];
 			// compute f-measure into top-array
-			topArray[i] = (1 + doubleBeta) * precisionArray[i] * recallArray[i] / 
-					(doubleBeta * precisionArray[i] + recallArray[i]);
+			topArray[i] = (1 + doubleBeta) * precisionArray[i] * recallArray[i]
+					/ (doubleBeta * precisionArray[i] + recallArray[i]);
 		}
 
 		return topArray;

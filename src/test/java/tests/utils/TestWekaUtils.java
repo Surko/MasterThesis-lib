@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.structures.extensions.HeightExtension;
-import genlib.structures.trees.MultiWayDepthNode;
+import genlib.structures.trees.MultiWayHeightNode;
 import genlib.structures.trees.MultiWayNode;
 import genlib.structures.trees.Node;
 import genlib.utils.Utils;
@@ -109,14 +109,14 @@ public class TestWekaUtils {
 		Node root = individual.getRootNode();
 		assertTrue(root.getChildCount() == 2);
 		assertTrue(root.getAttribute() == 5);
-		assertEquals(root.getSign(), Sign.EQUALS);
+		assertEquals(root.getSign(), null);
 		assertTrue(root.getChildAt(0).isLeaf());
 		assertTrue(root.getChildAt(0).getValue() == 0);
 		assertNull(root.getChildAt(0).getChilds());
 		assertNull(root.getChildAt(0).getSign());
 		assertTrue(root.getChildAt(1).getChildCount() == 2);
 		assertTrue(root.getChildAt(1).getAttribute() == 8);
-		assertEquals(root.getChildAt(1).getSign(), Sign.EQUALS);
+		assertEquals(root.getChildAt(1).getSign(), null);
 		assertTrue(Utils.computeHeight(root) == 6);
 
 		Node n = root.getChildAt(1).getChildAt(1).getChildAt(0).getChildAt(1);
@@ -213,11 +213,11 @@ public class TestWekaUtils {
 					wekaData.numInstances(), attrIndexMap, attrValueIndexMap,
 					true);
 
-			MultiWayDepthNode root = MultiWayDepthNode.makeNode(2, 1,
+			MultiWayHeightNode root = MultiWayHeightNode.makeNode(2, 1,
 					Sign.LESS, 20d);
-			MultiWayDepthNode[] childs = new MultiWayDepthNode[2];
-			childs[0] = MultiWayDepthNode.makeLeaf(1);
-			childs[1] = MultiWayDepthNode.makeLeaf(0);
+			MultiWayHeightNode[] childs = new MultiWayHeightNode[2];
+			childs[0] = MultiWayHeightNode.makeLeaf(1);
+			childs[1] = MultiWayHeightNode.makeLeaf(0);
 			root.setChilds(childs);
 			testIndividual = new TreeIndividual(root);
 
@@ -370,18 +370,21 @@ public class TestWekaUtils {
 
 	@Test
 	public void testFiltering() {
-		MultiWayDepthNode root = MultiWayDepthNode.makeNode(2, 1,
+		MultiWayHeightNode root = MultiWayHeightNode.makeNode(2, 1,
 				Sign.LESS, 1d);
-		MultiWayDepthNode[] childs = new MultiWayDepthNode[2];
-		childs[0] = MultiWayDepthNode.makeLeaf(1);
-		childs[1] = MultiWayDepthNode.makeLeaf(0);
+		MultiWayHeightNode[] childs = new MultiWayHeightNode[2];
+		childs[0] = MultiWayHeightNode.makeLeaf(1);
+		childs[1] = MultiWayHeightNode.makeLeaf(0);
 		root.setChilds(childs);		
 		
 		double[] filtered = WekaUtils.getFilteredInstancesClasses(wekaData, MultiWayNode.makeLeaf(2));
-		System.out.println(filtered[0] + " " + filtered[1]);
+		System.out.println("filtered " + filtered[0] + " " + filtered[1]);
 		assertTrue(filtered.length == 2);
 		filtered = WekaUtils.getFilteredInstancesClasses(wekaData, root.getChildAt(0));
-		System.out.println(filtered[0] + " " + filtered[1]);
+		System.out.println("filtered " + filtered[0] + " " + filtered[1]);
+		assertTrue(filtered.length == 2);
+		filtered = WekaUtils.getFilteredInstancesClasses(wekaData, root.getChildAt(1));
+		System.out.println("filtered " + filtered[0] + " " + filtered[1]);
 		assertTrue(filtered.length == 2);
 	}
 	

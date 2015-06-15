@@ -111,7 +111,7 @@ public class WekaCompletedTrees extends CompletedTrees {
 				"type %s;gen %s;depth %s;divide %s;resample %s;threads %s",
 				initName,
 				gen.getGenName(),
-				maxDepth,
+				maxHeight,
 				divideParam,
 				resample,
 				nThreads);

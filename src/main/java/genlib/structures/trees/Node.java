@@ -24,6 +24,7 @@ public interface Node extends Serializable {
 	public boolean isLeaf();
 	public void makeLeaf();	
 	public Node copy();
+	public Node newInstance();
 	
 	
 }

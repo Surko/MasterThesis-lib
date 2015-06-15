@@ -185,12 +185,7 @@ public class EvolutionTreeClassifier implements Serializable,
 		if (parameters.length < 2) {
 			throw new PopulationTypeStringFormatException(
 					TextResource.getString(TextKeys.ePopTypeFormat));
-		}
-
-		if (parameters[0].equals(Population.initName)) {
-			return new Population<>(popInit.getPopulation(),
-					c.getPopulationSize());
-		}
+		}		
 
 		@SuppressWarnings("rawtypes")
 		Class<? extends IPopulation> iPopClass = IPopulation.populationTypes
@@ -363,8 +358,19 @@ public class EvolutionTreeClassifier implements Serializable,
 			}
 
 			// inner error
-			FitnessFunction<TreeIndividual> func = h.get(parameters[i])
-					.newInstance();
+			Class<? extends FitnessFunction<TreeIndividual>> fitFuncClass = h.get(parameters[i]);
+			
+			if (fitFuncClass == null) {
+				LOG.log(Level.SEVERE, String.format(
+						TextResource.getString(TextKeys.eNotDefClass),
+						parameters[0]));
+				// not defined class for pop init
+				throw new NotDefClassException(String.format(
+						TextResource.getString(TextKeys.eNotDefClass),
+						parameters[0]));
+			}
+			
+			FitnessFunction<TreeIndividual> func = fitFuncClass.newInstance();
 
 			// if class attribute is numeric and function can't handle it.
 			if (isNumeric && !func.canHandleNumeric()) {
@@ -457,6 +463,7 @@ public class EvolutionTreeClassifier implements Serializable,
 			}
 
 			xOper.setRandomGenerator(new Random(random.nextLong()));
+			xOper.setOperatorProbability(Double.parseDouble(parameters[i+1]));
 			xoverSet.add(xOper);
 		}
 	}
@@ -535,6 +542,7 @@ public class EvolutionTreeClassifier implements Serializable,
 			}
 
 			mutOper.setRandomGenerator(new Random(random.nextLong()));
+			mutOper.setOperatorProbability(Double.parseDouble(parameters[i+1]));
 			mutSet.add(mutOper);
 		}
 	}
@@ -613,7 +621,7 @@ public class EvolutionTreeClassifier implements Serializable,
 	 * into generator list and then set into population initializator.
 	 * 
 	 * @throws PopulationInitStringFormatException
-	 *             if there is bad format for population initializator
+	 *             if there is bad format for individual generators
 	 * @throws NotDefClassException
 	 *             if there isn't population initializator for config
 	 * @throws IllegalAccessException
@@ -624,7 +632,7 @@ public class EvolutionTreeClassifier implements Serializable,
 	 *             if the generator is dependent on weka
 	 */
 	private void makeGenerators() throws Exception {
-		String indGen = c.getPopulationInit();
+		String indGen = c.getIndGenerators();
 		String[] parameters = indGen.split(Utils.oDELIM);
 
 		if (popInit == null) {

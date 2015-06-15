@@ -2,48 +2,78 @@ package genlib.classifier.popinit;
 
 import genlib.classifier.gens.PopGenerator;
 import genlib.classifier.gens.TreeGenerator;
+import genlib.evolution.fitness.tree.confusion.TreeConfusionFitness;
 import genlib.evolution.individuals.TreeIndividual;
+import genlib.exceptions.NotDefParamException;
+import genlib.locales.TextKeys;
+import genlib.locales.TextResource;
 import genlib.structures.Data;
+import genlib.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.logging.Logger;
 
-public abstract class TreePopulationInitializator implements PopulationInitializator<TreeIndividual> {
-	
+public abstract class TreePopulationInitializator implements
+		PopulationInitializator<TreeIndividual> {
+
 	enum PopInitEnum {
-		resample,
-		autoDepth,
-		divideParam,
-		maxDepth,
+		RESAMPLE, AUTOHEIGHT, DIVIDEPARAM, MAXHEIGHT;
+
+		public static PopInitEnum value(String name) {
+			if (RESAMPLE.name().equals(name)) {
+				return RESAMPLE;
+			}
+			if (AUTOHEIGHT.name().equals(name)) {
+				return AUTOHEIGHT;
+			}
+			if (DIVIDEPARAM.name().equals(name)) {
+				return DIVIDEPARAM;
+			}
+			if (MAXHEIGHT.name().equals(name)) {
+				return MAXHEIGHT;
+			}
+
+			return null;
+		}
 	}
-	
+
 	/** for serialization */
 	private static final long serialVersionUID = 7222530982342870829L;
+	/** logger */
+	private static final Logger LOG = Logger
+			.getLogger(TreePopulationInitializator.class.getName());
 	/** loaded population initializators */
 	public static final HashMap<String, Class<? extends TreePopulationInitializator>> treePopInits = new HashMap<>();
 	/** depth of generated trees. */
-	protected int maxDepth = 1;
+	protected int maxHeight = 1;
 	/** number of division of trainin data */
 	protected int divideParam = 10;
 	/** only resampling instead of dividing */
 	protected boolean resample = true;
 	/** recounting of depth inside trees */
-	protected boolean autoDepth = false;
+	protected boolean autoHeight = false;
 	/** Individuals that makes this population */
 	protected TreeIndividual[] population;
 	/** Number of threads that will be creating population */
 	protected int nThreads;
 
-	/** Generator of tree population. It contains all of the generated trees that are used to combine. */
+	/**
+	 * Generator of tree population. It contains all of the generated trees that
+	 * are used to combine.
+	 */
 	protected TreeGenerator gen;
-	/** Random seeded object for this run of algorithm. Default from Utils. Can be changed. */
+	/**
+	 * Random seeded object for this run of algorithm. Default from Utils. Can
+	 * be changed.
+	 */
 	protected Random random;
 	/** Object ({@link Data}) of all instances */
 	protected Data data;
 	/** Final population size */
 	protected int popSize;
-	
+
 	/**
 	 * Method that returns population of generated individuals from
 	 * TreeGenerator.
@@ -56,21 +86,23 @@ public abstract class TreePopulationInitializator implements PopulationInitializ
 	public TreeIndividual[] getOriginPopulation() {
 		return gen.getIndividuals();
 	}
-	
+
 	/**
-	 * Gets the depth of the combined trees (population trees) from generated trees. 
+	 * Gets the depth of the combined trees (population trees) from generated
+	 * trees.
+	 * 
 	 * @return Depth of the trees in population.
 	 */
-	public int getDepth() {
-		return maxDepth;
+	public int getMaxHeight() {
+		return maxHeight;
 	}
 
 	public int getDivideParam() {
 		return divideParam;
 	}
-	
-	public boolean getAutoDepth() {
-		return autoDepth;
+
+	public boolean getAutoHeight() {
+		return autoHeight;
 	}
 
 	@Override
@@ -81,7 +113,7 @@ public abstract class TreePopulationInitializator implements PopulationInitializ
 	public HashMap<String, Integer>[] getAttrValueIndexMap() {
 		return data.getAttrValueIndexMap();
 	}
-	
+
 	public HashMap<String, Integer> getAttrIndexMap() {
 		return data.getAttrIndexMap();
 	}
@@ -89,18 +121,18 @@ public abstract class TreePopulationInitializator implements PopulationInitializ
 	public boolean isResampling() {
 		return resample;
 	}
-	
+
 	@Override
 	public int getPopulationSize() {
 		return popSize;
 	}
-	
+
 	public void setRandomGenerator(Random random) {
 		this.random = random;
 	}
 
 	public void setDepth(int depth) {
-		this.maxDepth = depth;
+		this.maxHeight = depth;
 	}
 
 	public void setDivideParam(int divideParam) {
@@ -112,13 +144,14 @@ public abstract class TreePopulationInitializator implements PopulationInitializ
 	}
 
 	public void setAutoDepth(boolean autoDepth) {
-		this.autoDepth = autoDepth;
+		this.autoHeight = autoDepth;
 	}
-	
+
 	@Override
-	public void setGenerator(ArrayList<? extends PopGenerator<TreeIndividual>> gen) {
+	public void setGenerator(
+			ArrayList<? extends PopGenerator<TreeIndividual>> gen) {
 		if (gen.size() > 0) {
-			this.gen = (TreeGenerator)gen.get(0);
+			this.gen = (TreeGenerator) gen.get(0);
 		}
 	}
 
@@ -137,8 +170,36 @@ public abstract class TreePopulationInitializator implements PopulationInitializ
 	}
 
 	public void setParam(String param) {
-		
+		String[] params = param.split(Utils.pDELIM);
+
+		for (int i = 0; i < params.length; i += 2) {
+			PopInitEnum popInitEnum = PopInitEnum.value(params[i]);
+
+			if (popInitEnum == null) {
+				LOG.warning(String.format(
+						TextResource.getString(TextKeys.iExcessParam),
+						params[i]));
+				continue;
+			}
+
+			switch (popInitEnum) {
+			case AUTOHEIGHT:
+				this.autoHeight = Boolean.parseBoolean(params[i+1]);
+				break;
+			case DIVIDEPARAM:
+				this.divideParam = Integer.parseInt(params[i+1]);
+				break;
+			case MAXHEIGHT:
+				this.maxHeight = Integer.parseInt(params[i+1]);				
+				break;
+			case RESAMPLE:
+				this.resample = Boolean.parseBoolean(params[i+1]);				
+				break;
+			default:
+				break;
+			}
+
+		}
 	}
-	
-	
+
 }
