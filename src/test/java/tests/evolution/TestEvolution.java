@@ -137,6 +137,9 @@ public class TestEvolution {
 		ea.setFitnessComparator(comp);
 		ea.setFitnessFunctions(fit);
 		ea.run();
+		
+		TreeIndividual bestIndividual = ea.getActualPopulation().getBestIndividual();
+		assertNotNull(bestIndividual);
 	}
 
 }

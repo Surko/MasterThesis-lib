@@ -1,6 +1,5 @@
 package genlib.evolution;
 
-import genlib.classifier.popinit.PopulationInitializator;
 import genlib.configurations.Config;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.fitness.comparators.FitnessComparator;
@@ -17,15 +16,14 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+public class EvolutionAlgorithm<T extends Individual> implements Runnable,
+		Serializable {
 
-public class EvolutionAlgorithm<T extends Individual> implements Runnable, Serializable {
-	
 	/** for serialization */
 	private static final long serialVersionUID = -8654725926081507012L;
-	private static final Logger LOG = Logger.getLogger(EvolutionAlgorithm.class.getName());
-	private IPopulation<T> actualPopulation;		
+	private static final Logger LOG = Logger.getLogger(EvolutionAlgorithm.class
+			.getName());
+	private IPopulation<T> actualPopulation;
 	private int numberOfGenerations;
 	private int fitNumOfThreads = 1;
 	private int fitBlockSize = 1;
@@ -33,8 +31,8 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable, Seria
 	@SuppressWarnings("unused")
 	private int operNumOfThreads;
 	private double elitism;
-	
-	private Data data;	
+
+	private Data data;
 	private FitnessComparator<T> fitComp;
 	private ArrayList<FitnessFunction<T>> fitFunctions;
 	private ArrayList<Selector> selectors, envSelectors;
@@ -56,7 +54,8 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable, Seria
 		this.operNumOfThreads = c.getOperNumOfThreads();
 	}
 
-	public EvolutionAlgorithm(Data data, IPopulation<T> population, int numberOfGenerations) {
+	public EvolutionAlgorithm(Data data, IPopulation<T> population,
+			int numberOfGenerations) {
 		Config c = Config.getInstance();
 		this.data = data;
 		this.actualPopulation = population;
@@ -68,7 +67,15 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable, Seria
 	public Data getData() {
 		return data;
 	}
-	
+
+	public int getNumberOfGenerations() {
+		return numberOfGenerations;
+	}
+
+	public IPopulation<T> getActualPopulation() {
+		return actualPopulation;
+	}
+
 	public void setCrossOperators(ArrayList<Operator<T>> crossOperators) {
 		this.crossOperators = crossOperators;
 	}
@@ -85,7 +92,7 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable, Seria
 
 	public void addMutationOperator(Operator<T> operator) {
 		if (mutationOperators == null)
-			mutationOperators = new ArrayList<Operator<T>>();		
+			mutationOperators = new ArrayList<Operator<T>>();
 		mutationOperators.add(operator);
 	}
 
@@ -136,9 +143,10 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable, Seria
 	public void run() {
 		if (fitComp == null || mutationOperators == null
 				|| crossOperators == null || envSelectors == null
-				|| fitFunctions == null) { 
+				|| fitFunctions == null) {
 			LOG.log(Level.SEVERE, TextResource.getString("eNullInputEvolution"));
-			throw new NullPointerException(TextResource.getString("eNullInputEvolution"));
+			throw new NullPointerException(
+					TextResource.getString("eNullInputEvolution"));
 		}
 
 		// setting up population field
@@ -157,11 +165,12 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable, Seria
 
 	}
 
-	protected void evolve() {		
+	protected void evolve() {
 		// phase of mate selection
-		IPopulation<T> selected = actualPopulation.selectionPhase(selectors);		
+		IPopulation<T> selected = actualPopulation.selectionPhase(selectors);
 		// phase of operators evaluation
-		IPopulation<T> offspring = selected.operatorPhaseMates(crossOperators, mutationOperators);		
+		IPopulation<T> offspring = selected.operatorPhaseMates(crossOperators,
+				mutationOperators);
 		// computation of offspring fitness
 		offspring.computeFitness(fitNumOfThreads, fitBlockSize);
 		// elite phase - choosing elite individuals from original population
@@ -171,7 +180,7 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable, Seria
 
 		// change actual population with newly created generation.
 		actualPopulation = finalPopulation;
-		
+
 		// update of population, can be decreasing of max size or other
 		// types of variable size of population GAVaPS, PRoFIGA
 		actualPopulation.update();
