@@ -11,7 +11,7 @@ import java.util.Random;
 public class RouletteWheelSelector implements Selector {
 	/** for serialization */
 	private static final long serialVersionUID = -3268012087543397623L;
-	public static final String initName = "RW";
+	public static final String initName = "Rw";
 	private Random rng;
 	private int fitnessIndex = 0;
 	
@@ -26,20 +26,33 @@ public class RouletteWheelSelector implements Selector {
 			dest = new ArrayList<>();
 		}
 		
-		FitnessFunction<T> function = comp.getFitnessFuncs().get(fitnessIndex);
-		int individualFitIndex = function.getIndex();
 		int length = origin.size();
 		
 		double fitSum = 0d;
 		double[] fitnesses = new double[length];
 		
-		for (int i = 0; i < length; i++) {
-			fitnesses[i] = origin.get(i).getFitnessValue(individualFitIndex);
-			if (fitnesses[i] == 0) {
-				fitnesses[i] = 1;
-			}
-			fitSum += fitnesses[i];
-		}		
+		if (fitnessIndex < 0) {
+			// full comparator fitness. Pareto & Priority returns ones.			
+			for (int i = 0; i < length; i++) {
+				fitnesses[i] = comp.value(origin.get(i));
+				if (fitnesses[i] == 0) {
+					fitnesses[i] = 1;
+				}
+				fitSum += fitnesses[i];
+			}	
+		} else {
+			// fitness with specific index
+			FitnessFunction<T> function = comp.getFitnessFuncs().get(fitnessIndex);
+			int individualFitIndex = function.getIndex();
+						
+			for (int i = 0; i < length; i++) {
+				fitnesses[i] = origin.get(i).getFitnessValue(individualFitIndex);
+				if (fitnesses[i] == 0) {
+					fitnesses[i] = 1;
+				}
+				fitSum += fitnesses[i];
+			}					
+		}
 		
 		for (int i = 0; i < length; i++) {
 			fitnesses[i] /= fitSum;
@@ -57,6 +70,7 @@ public class RouletteWheelSelector implements Selector {
 				}
 			}
 		}	
+		
 		return dest;
 	}
 	

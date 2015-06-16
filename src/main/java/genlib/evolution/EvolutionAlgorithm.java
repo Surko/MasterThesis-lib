@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 public class EvolutionAlgorithm<T extends Individual> implements Runnable, Serializable {
 	
 	/** for serialization */
@@ -24,15 +27,14 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable, Seria
 	private static final Logger LOG = Logger.getLogger(EvolutionAlgorithm.class.getName());
 	private IPopulation<T> actualPopulation;		
 	private int numberOfGenerations;
-	private int fitNumOfThreads;
+	private int fitNumOfThreads = 1;
 	private int fitBlockSize = 1;
 	// it's not used, but can be in future
 	@SuppressWarnings("unused")
 	private int operNumOfThreads;
 	private double elitism;
 	
-	private Data data;
-	private PopulationInitializator<T> popInit;
+	private Data data;	
 	private FitnessComparator<T> fitComp;
 	private ArrayList<FitnessFunction<T>> fitFunctions;
 	private ArrayList<Selector> selectors, envSelectors;
@@ -130,18 +132,11 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable, Seria
 		this.fitComp = fitComp;
 	}
 
-	public void setPopInit(PopulationInitializator<T> popInit) {
-		this.popInit = popInit;
-	}
-
-	public PopulationInitializator<T> getPopInit() {
-		return popInit;
-	}
-
 	@Override
 	public void run() {
 		if (fitComp == null || mutationOperators == null
-				|| crossOperators == null || selectors == null) { 
+				|| crossOperators == null || envSelectors == null
+				|| fitFunctions == null) { 
 			LOG.log(Level.SEVERE, TextResource.getString("eNullInputEvolution"));
 			throw new NullPointerException(TextResource.getString("eNullInputEvolution"));
 		}

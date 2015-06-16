@@ -23,29 +23,22 @@ public interface IPopulation<T extends Individual> {
 	 * cases of variable population.
 	 */
 	public void update();
-
 	public void clear();
-
 	public void add(T individual);
-
 	public void addAll(IPopulation<T> population);
-
 	public void deepCopy(IPopulation<T> population);
-
 	public void setFitnessComparator(FitnessComparator<T> fitComp);
-
+	public void setMaxPopulationSize(int maxPopSize);
 	public FitnessComparator<T> getFitnessComparator();
-
 	public ArrayList<T> getIndividuals();
-
 	public T getBestIndividual();
-
 	public int getActualPopSize();
-
 	public int getMaxPopSize();
-
 	public T getIndividual(int index);
 
+	/**
+	 * Method which resamples population individuals.
+	 */
 	public void resample();
 
 	public void computeFitness(final int nThreads, final int blockSize);

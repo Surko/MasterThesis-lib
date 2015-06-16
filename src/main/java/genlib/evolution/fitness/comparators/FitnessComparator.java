@@ -15,42 +15,38 @@ public abstract class FitnessComparator<T extends Individual> implements
 	protected ArrayList<FitnessFunction<T>> fitFuncs;
 
 	/**
-	 * Enum with different types of fitness comparators/evaluators.
-	 * These four are the most famous one : </br>
-	 * {@link FitCompare#SINGLE} </br> 
-	 * {@link FitCompare#PARETO}  </br>
-	 * {@link FitCompare#PRIORITY} </br>
+	 * Enum with different types of fitness comparators/evaluators. These four
+	 * are the most famous one : </br> {@link FitCompare#SINGLE} </br>
+	 * {@link FitCompare#PARETO} </br> {@link FitCompare#PRIORITY} </br>
 	 * {@link FitCompare#WEIGHT} </br>
 	 * 
-	 * @author Lukas Surin	 
+	 * @author Lukas Surin
 	 */
 	public enum FitCompare {
 		/**
 		 * Simple signle fitness evaluator. Only one function is utilized.
 		 */
-		SINGLE,		
+		SINGLE,
 		/**
-		 * Pareto fitness evaluator. All the functions are utilized.
-		 * Comparator of this type should work according to
-		 * pareto approach.
+		 * Pareto fitness evaluator. All the functions are utilized. Comparator
+		 * of this type should work according to pareto approach.
 		 */
 		PARETO,
 		/**
 		 * Priority fitness evaluator. All the functions are utilized.
-		 * Comparator of this type should work according to
-		 * priority approach.
+		 * Comparator of this type should work according to priority approach.
 		 */
 		PRIORITY,
 		/**
 		 * Weighted fitness evaluator. All the functions are utilized.
-		 * Comparator of this type should work according to
-		 * weight approach.
+		 * Comparator of this type should work according to weight approach.
 		 */
 		WEIGHT
 	}
 
 	/**
 	 * Method which returns fitness functions for this comparator/evaluator.
+	 * 
 	 * @return fitness functions of comparator/evaluator.
 	 */
 	public ArrayList<FitnessFunction<T>> getFitnessFuncs() {
@@ -79,4 +75,28 @@ public abstract class FitnessComparator<T extends Individual> implements
 	 */
 	public void setParam(String s) {
 	}
+
+	/**
+	 * Value method which should return the value of evaluated fitness that is
+	 * used in comparison. If the comparator does not know what to return than
+	 * return 1.
+	 * 
+	 * @param o
+	 *            individual for which we compute the value
+	 */
+	public abstract double value(T o);
+
+	/**
+	 * Compare method inherited from Comparator that is used to compare
+	 * individuals.
+	 * 
+	 * @param o1
+	 *            first individual
+	 * @param o2
+	 *            second individual
+	 * @return {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public abstract int compare(T o1, T o2);
 }

@@ -36,8 +36,8 @@ public class TestPlugins {
 		assertTrue(FitnessFunction.tFitFuncs.size() == 13);
 		assertTrue(Operator.tMOper.size() == 4);
 		assertTrue(Operator.tXOper.size() == 2);
-		assertTrue(Selector.envSelectors.size() == 2);
-		assertTrue(Selector.selectors.size() == 2);
+		assertTrue(Selector.envSelectors.size() == 3);
+		assertTrue(Selector.selectors.size() == 3);
 		assertTrue(Population.populationTypes.size() == 1);
 		assertTrue(SplitCriteria.splitCriterias.size() == 1);
 	}

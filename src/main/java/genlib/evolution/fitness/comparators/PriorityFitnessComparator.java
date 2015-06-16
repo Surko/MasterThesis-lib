@@ -13,6 +13,19 @@ public class PriorityFitnessComparator<T extends Individual> extends
 	/** for serialization */
 	private static final long serialVersionUID = -4763112985337101338L;
 
+	/**
+	 * {@inheritDoc} </p> This method returns 1 because priority can't be
+	 * evaluated.
+	 */
+	public double value(T o) {
+		// not defined for this type of comparator
+		return 0d;
+	}
+
+	/**
+	 * {@inheritDoc} </p> It compares fitnesses of individuals by their priority
+	 * that is defined by its ordering in {@link FitnessComparator#fitFuncs}.
+	 */
 	@Override
 	public int compare(T o1, T o2) {
 

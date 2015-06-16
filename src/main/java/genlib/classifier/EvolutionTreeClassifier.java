@@ -120,8 +120,6 @@ public class EvolutionTreeClassifier implements Serializable,
 		// Evolution algorithm that evolves population of tree individuals.
 		ea = new EvolutionAlgorithm<>(workData, population,
 				c.getPopulationSize());
-		// original basic individuals which were used to create population
-		ea.setPopInit(popInit);
 		// number of generations to be run through
 		ea.setNumberOfGenerations(c.getNumberOfGenerations());
 		// mates are selected with selector

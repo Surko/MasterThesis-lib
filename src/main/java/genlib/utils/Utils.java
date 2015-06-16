@@ -827,6 +827,7 @@ public class Utils {
 	 */
 	public static Population<TreeIndividual> debugTreePopulation() {
 		Population<TreeIndividual> individuals = new Population<>();
+		individuals.setMaxPopulationSize(20);
 		MultiWayHeightNode root = MultiWayHeightNode.makeNode(2, 1, Sign.LESS,
 				20d);
 		MultiWayHeightNode[] childs = new MultiWayHeightNode[2];

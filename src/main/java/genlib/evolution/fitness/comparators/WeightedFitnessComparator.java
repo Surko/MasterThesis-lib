@@ -17,12 +17,32 @@ public class WeightedFitnessComparator<T extends Individual> extends
 	protected double[] weights;
 
 	/**
-	 * Constructor that creates instance of WeightedFitnessComparator.
-	 * It initializes weights array to be of length fitCounts.
-	 * @param fitCounts length of weights array to be set
+	 * Constructor that creates instance of WeightedFitnessComparator. It
+	 * initializes weights array to be of length fitCounts.
+	 * 
+	 * @param fitCounts
+	 *            length of weights array to be set
 	 */
 	public WeightedFitnessComparator(int fitCounts) {
 		this.weights = new double[fitCounts];
+	}
+
+	/**
+	 * {@inheritDoc} </p> This method returns fitness value of weighted fitness
+	 * functions defined with param.
+	 */
+	public double value(T o) {
+		double fit = 0;
+		if (o.hasChanged()) {
+			for (int i = 0; i < weights.length; i++) {
+				fit += weights[i] * fitFuncs.get(i).computeFitness(o);
+			}
+			o.setComplexFitness(fit);
+			o.unchange();
+		} else {
+			fit = o.getComplexFitness();
+		}
+		return fit;
 	}
 
 	/**
@@ -78,10 +98,12 @@ public class WeightedFitnessComparator<T extends Individual> extends
 	/**
 	 * {@inheritDoc}
 	 * <p>
-	 * This one is setting up the weights field from input parameter s.
-	 * Weights in string are in format weight1,...,weightn.
+	 * This one is setting up the weights field from input parameter s. Weights
+	 * in string are in format weight1,...,weightn.
 	 * </p>
-	 * @param s parameters in string format
+	 * 
+	 * @param s
+	 *            parameters in string format
 	 */
 	@Override
 	public void setParam(String s) {
@@ -103,6 +125,7 @@ public class WeightedFitnessComparator<T extends Individual> extends
 
 	/**
 	 * Method returns weights of this comparator/evaluator.
+	 * 
 	 * @return weights in array format
 	 */
 	public double[] getWeights() {

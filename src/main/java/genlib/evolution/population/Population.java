@@ -254,6 +254,10 @@ public class Population<T extends Individual> implements Serializable, IPopulati
 		this.comparator = fitComp;
 	}
 
+	public void setMaxPopulationSize(int maxPopSize) {
+		this.maxPopSize = maxPopSize;
+	}
+	
 	/* SELECTIONPHASE METHODS*/
 
 	@Override	
@@ -365,8 +369,8 @@ public class Population<T extends Individual> implements Serializable, IPopulati
 	 * @return
 	 */
 	@Override
-	public Population<T> elitePhase(double elitismRate) {
-		return elitePhase(elitismRate);
+	public IPopulation<T> elitePhase(double elitismRate) {
+		return elitePhase(null, elitismRate);
 	}
 
 	/**

@@ -33,7 +33,7 @@ public class TestDummy {
 
 		a[1] = 5;
 
-		assertArrayEquals(a, b, 0d);
+		assertArrayEquals(a, b, 0d);				
 	}
 
 	@Test

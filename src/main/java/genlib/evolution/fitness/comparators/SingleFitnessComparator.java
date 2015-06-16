@@ -16,8 +16,32 @@ public class SingleFitnessComparator<T extends Individual> extends
 			.getLogger(SingleFitnessComparator.class.getName());
 	/** for serialization */
 	private static final long serialVersionUID = 5637425664834090230L;
+	/** fitness function with which we compare individuals */
 	private FitnessFunction<T> function;
 
+	/**
+	 * {@inheritDoc} </p> This method returns fitness value for one function
+	 * defined with parameters.
+	 */
+	public double value(T o) {
+		double fit = 0;
+		if (function != null) {
+			fit = function.computeFitness(o);
+			o.unchange();
+		} else {
+			if (Utils.DEBUG) {
+				LOG.log(Level.INFO,
+						TextResource.getString(TextKeys.comparator_complex_fit));
+			}
+			fit = o.getComplexFitness();
+		}
+		return fit;
+	}
+
+	/**
+	 * {@inheritDoc} </p> It compares fitnesses of individuals by their priority
+	 * that is defined by its ordering in {@link FitnessComparator#fitFuncs}.
+	 */
 	@Override
 	public int compare(T o1, T o2) {
 		double fit1, fit2;
@@ -39,6 +63,9 @@ public class SingleFitnessComparator<T extends Individual> extends
 		return -Double.compare(fit1, fit2);
 	}
 
+	/**
+	 * Method parses the index of function that is used to compare individuals.
+	 */
 	@Override
 	public void setParam(String s) {
 		int index = Integer.parseInt(s);
