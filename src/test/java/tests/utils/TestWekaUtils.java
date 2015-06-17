@@ -13,6 +13,7 @@ import genlib.utils.Utils;
 import genlib.utils.Utils.Sign;
 import genlib.utils.WekaUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.junit.Test;
@@ -24,7 +25,7 @@ import weka.datagenerators.classifiers.classification.RDG1;
 public class TestWekaUtils {
 
 	private static Instances wekaData;
-	
+
 	static {
 		try {
 			// binary class problem
@@ -36,15 +37,15 @@ public class TestWekaUtils {
 			RDG1 rdg = new RDG1();
 			rdg.setOptions(options);
 			rdg.defineDataFormat();
-			wekaData = rdg.generateExamples();						
+			wekaData = rdg.generateExamples();
 
 		} catch (Exception e) {
 
 		}
 	}
-	
+
 	@Test
-	public void testAttrMaps() throws Exception {				
+	public void testAttrMaps() throws Exception {
 		HashMap<String, Integer> attrIndexMap = WekaUtils
 				.makeAttrIndexMap(wekaData);
 		HashMap<String, Integer>[] attrValueIndexMap = WekaUtils
@@ -59,7 +60,7 @@ public class TestWekaUtils {
 	}
 
 	@Test
-	public void testWekaToNodeConversion() throws Exception {		
+	public void testWekaToNodeConversion() throws Exception {
 		HashMap<String, Integer> attrIndexMap = WekaUtils
 				.makeAttrIndexMap(wekaData);
 		HashMap<String, Integer>[] attrValueIndexMap = WekaUtils
@@ -159,7 +160,7 @@ public class TestWekaUtils {
 		Instances wekaDataThree = null;
 		TreeIndividual wekaIndividual = null, testIndividual = null, wekaThreeIndividual = null;
 
-		try {			
+		try {
 			HashMap<String, Integer> attrIndexMap = WekaUtils
 					.makeAttrIndexMap(wekaData);
 			HashMap<String, Integer>[] attrValueIndexMap = WekaUtils
@@ -304,8 +305,8 @@ public class TestWekaUtils {
 					+ "}";
 
 			wekaThreeIndividual = WekaUtils.constructTreeIndividual(sTree, 33,
-					wekaDataThree.numInstances(), attrIndexMap, attrValueIndexMap,
-					true);
+					wekaDataThree.numInstances(), attrIndexMap,
+					attrValueIndexMap, true);
 
 		} catch (Exception e) {
 			System.out.println("Something strange, in the neighborhood");
@@ -347,7 +348,7 @@ public class TestWekaUtils {
 
 		confusionMatrix = WekaUtils.makeConfusionMatrix(wekaThreeIndividual,
 				wekaDataThree);
-		
+
 		if (TestProperties.testPrints) {
 			for (double[] row : confusionMatrix) {
 				for (double element : row) {
@@ -356,7 +357,7 @@ public class TestWekaUtils {
 				System.out.println();
 			}
 		}
-		
+
 		assertTrue(confusionMatrix[0][0] == 16.0);
 		assertTrue(confusionMatrix[0][1] == 3.0);
 		assertTrue(confusionMatrix[0][2] == 0.0);
@@ -370,22 +371,180 @@ public class TestWekaUtils {
 
 	@Test
 	public void testFiltering() {
-		MultiWayHeightNode root = MultiWayHeightNode.makeNode(2, 1,
-				Sign.LESS, 1d);
+		MultiWayHeightNode root = MultiWayHeightNode.makeNode(2, 1, Sign.LESS,
+				1d);
 		MultiWayHeightNode[] childs = new MultiWayHeightNode[2];
 		childs[0] = MultiWayHeightNode.makeLeaf(1);
 		childs[1] = MultiWayHeightNode.makeLeaf(0);
-		root.setChilds(childs);		
-		
-		double[] filtered = WekaUtils.getFilteredInstancesClasses(wekaData, MultiWayNode.makeLeaf(2));
+		root.setChilds(childs);
+
+		double[] filtered = WekaUtils.getFilteredInstancesClasses(wekaData,
+				MultiWayNode.makeLeaf(2));
 		System.out.println("filtered " + filtered[0] + " " + filtered[1]);
 		assertTrue(filtered.length == 2);
-		filtered = WekaUtils.getFilteredInstancesClasses(wekaData, root.getChildAt(0));
+		filtered = WekaUtils.getFilteredInstancesClasses(wekaData,
+				root.getChildAt(0));
 		System.out.println("filtered " + filtered[0] + " " + filtered[1]);
 		assertTrue(filtered.length == 2);
-		filtered = WekaUtils.getFilteredInstancesClasses(wekaData, root.getChildAt(1));
+		filtered = WekaUtils.getFilteredInstancesClasses(wekaData,
+				root.getChildAt(1));
 		System.out.println("filtered " + filtered[0] + " " + filtered[1]);
 		assertTrue(filtered.length == 2);
 	}
-	
+
+	@Test
+	public void testSizes() {
+		HashMap<String, Integer> attrIndexMap = WekaUtils
+				.makeAttrIndexMap(wekaData);
+		HashMap<String, Integer>[] attrValueIndexMap = WekaUtils
+				.makeAttrValueIndexMap(wekaData);
+
+		String sTree = "digraph J48Tree {\n" + "N0 [label=\"a5\" ]\n"
+				+ "N0->N1 [label=\"\'= false\'\"]\n"
+				+ "N1 [label=\"\'c0 (44.0/2.0)\'\" shape=box style=filled ]\n"
+				+ "N0->N2 [label=\"\'= true\'\"]\n" + "N2 [label=\"a8\" ]\n"
+				+ "N2->N3 [label=\"\'= false\'\"]\n" + "N3 [label=\"a9\" ]\n"
+				+ "N3->N4 [label=\"\'= false\'\"]\n" + "N4 [label=\"a2\" ]\n"
+				+ "N4->N5 [label=\"\'= false\'\"]\n"
+				+ "N5 [label=\"\'c0 (4.0/1.0)\'\" shape=box style=filled ]\n"
+				+ "N4->N6 [label=\"\'= true\'\"]\n" + "N6 [label=\"a0\" ]\n"
+				+ "N6->N7 [label=\"\'= false\'\"]\n" + "N7 [label=\"a4\" ]\n"
+				+ "N7->N8 [label=\"\'= false\'\"]\n"
+				+ "N8 [label=\"\'c1 (2.0)\'\" shape=box style=filled ]\n"
+				+ "N7->N9 [label=\"\'= true\'\"]\n"
+				+ "N9 [label=\"\'c0 (2.0)\'\" shape=box style=filled ]\n"
+				+ "N6->N10 [label=\"\'= true\'\"]\n"
+				+ "N10 [label=\"\'c1 (5.0)\'\" shape=box style=filled ]\n"
+				+ "N3->N11 [label=\"\'= true\'\"]\n"
+				+ "N11 [label=\"\'c1 (15.0/1.0)\'\" shape=box style=filled ]\n"
+				+ "N2->N12 [label=\"\'= true\'\"]\n" + "N12 [label=\"a1\" ]\n"
+				+ "N12->N13 [label=\"\'= false\'\"]\n"
+				+ "N13 [label=\"a2\" ]\n"
+				+ "N13->N14 [label=\"\'= false\'\"]\n"
+				+ "N14 [label=\"a0\" ]\n"
+				+ "N14->N15 [label=\"\'= false\'\"]\n"
+				+ "N15 [label=\"\'c1 (4.0/1.0)\'\" shape=box style=filled ]\n"
+				+ "N14->N16 [label=\"\'= true\'\"]\n"
+				+ "N16 [label=\"\'c0 (3.0)\'\" shape=box style=filled ]\n"
+				+ "N13->N17 [label=\"\'= true\'\"]\n" + "N17 [label=\"a4\" ]\n"
+				+ "N17->N18 [label=\"\'= false\'\"]\n"
+				+ "N18 [label=\"\'c1 (5.0)\'\" shape=box style=filled ]\n"
+				+ "N17->N19 [label=\"\'= true\'\"]\n"
+				+ "N19 [label=\"\'c0 (2.0)\'\" shape=box style=filled ]\n"
+				+ "N12->N20 [label=\"\'= true\'\"]\n"
+				+ "N20 [label=\"\'c0 (14.0/2.0)\'\" shape=box style=filled ]\n"
+				+ "}";
+
+		TreeIndividual individual = WekaUtils.constructTreeIndividual(sTree,
+				21, wekaData.numInstances(), attrIndexMap, attrValueIndexMap,
+				true);
+
+		assertTrue(Utils.computeHeight(individual.getRootNode()) == 6);
+		assertTrue(Utils.computeSize(individual.getRootNode()) == 21);
+		assertTrue(Utils.computeNumNodes(individual.getRootNode()) == 10);
+		assertTrue(Utils.computeNumLeaves(individual.getRootNode()) == 11);
+	}
+
+	@Test
+	public void testRegression() {
+		HashMap<String, Integer> attrIndexMap = WekaUtils
+				.makeAttrIndexMap(wekaData);
+		HashMap<String, Integer>[] attrValueIndexMap = WekaUtils
+				.makeAttrValueIndexMap(wekaData);
+
+		String sTree = "digraph J48Tree {\n" + "N0 [label=\"a5\" ]\n"
+				+ "N0->N1 [label=\"\'= false\'\"]\n"
+				+ "N1 [label=\"\'c0 (44.0/2.0)\'\" shape=box style=filled ]\n"
+				+ "N0->N2 [label=\"\'= true\'\"]\n" + "N2 [label=\"a8\" ]\n"
+				+ "N2->N3 [label=\"\'= false\'\"]\n" + "N3 [label=\"a9\" ]\n"
+				+ "N3->N4 [label=\"\'= false\'\"]\n" + "N4 [label=\"a2\" ]\n"
+				+ "N4->N5 [label=\"\'= false\'\"]\n"
+				+ "N5 [label=\"\'c0 (4.0/1.0)\'\" shape=box style=filled ]\n"
+				+ "N4->N6 [label=\"\'= true\'\"]\n" + "N6 [label=\"a0\" ]\n"
+				+ "N6->N7 [label=\"\'= false\'\"]\n" + "N7 [label=\"a4\" ]\n"
+				+ "N7->N8 [label=\"\'= false\'\"]\n"
+				+ "N8 [label=\"\'c1 (2.0)\'\" shape=box style=filled ]\n"
+				+ "N7->N9 [label=\"\'= true\'\"]\n"
+				+ "N9 [label=\"\'c0 (2.0)\'\" shape=box style=filled ]\n"
+				+ "N6->N10 [label=\"\'= true\'\"]\n"
+				+ "N10 [label=\"\'c1 (5.0)\'\" shape=box style=filled ]\n"
+				+ "N3->N11 [label=\"\'= true\'\"]\n"
+				+ "N11 [label=\"\'c1 (15.0/1.0)\'\" shape=box style=filled ]\n"
+				+ "N2->N12 [label=\"\'= true\'\"]\n" + "N12 [label=\"a1\" ]\n"
+				+ "N12->N13 [label=\"\'= false\'\"]\n"
+				+ "N13 [label=\"a2\" ]\n"
+				+ "N13->N14 [label=\"\'= false\'\"]\n"
+				+ "N14 [label=\"a0\" ]\n"
+				+ "N14->N15 [label=\"\'= false\'\"]\n"
+				+ "N15 [label=\"\'c1 (4.0/1.0)\'\" shape=box style=filled ]\n"
+				+ "N14->N16 [label=\"\'= true\'\"]\n"
+				+ "N16 [label=\"\'c0 (3.0)\'\" shape=box style=filled ]\n"
+				+ "N13->N17 [label=\"\'= true\'\"]\n" + "N17 [label=\"a4\" ]\n"
+				+ "N17->N18 [label=\"\'= false\'\"]\n"
+				+ "N18 [label=\"\'c1 (5.0)\'\" shape=box style=filled ]\n"
+				+ "N17->N19 [label=\"\'= true\'\"]\n"
+				+ "N19 [label=\"\'c0 (2.0)\'\" shape=box style=filled ]\n"
+				+ "N12->N20 [label=\"\'= true\'\"]\n"
+				+ "N20 [label=\"\'c0 (14.0/2.0)\'\" shape=box style=filled ]\n"
+				+ "}";
+
+		TreeIndividual individual = WekaUtils.constructTreeIndividual(sTree,
+				21, wekaData.numInstances(), attrIndexMap, attrValueIndexMap,
+				true);
+
+		Node root = individual.getRootNode();
+
+		long start1 = System.nanoTime();
+		for (int i = 0; i < 100000; i++) {
+			Utils.computeHeight(root);
+		}
+		long end1 = System.nanoTime();
+
+		System.out.println("TreeHeight " + (end1 - start1));
+
+		start1 = System.nanoTime();
+		for (int i = 0; i < 100000; i++) {
+			Utils.computeNumLeaves(root);
+		}
+		end1 = System.nanoTime();
+
+		System.out.println("NumLeaves " + (end1 - start1));
+
+		start1 = System.nanoTime();
+		for (int i = 0; i < 100000; i++) {
+			Utils.computeNumNodes(root);
+		}
+		end1 = System.nanoTime();
+
+		System.out.println("NumNodes " + (end1 - start1));
+
+		start1 = System.nanoTime();
+		for (int i = 0; i < 100000; i++) {
+			Utils.computeSize(root);
+		}
+		end1 = System.nanoTime();
+
+		System.out.println("TreeSize " + (end1 - start1));
+
+		// Other
+		ArrayList<Node> temp = new ArrayList<>();
+
+		start1 = System.nanoTime();
+		for (int i = 0; i < 100000; i++) {
+			Utils.getNodesRecursive(root, temp).size();
+			temp.clear();
+		}
+		end1 = System.nanoTime();
+
+		System.out.println("NumNodes " + (end1 - start1));
+
+		start1 = System.nanoTime();
+		for (int i = 0; i < 100000; i++) {
+			Utils.getLeavesRecursive(root, temp).size();
+			temp.clear();
+		}
+		end1 = System.nanoTime();
+
+		System.out.println("NumLeaves " + (end1 - start1));
+	}
 }

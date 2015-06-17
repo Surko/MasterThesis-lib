@@ -11,9 +11,9 @@ import genlib.structures.trees.MultiWayHeightNode;
  * @see MultiWayHeightNode
  *
  */
-public interface NodeCountExtension {
+public interface LeavesCountExtension {
 
-	public int getNumNodes();	
-	public void updateNumNodes(int numNodesToUpdate);
+	public int getNumLeaves();	
+	public void updateNumLeaves(int numLeavesToUpdate);
 	
 }

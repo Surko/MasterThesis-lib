@@ -251,8 +251,22 @@ public class TestIndividuals {
 	}
 
 	@Test
+	public void testComputationOfSizes() {
+		TreeIndividual t1Copy = t1.copy();
+		
+		assertTrue(Utils.computeHeight(t1Copy.getRootNode()) == 6);
+		assertTrue(Utils.computeSize(t1Copy.getRootNode()) == 21);
+		assertTrue(Utils.computeNumNodes(t1Copy.getRootNode()) == 10);
+		assertTrue(Utils.computeNumLeaves(t1Copy.getRootNode()) == 11);
+		
+		assertTrue(t1Copy.getTreeHeight() == 6);
+		assertTrue(t1Copy.getNumLeaves() == 11);
+		assertTrue(t1Copy.getNumNodes() == 10);
+	}
+	
+	@Test
 	public void testLeaves() {
-		TreeIndividual t1Copy = t1.copy();		
+		TreeIndividual t1Copy = t1.copy();				
 		
 		ArrayList<Node> leaves1 = null;		
 		leaves1 = Utils.getLeaves(t1Copy.getRootNode());			

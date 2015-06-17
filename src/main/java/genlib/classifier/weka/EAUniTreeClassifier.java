@@ -16,6 +16,7 @@ import java.util.Vector;
 import weka.classifiers.Classifier;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
+import weka.core.AdditionalMeasureProducer;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Option;
@@ -47,7 +48,7 @@ import weka.core.Utils;
  *
  */
 public class EAUniTreeClassifier extends Classifier implements Randomizable,
-		OptionHandler, TechnicalInformationHandler {
+		OptionHandler, TechnicalInformationHandler, AdditionalMeasureProducer {
 
 	/** for serialization */
 	private static final long serialVersionUID = 5314273117546487901L;
@@ -874,6 +875,40 @@ public class EAUniTreeClassifier extends Classifier implements Randomizable,
 		result.setValue(Field.YEAR, "2015");
 		result.setValue(Field.TITLE, "Evolutionary Trees");
 		return result;
+	}
+
+	/**
+	 * Returns an enumeration of the additional measure names
+	 * 
+	 * @return an enumeration of the measure names
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Enumeration enumerateMeasures() {
+		Vector newVector = new Vector(3);
+		newVector.addElement("measureTreeSize");
+		newVector.addElement("measureNumLeaves");
+		return newVector.elements();
+	}
+
+	/**
+	 * Returns the value of the named measure
+	 * 
+	 * @param additionalMeasureName
+	 *            the name of the measure to query for its value
+	 * @return the value of the named measure
+	 * @throws IllegalArgumentException
+	 *             if the named measure is not supported
+	 */
+	public double getMeasure(String additionalMeasureName) {
+		if (additionalMeasureName.compareToIgnoreCase("measureTreeSize") == 0) {
+			return e_tree_class.getBestIndividual().getTreeSize();
+		} else if (additionalMeasureName
+				.compareToIgnoreCase("measureNumLeaves") == 0) {
+			return e_tree_class.getBestIndividual().getNumLeaves();
+		} else {
+			throw new IllegalArgumentException(additionalMeasureName
+					+ " not supported (genlib EAUniTreeClassifier)");
+		}
 	}
 
 }

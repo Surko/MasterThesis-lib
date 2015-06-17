@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.structures.extensions.HeightExtension;
-import genlib.structures.extensions.NodeCountExtension;
+import genlib.structures.extensions.LeavesCountExtension;
 import genlib.structures.extensions.SizeExtension;
 import genlib.structures.trees.BinaryHeightNode;
 import genlib.structures.trees.BinaryNode;
@@ -58,8 +58,8 @@ public class TreeIndividual extends Individual {
 	}
 
 	/**
-	 * Get size of a created tree individual.
-	 * @return Size of tree in this individual
+	 * Get tree height of a created tree individual.
+	 * @return Height of tree in this individual
 	 */
 	public double getTreeHeight() {
 		if (root instanceof HeightExtension) {
@@ -77,19 +77,21 @@ public class TreeIndividual extends Individual {
 		}
 	}
 	
-	public int getNumNodes() {
-		if (root instanceof SizeExtension) {
-			return ((SizeExtension)root).getTreeSize();
+	public int getNumLeaves() {
+		if (root instanceof LeavesCountExtension) {
+			return ((LeavesCountExtension)root).getNumLeaves();
 		} else {
-			return Utils.computeNumNodes(root);
+			return Utils.computeNumLeaves(root);
 		}		
 	}
 	
-	public int getNumLeaves() {
-		if (root instanceof SizeExtension && root instanceof NodeCountExtension) {
-			return ((SizeExtension)root).getTreeSize() - ((NodeCountExtension)root).getNumNodes(); 
+	public int getNumNodes() {
+		if (root instanceof SizeExtension && root instanceof LeavesCountExtension) {
+			return ((SizeExtension)root).getTreeSize() - ((LeavesCountExtension)root).getNumLeaves(); 
+		} else {
+			return Utils.computeNumNodes(root);
 		}
-		return 0;
+		
 	}
 
 	public void setRoot(Node root) {

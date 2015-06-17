@@ -272,12 +272,12 @@ public class Utils {
 	}
 
 	/**
-	 * Method which gets number of nodes of a given tree. Root must be of type
+	 * Method which gets number of leaves of a given tree. Root must be of type
 	 * Node.
 	 * 
 	 * @param root
 	 *            Root node of a tree
-	 * @return Num nodes of given tree
+	 * @return Num nodes of given tree, if root is null than -1
 	 */
 	public static int computeNumNodes(Node root) {
 		if (root == null) {
@@ -288,7 +288,7 @@ public class Utils {
 			return 0;
 		}
 
-		int numNodes = 0;
+		int numNodes = 1;
 		boolean node = false;
 
 		for (Node child : root.getChilds()) {
@@ -301,10 +301,47 @@ public class Utils {
 		}
 
 		if (node) {
-			return numNodes + 1;
+			return numNodes;
 		}
 
 		return 0;
+
+	}
+	
+	/**
+	 * Method which gets number of nodes of a given tree. Root must be of type
+	 * Node.
+	 * 
+	 * @param root
+	 *            Root node of a tree
+	 * @return Num nodes of given tree, if root is null than -1
+	 */
+	public static int computeNumLeaves(Node root) {
+		if (root == null) {
+			return -1;
+		}
+
+		if (root.isLeaf()) {
+			return 1;
+		}
+
+		int numLeaves = 0;
+		boolean node = false;
+
+		for (Node child : root.getChilds()) {
+			int n = computeNumLeaves(child);
+			if (n == -1) {
+				continue;
+			}
+			node = true;
+			numLeaves += n;
+		}
+
+		if (node) {
+			return numLeaves;
+		}
+
+		return 1;
 
 	}
 

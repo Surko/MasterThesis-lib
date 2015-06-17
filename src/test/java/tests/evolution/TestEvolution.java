@@ -141,5 +141,35 @@ public class TestEvolution {
 		TreeIndividual bestIndividual = ea.getActualPopulation().getBestIndividual();
 		assertNotNull(bestIndividual);
 	}
+	
+	@Test
+	public void testEvolution8() {
+		FitnessFunction.registeredFunctions = 1;
+		Population<TreeIndividual> testIndividuals = Utils.debugTreePopulation(); 
+		testIndividuals.getIndividual(0).getFitnessValue(0);
+		EvolutionAlgorithm<TreeIndividual> ea = new EvolutionAlgorithm<>(
+				wekaData, 1);
+		ea.setInitialPopulation(testIndividuals);
+		TournamentSelector sel = new TournamentSelector();
+		sel.setRandomGenerator(new Random(0));
+		ea.addSelector(sel);
+		TournamentSelector envSel = new TournamentSelector();
+		envSel.setRandomGenerator(new Random(0));
+		ea.addEnvSelector(envSel);
+		ea.addMutationOperator(new DefaultTreeMutation());
+		ea.addCrossOperator(new DefaultTreeCrossover());
+		FitnessComparator<TreeIndividual> comp = new SingleFitnessComparator<TreeIndividual>();
+		ArrayList<FitnessFunction<TreeIndividual>> fit = new ArrayList<>();
+		FitnessFunction<TreeIndividual> func = new TreeHeightFitness();
+		func.setIndex(0);
+		fit.add(func);
+		FitnessFunction.registeredFunctions = 1;
+		ea.setFitnessComparator(comp);
+		ea.setFitnessFunctions(fit);
+		ea.run();
+		
+		TreeIndividual bestIndividual = ea.getActualPopulation().getBestIndividual();
+		assertNotNull(bestIndividual);
+	}
 
 }
