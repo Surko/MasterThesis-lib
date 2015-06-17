@@ -118,11 +118,15 @@ public abstract class Individual implements Serializable {
 	}
 
 	/**
-	 * Abstract method makes copy of individual. Each ancestor extends and fills
-	 * it as it should.
+	 * Method makes copy of individual fields.
 	 * 
 	 * @return Copy of this individual
 	 */
 	public abstract Individual copy();
 
+	/**
+	 * Overriden method that returns the representation of this individual.
+	 */
+	public abstract String toString();
+	
 }
