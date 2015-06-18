@@ -2,6 +2,7 @@ package genlib.evolution.fitness.comparators;
 
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.individuals.Individual;
+import genlib.locales.PermMessages;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
 import genlib.utils.Utils;
@@ -68,7 +69,10 @@ public class SingleFitnessComparator<T extends Individual> extends
 	 */
 	@Override
 	public void setParam(String s) {
-		int index = Integer.parseInt(s);
+		int index = -1;
+		if (!s.equals(PermMessages._blank_param)) {
+			index = Integer.parseInt(s);
+		}
 		if (index != -1) {
 			this.function = fitFuncs.get(index);
 		}

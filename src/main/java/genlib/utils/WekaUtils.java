@@ -303,11 +303,11 @@ public class WekaUtils {
 			boolean shouldAdd = true;
 			while (node.getParent() != null) {
 				int nodeIndex = 0;
-				if (node.getParent().getChilds() == null) {
-					System.out.println(node.getParent().isLeaf());
-					System.out.println(node);
-					System.out.println(Arrays.toString(node.getChilds()));
-				}
+				//if (node.getParent().getChilds() == null) {
+				//	System.out.println(node.getParent().isLeaf());
+				//	System.out.println(node);
+				//	System.out.println(Arrays.toString(node.getChilds()));
+				//}
 				for (Node child : node.getParent().getChilds()) {
 					if (child == node) {
 						break;

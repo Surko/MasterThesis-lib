@@ -48,14 +48,14 @@ public class TestInit {
 		assertTrue(c.changeProperty("locale", Config.getInstance().getLocale()
 				.toString().equals("en") ? "sk" : "en"));
 		c.reset();
-		assertEquals(c.getFitnessComparator(), "SINGLE x");
+		assertEquals(c.getFitnessComparator(), "SINGLE 0");
 		assertEquals(c.getFitnessFunctions(), "tAcc x");
 		assertTrue(c.getElitismRate() == 0.15);
 		assertTrue(c.getOperNumOfThreads() == 1);
 		assertTrue(c.getGenNumOfThreads() == 1);
 		assertEquals(c.getSelectors(), "Tmt x");
 		assertEquals(c.getEnvSelectors(), "Tmt x");
-		assertEquals(c.getPopulationInit(), "CompTree MAXHEIGHT,2");
+		assertEquals(c.getPopulationInit(), "wCompTree MAXHEIGHT,2");
 		assertTrue(c.getSeed() == 28041991);
 		assertTrue(c.getPopulationSize() == 100);
 		
@@ -115,6 +115,9 @@ public class TestInit {
 
 	@Test
 	public void testEvolutionTreeClassifierInit() throws Exception {
+		Config c = Config.getInstance();
+		c.reset();
+		c.setAbsentProperties();
 		PluginManager.initPlugins();
 		
 		EvolutionTreeClassifier etc = new EvolutionTreeClassifier(true);
@@ -127,6 +130,7 @@ public class TestInit {
 		assertTrue(PluginManager.envSelectors.size() == 3);
 		
 		assertTrue(etc.getFitnessComparator() != null);
+		
 		assertTrue(etc.getFitnessComparator() instanceof SingleFitnessComparator); 
 		assertTrue(etc.getFitnessFunctions().size() == 1);
 		assertTrue(etc.getFitnessFunctions().get(0) instanceof TreeAccuracyFitness);

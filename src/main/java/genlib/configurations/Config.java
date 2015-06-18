@@ -208,10 +208,10 @@ public class Config implements Serializable {
 		putIfAbsent(FIT_THREADS, "1");
 		putIfAbsent(GEN_THREADS, "1");
 		putIfAbsent(OPER_THREADS, "1");
-		putIfAbsent(FIT_COMPARATOR, "PRIORITY x");
-		putIfAbsent(FIT_FUNCTIONS, "tAcc x;tSize x");
-		putIfAbsent(MUT_OPERATORS, "ntlNomM 0.04");
-		putIfAbsent(XOVER_OPERATORS, "subTreeX 0.8");
+		putIfAbsent(FIT_COMPARATOR, "SINGLE 0");
+		putIfAbsent(FIT_FUNCTIONS, "tAcc x");
+		putIfAbsent(MUT_OPERATORS, "dtM 0.04");
+		putIfAbsent(XOVER_OPERATORS, "dtX 0.8");
 		putIfAbsent(ELITISM, "0.15");
 		putIfAbsent(NUM_OF_GEN, "1");
 		putIfAbsent(SELECTORS, "Tmt x");
