@@ -65,6 +65,13 @@ public class DefaultTreeCrossover implements Operator<TreeIndividual> {
 
 	/**
 	 * {@inheritDoc}
+	 */
+	public Class<TreeIndividual> getIndividualClassType() {
+		return TreeIndividual.class;
+	}
+	
+	/**
+	 * {@inheritDoc}
 	 * </p>
 	 * This operator does not set the Data object.
 	 */

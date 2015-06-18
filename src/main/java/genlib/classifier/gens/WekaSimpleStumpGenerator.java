@@ -6,6 +6,7 @@ import genlib.exceptions.NotDefParamException;
 import genlib.exceptions.PopulationInitializationException;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
+import genlib.plugins.PluginManager;
 import genlib.structures.trees.Node;
 import genlib.utils.Utils;
 import weka.classifiers.trees.j48.Distribution;
@@ -155,7 +156,7 @@ public class WekaSimpleStumpGenerator extends TreeGenerator {
 
 			switch (simpleStumpEnum) {
 			case SPLIT:
-				SplitCriteria<?, ?> genericCriteria = SplitCriteria.splitCriterias
+				SplitCriteria<?, ?> genericCriteria = PluginManager.splitCriterias
 						.get(params[i + 1]);
 
 				if (genericCriteria == null) {

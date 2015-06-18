@@ -6,15 +6,11 @@ import genlib.evolution.operators.Operator;
 import genlib.evolution.selectors.Selector;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public interface IPopulation<T extends Individual> {
 
-	@SuppressWarnings("rawtypes")
-	public static final HashMap<String, Class<? extends IPopulation>> populationTypes = new HashMap<>();	
-	
 	public <S extends Individual> IPopulation<S> makeNewInstance();
-	
+
 	public IPopulation<T> createNewInstance();
 
 	/**
@@ -23,17 +19,29 @@ public interface IPopulation<T extends Individual> {
 	 * cases of variable population.
 	 */
 	public void update();
+
 	public void clear();
+
 	public void add(T individual);
+
 	public void addAll(IPopulation<T> population);
+
 	public void deepCopy(IPopulation<T> population);
+
 	public void setFitnessComparator(FitnessComparator<T> fitComp);
+
 	public void setMaxPopulationSize(int maxPopSize);
+
 	public FitnessComparator<T> getFitnessComparator();
+
 	public ArrayList<T> getIndividuals();
+
 	public T getBestIndividual();
+
 	public int getActualPopSize();
+
 	public int getMaxPopSize();
+
 	public T getIndividual(int index);
 
 	/**

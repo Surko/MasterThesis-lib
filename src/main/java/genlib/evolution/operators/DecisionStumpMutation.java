@@ -88,15 +88,22 @@ public class DecisionStumpMutation implements Operator<TreeIndividual> {
 				// change to recompute fitness
 				child.change();
 			}
-			
+
 			leaves.clear();
 		}
-		
+
 		if (childs != null) {
 			childs.addAll(parents);
 		}
 	}
 
+	/**
+	 * Method which creates the stumps with {@link WekaSimpleStumpGenerator}. It
+	 * uses {@link InformationGainCriteria} as a split criterion.
+	 * 
+	 * @param node
+	 *            that serves as a template for created stumps
+	 */
 	private void createStumps(Node node) {
 		WekaSimpleStumpGenerator wekaSSGen = new WekaSimpleStumpGenerator();
 		wekaSSGen.setInstances(data.toInstances());
@@ -113,7 +120,7 @@ public class DecisionStumpMutation implements Operator<TreeIndividual> {
 			this.stumps = wekaSSGen.createPopulation();
 		} catch (Exception e) {
 			if (e instanceof RuntimeException) {
-				throw (RuntimeException)e;
+				throw (RuntimeException) e;
 			}
 			throw new PopulationInitializationException(e.getMessage());
 		}
@@ -135,6 +142,13 @@ public class DecisionStumpMutation implements Operator<TreeIndividual> {
 		return true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public Class<TreeIndividual> getIndividualClassType() {
+		return TreeIndividual.class;
+	}
+	
 	/**
 	 * {@inheritDoc} </p> This operator does set the Data object but uses it
 	 * only to create decision stumps from them.

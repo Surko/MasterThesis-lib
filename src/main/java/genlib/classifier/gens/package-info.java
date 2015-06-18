@@ -9,8 +9,8 @@
 					genlib.classifier.gens.WekaJ48TreeGenerator.class,
 					genlib.classifier.gens.WekaTreeGenerator.class
 			},
-			toInjectField = "treeGens",
-			toInjectClass = TreeGenerator.class,
+			toInjectField = "gens",
+			toInjectClass = genlib.plugins.PluginManager.class,
 			wekaCompatibility = {
 				true,		
 				true,

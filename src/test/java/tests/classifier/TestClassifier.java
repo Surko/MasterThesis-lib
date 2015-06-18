@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
-import genlib.classifier.EvolutionTreeClassifier;
+import genlib.classifier.common.EvolutionTreeClassifier;
 import genlib.configurations.Config;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.fitness.comparators.FitnessComparator;

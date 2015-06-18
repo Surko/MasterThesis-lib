@@ -2,9 +2,7 @@ package genlib.classifier.popinit;
 
 import genlib.classifier.gens.PopGenerator;
 import genlib.classifier.gens.TreeGenerator;
-import genlib.evolution.fitness.tree.confusion.TreeConfusionFitness;
 import genlib.evolution.individuals.TreeIndividual;
-import genlib.exceptions.NotDefParamException;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
 import genlib.structures.Data;
@@ -44,8 +42,6 @@ public abstract class TreePopulationInitializator implements
 	/** logger */
 	private static final Logger LOG = Logger
 			.getLogger(TreePopulationInitializator.class.getName());
-	/** loaded population initializators */
-	public static final HashMap<String, Class<? extends TreePopulationInitializator>> treePopInits = new HashMap<>();
 	/** depth of generated trees. */
 	protected int maxHeight = 1;
 	/** number of division of trainin data */
@@ -184,16 +180,16 @@ public abstract class TreePopulationInitializator implements
 
 			switch (popInitEnum) {
 			case AUTOHEIGHT:
-				this.autoHeight = Boolean.parseBoolean(params[i+1]);
+				this.autoHeight = Boolean.parseBoolean(params[i + 1]);
 				break;
 			case DIVIDEPARAM:
-				this.divideParam = Integer.parseInt(params[i+1]);
+				this.divideParam = Integer.parseInt(params[i + 1]);
 				break;
 			case MAXHEIGHT:
-				this.maxHeight = Integer.parseInt(params[i+1]);				
+				this.maxHeight = Integer.parseInt(params[i + 1]);
 				break;
 			case RESAMPLE:
-				this.resample = Boolean.parseBoolean(params[i+1]);				
+				this.resample = Boolean.parseBoolean(params[i + 1]);
 				break;
 			default:
 				break;

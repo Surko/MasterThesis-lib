@@ -7,8 +7,8 @@
 				genlib.evolution.operators.DefaultTreeCrossover.class,
 				genlib.evolution.operators.SubTreeCrossover.class
 		},
-		toInjectField = "tXOper",
-		toInjectClass = Operator.class
+		toInjectField = "xOper",
+		toInjectClass = genlib.plugins.PluginManager.class
 		)
 @genlib.annotations.MOperatorAnnot(
 		toInjectNames = {
@@ -23,7 +23,7 @@
 				genlib.evolution.operators.NodeToLeafNumericMutation.class,
 				genlib.evolution.operators.DecisionStumpMutation.class
 		},
-		toInjectField = "tMOper",
-		toInjectClass = Operator.class
+		toInjectField = "mutOper",
+		toInjectClass = genlib.plugins.PluginManager.class
 		)
 package genlib.evolution.operators;

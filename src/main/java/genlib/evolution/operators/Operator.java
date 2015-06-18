@@ -1,7 +1,6 @@
 package genlib.evolution.operators;
 
 import genlib.evolution.individuals.Individual;
-import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.population.IPopulation;
 import genlib.structures.Data;
 
@@ -31,10 +30,6 @@ import java.util.Random;
  *
  */
 public interface Operator<T extends Individual> extends Serializable {	
-	/** hashmap with crossover tree operators */
-	public static final HashMap<String, Class<Operator<TreeIndividual>>> tXOper = new HashMap<>();
-	/** hashmap with mutation tree operators */
-	public static final HashMap<String, Class<Operator<TreeIndividual>>> tMOper = new HashMap<>();
 
 	/**
 	 * Method should return the tag of compatibility with weka for operator.
@@ -66,18 +61,28 @@ public interface Operator<T extends Individual> extends Serializable {
 	public double getOperatorProbability();
 
 	/**
+	 * Method returns the type of individual with which the operator works.
+	 * 
+	 * @return class of individual
+	 */
+	public Class<T> getIndividualClassType();
+
+	/**
 	 * Method which should set the random generator for this operator.
 	 * 
-	 * @param random Random object 
+	 * @param random
+	 *            Random object
 	 */
 	public void setRandomGenerator(Random random);
 
 	/**
 	 * Method should set the data for operator.
-	 * @param data to be set (GenLibInstances or Instances)
+	 * 
+	 * @param data
+	 *            to be set (GenLibInstances or Instances)
 	 */
 	public void setData(Data data);
-	
+
 	/**
 	 * Method which should apply the operator on parents population and add the
 	 * newly created individuals into childs array. If the childs array is null

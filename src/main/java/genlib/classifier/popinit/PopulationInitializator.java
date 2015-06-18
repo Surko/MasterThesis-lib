@@ -28,24 +28,32 @@ import java.util.Random;
  * @see PopGenerator
  */
 public interface PopulationInitializator<T extends Individual> extends
-		Serializable {	
-	
+		Serializable {
+
 	public T[] getPopulation();
+
 	public T[] getOriginPopulation();
+
 	public void initPopulation() throws Exception;
-	
+
 	public void setParam(String param);
+
 	public void setInstances(Data data);
+
 	public void setRandomGenerator(Random random);
+
 	public void setPopulationSize(int popSize);
+
 	public void setGenerator(ArrayList<? extends PopGenerator<T>> generator);
-	
+
 	public int getPopulationSize();
+
 	public PopGenerator<T> getGenerator();
+
 	public String getInitName();
+
 	public boolean isWekaCompatible();
-	
-	public String objectInfo();	
-	
-	
+
+	public String objectInfo();
+
 }

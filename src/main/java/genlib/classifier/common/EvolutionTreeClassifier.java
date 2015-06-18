@@ -1,8 +1,9 @@
-package genlib.classifier;
+package genlib.classifier.common;
 
+import genlib.classifier.gens.PopGenerator;
 import genlib.classifier.gens.TreeGenerator;
+import genlib.classifier.popinit.PopulationInitializator;
 import genlib.classifier.popinit.TreePopulationInitializator;
-import genlib.classifier.weka.WekaClassifierExtension;
 import genlib.configurations.Config;
 import genlib.evolution.EvolutionAlgorithm;
 import genlib.evolution.fitness.FitnessFunction;
@@ -12,6 +13,7 @@ import genlib.evolution.fitness.comparators.ParetoFitnessComparator;
 import genlib.evolution.fitness.comparators.PriorityFitnessComparator;
 import genlib.evolution.fitness.comparators.SingleFitnessComparator;
 import genlib.evolution.fitness.comparators.WeightedFitnessComparator;
+import genlib.evolution.individuals.Individual;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.operators.Operator;
 import genlib.evolution.population.IPopulation;
@@ -21,6 +23,7 @@ import genlib.exceptions.CompatibleWekaException;
 import genlib.exceptions.NotDefClassException;
 import genlib.exceptions.NotInitializedFieldException;
 import genlib.exceptions.NumericHandleException;
+import genlib.exceptions.TypeParameterException;
 import genlib.exceptions.format.FitCompStringFormatException;
 import genlib.exceptions.format.FitnessStringFormatException;
 import genlib.exceptions.format.OperatorStringFormatException;
@@ -29,6 +32,7 @@ import genlib.exceptions.format.PopulationTypeStringFormatException;
 import genlib.exceptions.format.SelectorStringFormatException;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
+import genlib.plugins.PluginManager;
 import genlib.structures.Data;
 import genlib.structures.data.GenLibInstances;
 import genlib.utils.Utils;
@@ -42,8 +46,7 @@ import java.util.logging.Logger;
 
 import weka.core.Instances;
 
-public class EvolutionTreeClassifier implements Serializable,
-		WekaClassifierExtension, Classifier {
+public class EvolutionTreeClassifier implements Serializable {
 	private static final Logger LOG = Logger
 			.getLogger(EvolutionTreeClassifier.class.getName());
 	/** for serialization */
@@ -62,7 +65,7 @@ public class EvolutionTreeClassifier implements Serializable,
 	private EvolutionAlgorithm<TreeIndividual> ea;
 	private TreeIndividual theBestIndividual;
 
-	public EvolutionTreeClassifier(boolean isWeka) throws Exception {
+	public EvolutionTreeClassifier(boolean isWeka) {
 		this.c = Config.getInstance();
 		this.isWeka = isWeka;
 		this.fitFuncs = new ArrayList<>();
@@ -73,7 +76,6 @@ public class EvolutionTreeClassifier implements Serializable,
 		this.random = Utils.randomGen;
 	}
 
-	@Override
 	public void buildClassifier(Instances data) throws Exception {
 		theBestIndividual = null;
 
@@ -90,7 +92,6 @@ public class EvolutionTreeClassifier implements Serializable,
 		commonBuildClassifier(workData);
 	}
 
-	@Override
 	public void buildClassifier(GenLibInstances data) throws Exception {
 		theBestIndividual = null;
 
@@ -149,7 +150,6 @@ public class EvolutionTreeClassifier implements Serializable,
 		}
 	}
 
-	@Override
 	public void makePropsFromString(boolean isNumeric) throws Exception {
 		if (c.getFitnessFunctions() != null) {
 			makeFitnessFunctionsSet(isNumeric);
@@ -183,10 +183,10 @@ public class EvolutionTreeClassifier implements Serializable,
 		if (parameters.length < 2) {
 			throw new PopulationTypeStringFormatException(
 					TextResource.getString(TextKeys.ePopTypeFormat));
-		}		
+		}
 
 		@SuppressWarnings("rawtypes")
-		Class<? extends IPopulation> iPopClass = IPopulation.populationTypes
+		Class<? extends IPopulation> iPopClass = PluginManager.populationTypes
 				.get(parameters[0]);
 
 		if (iPopClass != null) {
@@ -217,7 +217,7 @@ public class EvolutionTreeClassifier implements Serializable,
 					TextResource.getString("eSelFormat"));
 		}
 
-		HashMap<String, Class<Selector>> h = Selector.selectors;
+		HashMap<String, Class<? extends Selector>> h = PluginManager.selectors;
 
 		for (int i = 0; i < parameters.length; i += 2) {
 			if (parameters[i] == "") {
@@ -226,7 +226,7 @@ public class EvolutionTreeClassifier implements Serializable,
 				throw new Exception();
 			}
 
-			Class<Selector> selectorClass = h.get(parameters[i]);
+			Class<? extends Selector> selectorClass = h.get(parameters[i]);
 
 			if (selectorClass == null) {
 				LOG.log(Level.SEVERE, String.format(
@@ -236,7 +236,7 @@ public class EvolutionTreeClassifier implements Serializable,
 				throw new NotDefClassException(String.format(
 						TextResource.getString(TextKeys.eNotDefClass),
 						parameters[0]));
-			}
+			}			
 
 			Selector selector = selectorClass.newInstance();
 
@@ -268,7 +268,7 @@ public class EvolutionTreeClassifier implements Serializable,
 					TextResource.getString("eSelFormat"));
 		}
 
-		HashMap<String, Class<Selector>> h = Selector.envSelectors;
+		HashMap<String, Class<? extends Selector>> h = PluginManager.envSelectors;
 
 		for (int i = 0; i < parameters.length; i += 2) {
 			if (parameters[i] == "") {
@@ -277,7 +277,7 @@ public class EvolutionTreeClassifier implements Serializable,
 				throw new Exception();
 			}
 
-			Class<Selector> selectorClass = h.get(parameters[i]);
+			Class<? extends Selector> selectorClass = h.get(parameters[i]);
 
 			if (selectorClass == null) {
 				LOG.log(Level.SEVERE, String.format(
@@ -346,7 +346,7 @@ public class EvolutionTreeClassifier implements Serializable,
 
 		int max = 0;
 
-		HashMap<String, Class<? extends FitnessFunction<TreeIndividual>>> h = FitnessFunction.tFitFuncs;
+		HashMap<String, Class<? extends FitnessFunction<? extends Individual>>> h = PluginManager.fitFuncs;
 		for (int i = 0; i < parameters.length; i += 2) {
 			if (parameters[i] == "") {
 				fitFuncs.clear();
@@ -356,8 +356,9 @@ public class EvolutionTreeClassifier implements Serializable,
 			}
 
 			// inner error
-			Class<? extends FitnessFunction<TreeIndividual>> fitFuncClass = h.get(parameters[i]);
-			
+			Class<? extends FitnessFunction<? extends Individual>> fitFuncClass = h
+					.get(parameters[i]);
+
 			if (fitFuncClass == null) {
 				LOG.log(Level.SEVERE, String.format(
 						TextResource.getString(TextKeys.eNotDefClass),
@@ -367,8 +368,20 @@ public class EvolutionTreeClassifier implements Serializable,
 						TextResource.getString(TextKeys.eNotDefClass),
 						parameters[0]));
 			}
-			
-			FitnessFunction<TreeIndividual> func = fitFuncClass.newInstance();
+
+			FitnessFunction<? extends Individual> genFunc = fitFuncClass
+					.newInstance();
+			if (genFunc.getIndividualClassType() != TreeIndividual.class) {
+				throw new TypeParameterException(String.format(
+						TextResource.getString(TextKeys.eTypeParameter),
+						genFunc.getIndividualClassType().getName(),
+						TreeIndividual.class.getName()));
+			}
+
+			// we checked the type, so the retype is always correct
+			@SuppressWarnings("unchecked")
+			FitnessFunction<TreeIndividual> func = (FitnessFunction<TreeIndividual>) fitFuncClass
+					.newInstance();
 
 			// if class attribute is numeric and function can't handle it.
 			if (isNumeric && !func.canHandleNumeric()) {
@@ -418,7 +431,7 @@ public class EvolutionTreeClassifier implements Serializable,
 					TextResource.getString("eOperFormat"));
 		}
 
-		HashMap<String, Class<Operator<TreeIndividual>>> h = Operator.tXOper;
+		HashMap<String, Class<? extends Operator<? extends Individual>>> h = PluginManager.xOper;
 		for (int i = 0; i < parameters.length; i += 2) {
 			if (parameters[i] == "") {
 				xoverSet.clear();
@@ -428,7 +441,8 @@ public class EvolutionTreeClassifier implements Serializable,
 			}
 
 			// inner error
-			Class<Operator<TreeIndividual>> xOperClass = h.get(parameters[i]);
+			Class<? extends Operator<? extends Individual>> xOperClass = h
+					.get(parameters[i]);
 
 			if (xOperClass == null) {
 				LOG.log(Level.SEVERE, String.format(
@@ -440,7 +454,17 @@ public class EvolutionTreeClassifier implements Serializable,
 						parameters[0]));
 			}
 
-			Operator<TreeIndividual> xOper = xOperClass.newInstance();
+			Operator<? extends Individual> genXOper = xOperClass.newInstance();
+			if (genXOper.getIndividualClassType() != TreeIndividual.class) {
+				throw new TypeParameterException(String.format(
+						TextResource.getString(TextKeys.eTypeParameter),
+						genXOper.getIndividualClassType().getName(),
+						TreeIndividual.class.getName()));
+			}
+
+			// we checked the type, so the retype is always correct
+			@SuppressWarnings("unchecked")
+			Operator<TreeIndividual> xOper = (Operator<TreeIndividual>) genXOper;
 
 			if (xOper.isWekaDependent() && !isWeka) {
 				LOG.log(Level.SEVERE, String.format(
@@ -461,7 +485,7 @@ public class EvolutionTreeClassifier implements Serializable,
 			}
 
 			xOper.setRandomGenerator(new Random(random.nextLong()));
-			xOper.setOperatorProbability(Double.parseDouble(parameters[i+1]));
+			xOper.setOperatorProbability(Double.parseDouble(parameters[i + 1]));
 			xoverSet.add(xOper);
 		}
 	}
@@ -497,7 +521,7 @@ public class EvolutionTreeClassifier implements Serializable,
 					TextResource.getString("eOperFormat"));
 		}
 
-		HashMap<String, Class<Operator<TreeIndividual>>> h = Operator.tMOper;
+		HashMap<String, Class<? extends Operator<? extends Individual>>> h = PluginManager.mutOper;
 		for (int i = 0; i < parameters.length; i += 2) {
 			if (parameters[i] == "") {
 				mutSet.clear();
@@ -506,8 +530,8 @@ public class EvolutionTreeClassifier implements Serializable,
 						TextResource.getString("eOperFormat"));
 			}
 
-			// inner error
-			Class<Operator<TreeIndividual>> mutOperClass = h.get(parameters[i]);
+			Class<? extends Operator<? extends Individual>> mutOperClass = h
+					.get(parameters[i]);
 
 			if (mutOperClass == null) {
 				LOG.log(Level.SEVERE, String.format(
@@ -519,7 +543,18 @@ public class EvolutionTreeClassifier implements Serializable,
 						parameters[0]));
 			}
 
-			Operator<TreeIndividual> mutOper = mutOperClass.newInstance();
+			Operator<? extends Individual> genMutOper = mutOperClass
+					.newInstance();
+			if (genMutOper.getIndividualClassType() != TreeIndividual.class) {
+				throw new TypeParameterException(String.format(
+						TextResource.getString(TextKeys.eTypeParameter),
+						genMutOper.getIndividualClassType().getName(),
+						TreeIndividual.class.getName()));
+			}
+
+			// we checked the type, so the retype is always correct
+			@SuppressWarnings("unchecked")
+			Operator<TreeIndividual> mutOper = (Operator<TreeIndividual>) genMutOper;
 
 			if (mutOper.isWekaDependent() && !isWeka) {
 				LOG.log(Level.SEVERE, String.format(
@@ -540,7 +575,8 @@ public class EvolutionTreeClassifier implements Serializable,
 			}
 
 			mutOper.setRandomGenerator(new Random(random.nextLong()));
-			mutOper.setOperatorProbability(Double.parseDouble(parameters[i+1]));
+			mutOper.setOperatorProbability(Double
+					.parseDouble(parameters[i + 1]));
 			mutSet.add(mutOper);
 		}
 	}
@@ -580,7 +616,7 @@ public class EvolutionTreeClassifier implements Serializable,
 		}
 
 		// inner error
-		Class<? extends TreePopulationInitializator> popInitClass = TreePopulationInitializator.treePopInits
+		Class<? extends PopulationInitializator<? extends Individual>> popInitClass = PluginManager.popInits
 				.get(parameters[0]);
 
 		if (popInitClass == null) {
@@ -593,7 +629,16 @@ public class EvolutionTreeClassifier implements Serializable,
 					parameters[0]));
 		}
 
-		popInit = popInitClass.newInstance();
+		PopulationInitializator<? extends Individual> genPopInit = popInitClass
+				.newInstance();
+		if (!(genPopInit instanceof TreePopulationInitializator)) {
+			throw new TypeParameterException(String.format(
+					TextResource.getString(TextKeys.eTypeParameter),
+					popInitClass.getName(),
+					TreePopulationInitializator.class.getName()));
+		}
+
+		popInit = (TreePopulationInitializator) genPopInit;
 
 		if (popInit.isWekaCompatible() && !isWeka) {
 			LOG.log(Level.SEVERE, String.format(
@@ -641,7 +686,7 @@ public class EvolutionTreeClassifier implements Serializable,
 			throw new PopulationInitStringFormatException();
 		}
 
-		HashMap<String, Class<? extends TreeGenerator>> h = TreeGenerator.treeGens;
+		HashMap<String, Class<? extends PopGenerator<? extends Individual>>> h = PluginManager.gens;
 		ArrayList<TreeGenerator> genList = new ArrayList<>();
 
 		for (int i = 0; i < parameters.length; i += 2) {
@@ -652,7 +697,8 @@ public class EvolutionTreeClassifier implements Serializable,
 			}
 
 			// inner error
-			Class<? extends TreeGenerator> genClass = h.get(parameters[i]);
+			Class<? extends PopGenerator<? extends Individual>> genClass = h
+					.get(parameters[i]);
 
 			if (genClass == null) {
 				LOG.log(Level.SEVERE, String.format(
@@ -664,7 +710,16 @@ public class EvolutionTreeClassifier implements Serializable,
 						parameters[0]));
 			}
 
-			TreeGenerator generator = genClass.newInstance();
+			PopGenerator<? extends Individual> genGenerator = genClass
+					.newInstance();
+			if (!(genGenerator instanceof TreeGenerator)) {
+				throw new TypeParameterException(String.format(
+						TextResource.getString(TextKeys.eTypeParameter),
+						genClass.getName(), TreeGenerator.class.getName()));
+			}
+
+			// we checked the type, so the retype is always correct
+			TreeGenerator generator = (TreeGenerator) genGenerator;
 
 			if (generator.isWekaDependent() && !isWeka) {
 				LOG.log(Level.SEVERE, String.format(
@@ -686,7 +741,6 @@ public class EvolutionTreeClassifier implements Serializable,
 		return c.getSeed();
 	}
 
-	@Override
 	public Random getRandom() {
 		return random;
 	}

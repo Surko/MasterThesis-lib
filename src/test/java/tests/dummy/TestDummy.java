@@ -12,6 +12,7 @@ import genlib.classifier.splitting.SplitCriteria;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.population.IPopulation;
 import genlib.evolution.population.Population;
+import genlib.plugins.PluginManager;
 import genlib.structures.trees.MultiWayHeightNode;
 import genlib.structures.trees.MultiWayNode;
 
@@ -109,9 +110,9 @@ public class TestDummy {
 
 	@Test
 	public void test6() {
-		IPopulation.populationTypes.put("test", Population.class);
+		PluginManager.populationTypes.put("test", Population.class);
 		try {
-			IPopulation<?> iPop = IPopulation.populationTypes.get("test")
+			IPopulation<?> iPop = PluginManager.populationTypes.get("test")
 					.newInstance();
 
 			IPopulation<TreeIndividual> ind = iPop.makeNewInstance();
@@ -125,11 +126,11 @@ public class TestDummy {
 	}
 
 	public void test7() {
-		SplitCriteria.splitCriterias.put("test",
+		PluginManager.splitCriterias.put("test",
 				InformationGainCriteria.getInstance());
 
 		@SuppressWarnings("unchecked")
-		SplitCriteria<Instances, Distribution> splitCriteria = (SplitCriteria<Instances, Distribution>) SplitCriteria.splitCriterias
+		SplitCriteria<Instances, Distribution> splitCriteria = (SplitCriteria<Instances, Distribution>) PluginManager.splitCriterias
 				.get("test");
 
 		assertNotNull(splitCriteria);

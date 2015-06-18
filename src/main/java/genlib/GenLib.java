@@ -1,13 +1,15 @@
 package genlib;
 
-import genlib.classifier.weka.EAUniTreeClassifier;
+import genlib.classifier.Classifier;
 import genlib.configurations.Config;
 import genlib.configurations.PathManager;
 import genlib.locales.PermMessages;
+import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
 import genlib.plugins.PluginManager;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -42,7 +44,7 @@ public class GenLib {
 	 * Console takes only message with Level higher or equal to Level.SEVERE.
 	 * GenTree.log recognize all the messages.
 	 */
-	static {		
+	static {
 		/*
 		 * When app runs with property -Djava.util.logging.config.file then we
 		 * skip all of if-condition and set the logger configuration from the
@@ -86,9 +88,10 @@ public class GenLib {
 	 * 
 	 * @return true - reconfiguration initialized, false - already configured
 	 */
-	public static boolean reconfig() {		
+	public static boolean reconfig() {
 		// Essential configuration
-		if (Config.configured) return false;
+		if (Config.configured)
+			return false;
 		Config c = Config.getInstance();
 		if (!Config.configured) {
 			c.init();
@@ -107,11 +110,11 @@ public class GenLib {
 	 * @param args
 	 *            Arguments that application is run with
 	 */
-	public static void main(String[] args) {		
+	public static void main(String[] args) {
 		LOG.info(PermMessages._arg_pars);
 		// COMMAND LINE
 		int _counter = 0;
-		
+
 		try {
 			while (_counter < args.length) {
 				switch (args[_counter]) {
@@ -136,9 +139,24 @@ public class GenLib {
 					logFile.deleteOnExit();
 					_counter++;
 					break;
-				case "-dummy":
-					new EAUniTreeClassifier().buildClassifier(null);
-					// default argument for not specific behavior
+				case "-classifier":
+					String className = args[_counter++];
+					Class<? extends Classifier> classifierClass = PluginManager.classifiers
+							.get(className);
+
+					if (classifierClass == null) {
+						LOG.log(Level.SEVERE, String.format(
+								TextResource.getString(TextKeys.eNotDefClass),
+								className));
+						break;
+					}
+
+					String[] restOfParams = Arrays.copyOfRange(args, _counter,
+							args.length);
+					Classifier classifier = classifierClass.newInstance();
+					classifier.setOptions(restOfParams);
+
+					break;
 				default:
 					System.out.printf(TextResource.getString("_arg_ndparam"),
 							new Object[] { args[_counter] });

@@ -112,6 +112,13 @@ public class NodeToLeafNumericMutation implements Operator<TreeIndividual> {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public Class<TreeIndividual> getIndividualClassType() {
+		return TreeIndividual.class;
+	}
+	
+	/**
 	 * {@inheritDoc} </p> This operator sets the Data object into field data.
 	 */
 	@Override

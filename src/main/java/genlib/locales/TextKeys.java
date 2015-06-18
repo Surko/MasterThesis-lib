@@ -43,6 +43,7 @@ public class TextKeys {
 	public static final String eWekaDependency = "eWekaDependency";
 	public static final String eNumericHandle = "eNumericHandle";
 	public static final String eNotImplemented = "eNotImplemented";
+	public static final String eTypeParameter = "eTypeParameter";
 	// Info keys
 	public static final String iExcessParam = "iExcessParam";
 	public static final String comparator_complex_fit = "comparator_complex_fit";

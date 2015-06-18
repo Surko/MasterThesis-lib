@@ -3,9 +3,7 @@ package genlib.classifier.splitting;
 import java.io.Serializable;
 import java.util.HashMap;
 
-public interface SplitCriteria<I,D> extends Serializable {	
-		
-	public static final HashMap<String, SplitCriteria<?,?>> splitCriterias = new HashMap<>();
+public interface SplitCriteria<I,D> extends Serializable {		
 	
 	public double computeCriteria(I data, int classIndex) throws Exception;
 	public double computeCriteria(D distribution) throws Exception;

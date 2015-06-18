@@ -29,7 +29,7 @@
 			genlib.evolution.fitness.tree.confusion.TreeSpecificityFitness.class,
 			genlib.evolution.fitness.tree.confusion.TreeFMeasureFitness.class
 		},
-		toInjectField = "tFitFuncs",
-		toInjectClass = FitnessFunction.class
+		toInjectField = "fitFuncs",
+		toInjectClass = genlib.plugins.PluginManager.class
 		)
 package genlib.evolution.fitness;

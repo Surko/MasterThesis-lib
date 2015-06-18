@@ -10,7 +10,7 @@
 				genlib.evolution.selectors.RandomSelector.class
 		},
 		toInjectField = "selectors",
-		toInjectClass = Selector.class
+		toInjectClass = genlib.plugins.PluginManager.class
 		)
 @genlib.annotations.EnvSelectAnnot(
 		toInjectNames = {
@@ -24,6 +24,6 @@
 				genlib.evolution.selectors.RandomSelector.class
 		},
 		toInjectField = "envSelectors",
-		toInjectClass = Selector.class
+		toInjectClass = genlib.plugins.PluginManager.class
 		)
 package genlib.evolution.selectors;

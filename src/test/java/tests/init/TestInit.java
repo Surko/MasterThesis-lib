@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 
 import genlib.GenLib;
-import genlib.classifier.EvolutionTreeClassifier;
+import genlib.classifier.common.EvolutionTreeClassifier;
 import genlib.classifier.gens.WekaJ48TreeGenerator;
 import genlib.classifier.popinit.TreePopulationInitializator;
 import genlib.configurations.Config;
@@ -120,11 +120,11 @@ public class TestInit {
 		EvolutionTreeClassifier etc = new EvolutionTreeClassifier(true);
 		etc.makePropsFromString(false);			
 				
-		assertTrue(FitnessFunction.tFitFuncs.size() == 13);
-		assertTrue(Operator.tMOper.size() == 4);
-		assertTrue(Operator.tXOper.size() == 2);
-		assertTrue(Selector.selectors.size() == 3);
-		assertTrue(Selector.envSelectors.size() == 3);
+		assertTrue(PluginManager.fitFuncs.size() == 13);
+		assertTrue(PluginManager.mutOper.size() == 4);
+		assertTrue(PluginManager.xOper.size() == 2);
+		assertTrue(PluginManager.selectors.size() == 3);
+		assertTrue(PluginManager.envSelectors.size() == 3);
 		
 		assertTrue(etc.getFitnessComparator() != null);
 		assertTrue(etc.getFitnessComparator() instanceof SingleFitnessComparator); 

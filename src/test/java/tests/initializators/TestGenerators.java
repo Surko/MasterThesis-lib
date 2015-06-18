@@ -5,6 +5,7 @@ import genlib.classifier.gens.WekaSimpleStumpGenerator;
 import genlib.classifier.gens.WekaTreeGenerator;
 import genlib.classifier.splitting.InformationGainCriteria;
 import genlib.classifier.splitting.SplitCriteria;
+import genlib.plugins.PluginManager;
 import genlib.structures.data.GenLibInstances;
 
 import org.junit.Test;
@@ -73,7 +74,7 @@ public class TestGenerators {
 	
 	@Test
 	public void testWekaSimpleStumpGenerator() throws Exception  {
-		SplitCriteria.splitCriterias.put(InformationGainCriteria.initName, InformationGainCriteria.getInstance());
+		PluginManager.splitCriterias.put(InformationGainCriteria.initName, InformationGainCriteria.getInstance());
 		WekaSimpleStumpGenerator wssg = new WekaSimpleStumpGenerator();
 		assertTrue(wssg.getGeneratorHeight() == 1);
 		assertNull(wssg.getSplitCriteria());

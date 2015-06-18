@@ -1,22 +1,25 @@
 package genlib.classifier.weka;
 
 import genlib.GenLib;
-import genlib.classifier.EvolutionTreeClassifier;
+import genlib.classifier.classifierextensions.WekaClassifierExtension;
+import genlib.classifier.common.EvolutionTreeClassifier;
 import genlib.configurations.Config;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.exceptions.ConfigInternalException;
 import genlib.exceptions.EmptyConfigParamException;
+import genlib.exceptions.TypeParameterException;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
+import genlib.structures.Data;
 import genlib.structures.trees.Node;
 
 import java.util.Enumeration;
 import java.util.Vector;
 
 import weka.classifiers.Classifier;
+import weka.core.AdditionalMeasureProducer;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
-import weka.core.AdditionalMeasureProducer;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Option;
@@ -47,8 +50,10 @@ import weka.core.Utils;
  * @author Lukas Surin
  *
  */
-public class EAUniTreeClassifier extends Classifier implements Randomizable,
-		OptionHandler, TechnicalInformationHandler, AdditionalMeasureProducer {
+public class WekaEvolutionTreeClassifier extends Classifier implements
+		Randomizable, OptionHandler, TechnicalInformationHandler,
+		AdditionalMeasureProducer, genlib.classifier.Classifier,
+		WekaClassifierExtension {
 
 	/** for serialization */
 	private static final long serialVersionUID = 5314273117546487901L;
@@ -64,7 +69,7 @@ public class EAUniTreeClassifier extends Classifier implements Randomizable,
 	 * @throws Exception
 	 *             Throws exception if
 	 */
-	public EAUniTreeClassifier() throws Exception {
+	public WekaEvolutionTreeClassifier() {
 		GenLib.reconfig();
 		this.e_tree_class = new EvolutionTreeClassifier(true);
 	}
@@ -908,6 +913,55 @@ public class EAUniTreeClassifier extends Classifier implements Randomizable,
 		} else {
 			throw new IllegalArgumentException(additionalMeasureName
 					+ " not supported (genlib EAUniTreeClassifier)");
+		}
+	}
+
+	/**
+	 * Main method for testing this class
+	 *
+	 * @param argv
+	 *            the commandline options
+	 */
+	public static void main(String[] argv) {
+		System.out.println("DONE");
+		runClassifier(new WekaEvolutionTreeClassifier(), argv);
+	}
+
+	@Override
+	public void buildClassifier(Data data) throws Exception {
+		if (data.isInstances()) {
+			buildClassifier(data.toInstances());
+		} else {
+			throw new TypeParameterException(String.format(
+					TextResource.getString(TextKeys.eTypeParameter),
+					Instances.class.getName(), data.getData().getClass()
+							.getName()));
+		}
+	}
+
+	@Override
+	public double[] classifyData(Data data) throws Exception {
+		if (data.isInstances()) {
+			double[] classifications = new double[data.numInstances()];
+
+			Instances instances = data.toInstances();
+			
+			// should be enumeration of instances
+			@SuppressWarnings("unchecked")
+			Enumeration<Instance> enumeration = (Enumeration<Instance>) instances
+					.enumerateInstances();
+
+			int index = 0;
+			while (enumeration.hasMoreElements()) {
+				classifications[index++] = classifyInstance(enumeration
+						.nextElement());
+			}
+			return classifications;
+		} else {
+			throw new TypeParameterException(String.format(
+					TextResource.getString(TextKeys.eTypeParameter),
+					Instances.class.getName(), data.getData().getClass()
+							.getName()));
 		}
 	}
 

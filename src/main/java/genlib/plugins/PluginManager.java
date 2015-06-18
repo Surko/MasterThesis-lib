@@ -7,12 +7,16 @@ import genlib.annotations.MOperatorAnnot;
 import genlib.annotations.MateSelectAnnot;
 import genlib.annotations.PopInitAnnot;
 import genlib.annotations.XOperatorAnnot;
+import genlib.classifier.Classifier;
+import genlib.classifier.GenLibEvolutionTreeClassifier;
 import genlib.classifier.gens.PopGenerator;
 import genlib.classifier.popinit.PopulationInitializator;
 import genlib.classifier.splitting.InformationGainCriteria;
 import genlib.classifier.splitting.SplitCriteria;
+import genlib.classifier.weka.WekaEvolutionTreeClassifier;
 import genlib.configurations.PathManager;
 import genlib.evolution.fitness.FitnessFunction;
+import genlib.evolution.individuals.Individual;
 import genlib.evolution.operators.Operator;
 import genlib.evolution.population.IPopulation;
 import genlib.evolution.population.Population;
@@ -32,6 +36,27 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PluginManager {
+	public static final HashMap<String, Class<? extends Classifier>> classifiers = new HashMap<>();
+	/** loaded population initializators */
+	public static final HashMap<String, Class<? extends PopulationInitializator<? extends Individual>>> popInits = new HashMap<>();
+	/** loaded population initializators */
+	public static final HashMap<String, Class<? extends PopGenerator<? extends Individual>>> gens = new HashMap<>();
+	/** loaded fitness functions */
+	public static final HashMap<String, Class<? extends FitnessFunction<? extends Individual>>> fitFuncs = new HashMap<>();
+	/** hashmap with crossover tree operators */
+	public static final HashMap<String, Class<? extends Operator<? extends Individual>>> xOper = new HashMap<>();
+	/** hashmap with mutation tree operators */
+	public static final HashMap<String, Class<? extends Operator<? extends Individual>>> mutOper = new HashMap<>();
+	/** loaded selectors */
+	public static final HashMap<String, Class<? extends Selector>> selectors = new HashMap<>();
+	/** loaded environmental selectors */
+	public static final HashMap<String, Class<? extends Selector>> envSelectors = new HashMap<>();
+	/** loaded population types */
+	@SuppressWarnings("rawtypes")
+	public static final HashMap<String, Class<? extends IPopulation>> populationTypes = new HashMap<>();	
+	/** loaded split criterias	 */
+	public static final HashMap<String, SplitCriteria<?,?>> splitCriterias = new HashMap<>();
+
 	/** logger for this class */
 	private static final Logger LOG = Logger.getLogger(PluginManager.class
 			.getName());
@@ -48,6 +73,7 @@ public class PluginManager {
 	 * as first).
 	 */
 	public static void initPlugins() {
+		initClassifierPlugins();
 		initPopInitPlugins();
 		initGeneratorPlugins();
 		initFitnessPlugins();
@@ -57,14 +83,71 @@ public class PluginManager {
 		initSplitCritPlugins();
 	}
 
-	private static void initSplitCritPlugins() {
+	private static void initClassifierPlugins() {
 		LOG.log(Level.INFO,
-				String.format(PermMessages._s_splitinit,
-						IPopulation.class.getName()));
+				String.format(PermMessages._s_classifiersinit,
+						Classifier.class.getName()));
 		int classLoaded = 0;
 		int plugLoaded = 0;
 
-		SplitCriteria.splitCriterias.put(InformationGainCriteria.initName,
+		classifiers.put(WekaEvolutionTreeClassifier.class.getName(),
+				WekaEvolutionTreeClassifier.class);
+		LOG.log(Level.INFO, String.format(PermMessages._classifierclass_loaded,
+				WekaEvolutionTreeClassifier.class.getName(),
+				WekaEvolutionTreeClassifier.class.getName()));
+		classLoaded++;
+		classifiers.put(GenLibEvolutionTreeClassifier.class.getName(),
+				GenLibEvolutionTreeClassifier.class);
+		LOG.log(Level.INFO, String.format(PermMessages._classifierclass_loaded,
+				GenLibEvolutionTreeClassifier.class.getName(),
+				GenLibEvolutionTreeClassifier.class.getName()));
+		classLoaded++;
+
+		// loading jar plugins inside plugin directory
+		PathManager pm = PathManager.getInstance();
+		File populationPluginPath = new File(pm.getPluginPath(),
+				"splitcriterias");
+		if (populationPluginPath.exists() && populationPluginPath.isDirectory()) {
+
+			for (File plugFile : populationPluginPath
+					.listFiles(Utils.jarFilter)) {
+				try {
+					URLClassLoader authorizedLoader = URLClassLoader
+							.newInstance(new URL[] { plugFile.toURI().toURL() });
+					URL url = authorizedLoader
+							.findResource("META-INF/MANIFEST.MF");
+					Manifest mf = new Manifest(url.openStream());
+					Attributes mfAttributes = mf.getMainAttributes();
+					ClassifierPlugin plugin = (ClassifierPlugin) authorizedLoader
+							.loadClass(mfAttributes.getValue(pluginClassTag))
+							.newInstance();
+					plugin.initClassifiers();
+					plugLoaded++;
+				} catch (ClassCastException cce) {
+					LOG.log(Level.WARNING,
+							String.format(PermMessages._plug_type_err,
+									plugFile.getName()));
+				} catch (Exception e) {
+					LOG.log(Level.SEVERE, e.toString());
+				}
+			}
+		}
+
+		String sSplitCrit = "classifiers";
+		LOG.log(Level.INFO, String.format(PermMessages._c_class_loaded,
+				sSplitCrit, classLoaded));
+		LOG.log(Level.INFO, String.format(PermMessages._c_plug_loaded,
+				sSplitCrit, plugLoaded));
+	}
+
+	private static void initSplitCritPlugins() {
+		LOG.log(Level.INFO,
+				String.format(PermMessages._s_splitinit,
+						SplitCriteria.class.getName()));
+		int classLoaded = 0;
+		int plugLoaded = 0;
+
+		splitCriterias.put(InformationGainCriteria.initName,
 				InformationGainCriteria.getInstance());
 		LOG.log(Level.INFO, String.format(PermMessages._splitclass_loaded,
 				InformationGainCriteria.class.getName(),
@@ -116,13 +199,12 @@ public class PluginManager {
 		int classLoaded = 0;
 		int plugLoaded = 0;
 
-		IPopulation.populationTypes.put(Population.initName,
-				Population.class);
-		LOG.log(Level.INFO, String.format(PermMessages._populationcontainer_loaded,
-				Population.class.getName(),
-				Population.initName));
+		PluginManager.populationTypes.put(Population.initName, Population.class);
+		LOG.log(Level.INFO, String.format(
+				PermMessages._populationcontainer_loaded,
+				Population.class.getName(), Population.initName));
 		classLoaded++;
-		
+
 		// loading jar plugins inside plugin directory
 		PathManager pm = PathManager.getInstance();
 		File populationPluginPath = new File(pm.getPluginPath(), "population");
