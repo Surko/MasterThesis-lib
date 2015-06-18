@@ -111,6 +111,16 @@ public class Population<T extends Individual> implements Serializable, IPopulati
 		actualSize = individuals.size();
 	}
 	
+	public void setIndividuals(T[] individuals) {
+		this.individuals.clear();
+		
+		int maxSize = Math.min(individuals.length, maxPopSize);
+		for (int i = 0; i < maxSize; i++) {
+			this.individuals.add(individuals[i]);
+		}		
+		actualSize = maxSize;
+	}
+	
 	/**
 	 * Deep copy of population from parameter into this population.
 	 * @param population Population from which we copy individuals

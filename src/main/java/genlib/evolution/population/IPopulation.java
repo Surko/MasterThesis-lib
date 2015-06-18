@@ -6,6 +6,7 @@ import genlib.evolution.operators.Operator;
 import genlib.evolution.selectors.Selector;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public interface IPopulation<T extends Individual> {
 
@@ -26,6 +27,8 @@ public interface IPopulation<T extends Individual> {
 
 	public void addAll(IPopulation<T> population);
 
+	public void setIndividuals(T[] individuals);
+	
 	public void deepCopy(IPopulation<T> population);
 
 	public void setFitnessComparator(FitnessComparator<T> fitComp);
@@ -53,6 +56,10 @@ public interface IPopulation<T extends Individual> {
 
 	public void sortIndividuals();
 
+	public ArrayList<T> getSortedIndividuals();
+	
+	public ArrayList<T> getSortedIndividuals(Comparator<T> comparator);
+	
 	public IPopulation<T> selectionPhase(ArrayList<Selector> selectors);
 
 	public IPopulation<T> selectionPhase(IPopulation<T> population,

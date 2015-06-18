@@ -155,9 +155,10 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable,
 		fitComp.setFitFuncs(fitFunctions);
 		// first computation of fitness for actual population
 		actualPopulation.computeFitness(fitNumOfThreads, fitBlockSize);
-
+		
 		for (int i = 0; i < numberOfGenerations; i++) {
 			// LOGGING OR OTHER ADDITIONAL METHODS CAN BE ADDED IF WE CARE
+			actualPopulation.sortIndividuals();
 			evolve();
 			// TODO CONTROL OF BEST INDIVIDUAL, ETC...
 

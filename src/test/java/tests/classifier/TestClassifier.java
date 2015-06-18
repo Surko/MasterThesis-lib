@@ -1,12 +1,9 @@
 package tests.classifier;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertTrue;
 import genlib.classifier.common.EvolutionTreeClassifier;
 import genlib.configurations.Config;
-import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.fitness.comparators.FitnessComparator;
 import genlib.evolution.fitness.comparators.WeightedFitnessComparator;
 import genlib.evolution.individuals.TreeIndividual;
@@ -14,36 +11,87 @@ import genlib.plugins.PluginManager;
 
 import org.junit.Test;
 
-
+import weka.core.Instances;
+import weka.datagenerators.classifiers.classification.RDG1;
 
 public class TestClassifier {
 
 	private static final Config c;
-	
+	private static Instances wekaData;
+
 	static {
 		PluginManager.initPlugins();
-		
 		c = Config.getInstance();
+
+		try {
+			String[] options = new String[] {
+					"-r",
+					"weka.datagenerators.classifiers.classification.RDG1-S_1_-n_100_-a_10_-c_2_-N_0_-I_0_-M_1_-R_10",
+					"-S", "1", "-n", "100", "-a", "10", "-c", "2", "-N", "0",
+					"-I", "0", "-M", "1", "-R", "10" };
+			RDG1 rdg = new RDG1();
+			rdg.setOptions(options);
+			rdg.defineDataFormat();
+			wekaData = rdg.generateExamples();
+		} catch (Exception e) {
+		}
+	}
+
+	@Test
+	public void testEvolutionTreeClassifier1() {
 		c.init();
 		c.changeProperty(Config.FIT_COMPARATOR, "WEIGHT 0.5,0.2,0.1");
-		c.changeProperty(Config.FIT_FUNCTIONS, "tAcc x;tDepth x");
-	}
-	
-	@Test
-	public void testEvolutionTreeClassifier() {
-		try {			
+		c.changeProperty(Config.FIT_FUNCTIONS, "tAcc x;tHeight x");
+		try {
 			EvolutionTreeClassifier etc = new EvolutionTreeClassifier(true);
 			etc.makePropsFromString(false);
 			FitnessComparator<TreeIndividual> comp = etc.getFitnessComparator();
-			ArrayList<FitnessFunction<TreeIndividual>> funcs = etc.getFitnessFunctions();
-			
+
 			assertTrue(comp instanceof WeightedFitnessComparator);
-			WeightedFitnessComparator<TreeIndividual> wComp = (WeightedFitnessComparator<TreeIndividual>)comp;
+			WeightedFitnessComparator<TreeIndividual> wComp = (WeightedFitnessComparator<TreeIndividual>) comp;
 			assertTrue(wComp.getWeights().length == 2);
-			assertArrayEquals(wComp.getWeights(), new double[] {0.5,0.2},0);
+			assertArrayEquals(wComp.getWeights(), new double[] { 0.5, 0.2 }, 0);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
+		}
+	}
+
+	@Test
+	public void testEvolutionTreeClassifier2() {
+		c.reset();
+		c.setAbsentProperties();
+
+		try {
+			EvolutionTreeClassifier etc = new EvolutionTreeClassifier(true);
+			etc.buildClassifier(wekaData);
+			assertTrue(etc.getActualIndividuals().size() == 100);
+			assertTrue(Double.compare(etc.getBestIndividual()
+					.getFitnessValue(0), 0.9d) == 0);
+			System.out.println(etc.getBestIndividual());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void testEvolutionTreeClassifier3() {
+		c.reset();
+		c.setAbsentProperties();
+
+		try {
+			EvolutionTreeClassifier etc = new EvolutionTreeClassifier(true);
+			etc.setNumberOfGenerations(150);
+			etc.buildClassifier(wekaData);
+			assertTrue(etc.getActualIndividuals().size() == 100);
+			//assertTrue(Double.compare(etc.getBestIndividual()
+			//		.getFitnessValue(0), 0.92d) == 0);
+			System.out.println(etc.getStartIndividual());
+			System.out.println(etc.getBestIndividual());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

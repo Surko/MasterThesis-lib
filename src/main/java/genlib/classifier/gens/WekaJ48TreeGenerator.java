@@ -15,13 +15,13 @@ public class WekaJ48TreeGenerator extends TreeGenerator  {
 	private J48 j48Tree;
 	
 	public WekaJ48TreeGenerator() {
-		this.j48Tree = new J48();		
+		this.j48Tree = new J48();			
 	}
 	
 	public WekaJ48TreeGenerator(String[] options) throws Exception {
 		this.j48Tree = new J48();
-		this.j48Tree.setOptions(options);
-	}	
+		this.j48Tree.setOptions(options);			
+	}
 
 	@Override
 	public TreeIndividual[] createPopulation() throws Exception {
@@ -32,9 +32,8 @@ public class WekaJ48TreeGenerator extends TreeGenerator  {
 		}
 	}
 
-	private TreeIndividual[] createPopulation(Instances data) throws Exception {
-		individuals = new TreeIndividual[1];
-		
+	private TreeIndividual[] createPopulation(Instances data) throws Exception {				
+		individuals = new TreeIndividual[1];		
 		// TODO ONLY ONE INDIVIDUAL IS HERE. ADD SOME SORT OF ATTRIBUTE REMOVING OR DIFFERENT PRUNING MECHANISMS?
 		j48Tree.buildClassifier(data);		
 		String sTree = j48Tree.graph();
@@ -44,7 +43,7 @@ public class WekaJ48TreeGenerator extends TreeGenerator  {
 	}
 	
 	public void setOptions(String[] options) throws Exception{
-		this.j48Tree.setOptions(options);
+		this.j48Tree.setOptions(options);			
 	}	
 
 	public J48 getJ48() {
@@ -67,7 +66,7 @@ public class WekaJ48TreeGenerator extends TreeGenerator  {
 	
 	@Override
 	public void setAdditionalOptions(String[] options) throws Exception {
-		this.j48Tree.setOptions(options);
+		this.j48Tree.setOptions(options);		
 	}
 
 	public void setParam(String param) throws Exception {

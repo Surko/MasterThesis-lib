@@ -8,9 +8,11 @@ import genlib.evolution.individuals.TreeIndividual;
 import genlib.exceptions.ConfigInternalException;
 import genlib.exceptions.EmptyConfigParamException;
 import genlib.exceptions.TypeParameterException;
+import genlib.exceptions.WrongDataException;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
 import genlib.structures.Data;
+import genlib.structures.data.GenLibInstance;
 import genlib.structures.trees.Node;
 
 import java.util.Enumeration;
@@ -361,9 +363,9 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	}
 
 	/**
-	 * Classifies an instance with out newly created individual. It's slightly
-	 * different from weka classify method because it uses different type of
-	 * representation for individual.
+	 * Classifies an {@link GenLibInstance} with newly created
+	 * {@link TreeIndividual}. It's slightly different from weka classify method
+	 * because it uses different type of representation for individual.
 	 *
 	 * @param instance
 	 *            the instance to classify
@@ -378,7 +380,9 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 
 		while (!root.isLeaf()) {
 			if (instance.attribute(root.getAttribute()).isNumeric()) {
-				if (instance.value(root.getAttribute()) < root.getValue()) {
+				if (genlib.utils.Utils.isValueProper(
+						instance.value(root.getAttribute()), root.getSign(),
+						root.getValue())) {
 					root = root.getChildAt(0);
 				} else {
 					root = root.getChildAt(1);
@@ -932,7 +936,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 		if (data.isInstances()) {
 			buildClassifier(data.toInstances());
 		} else {
-			throw new TypeParameterException(String.format(
+			throw new WrongDataException(String.format(
 					TextResource.getString(TextKeys.eTypeParameter),
 					Instances.class.getName(), data.getData().getClass()
 							.getName()));
@@ -945,7 +949,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 			double[] classifications = new double[data.numInstances()];
 
 			Instances instances = data.toInstances();
-			
+
 			// should be enumeration of instances
 			@SuppressWarnings("unchecked")
 			Enumeration<Instance> enumeration = (Enumeration<Instance>) instances
@@ -958,7 +962,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 			}
 			return classifications;
 		} else {
-			throw new TypeParameterException(String.format(
+			throw new WrongDataException(String.format(
 					TextResource.getString(TextKeys.eTypeParameter),
 					Instances.class.getName(), data.getData().getClass()
 							.getName()));

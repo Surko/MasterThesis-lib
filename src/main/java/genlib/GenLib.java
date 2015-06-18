@@ -193,9 +193,10 @@ public class GenLib {
 	private static void printHelp() {
 		System.out.println("Usage: GenLib [-options]");
 		System.out.println("where options include :");
-		System.out.println("	-h, -?		print this help message");
-		System.out.println("	-version	prints application version");
-		System.out.println("	-no-logging	logging is disabled for this run");
+		System.out.println("	-h, -?			print this help message");
+		System.out.println("	-version		prints application version");
+		System.out.println("	-no-logging		logging is disabled for this run");
+		System.out.println("	-classifier	class-name params	classify with classificator of name class-name and params");
 	}
 
 	/**

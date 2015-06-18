@@ -107,6 +107,10 @@ public class MultiWayHeightNode extends MultiWayNode implements HeightExtension 
 	}
 
 	// SETTERS
+	public void setParent(Node parent) {
+		this.parent = (MultiWayHeightNode) parent;
+	}
+	
 	public void setChildAt(int index, Node node) {
 		super.setChildAt(index, node);
 
@@ -183,6 +187,9 @@ public class MultiWayHeightNode extends MultiWayNode implements HeightExtension 
 	 * 
 	 */
 	public void clearChilds() {
+		for (Node node : childs) {
+			node.setParent(null);
+		}
 		super.clearChilds();
 		treeHeight = 0;
 		if (parent != null)

@@ -31,9 +31,9 @@ public class PriorityFitnessComparator<T extends Individual> extends
 
 		for (int i = 0; i < fitFuncs.size(); i++) {
 			int comparison = Double.compare(fitFuncs.get(i).computeFitness(o1),
-					fitFuncs.get(i).computeFitness(o1));
+					fitFuncs.get(i).computeFitness(o2));
 			if (comparison != 0) {
-				return comparison;
+				return -comparison;
 			}
 		}
 

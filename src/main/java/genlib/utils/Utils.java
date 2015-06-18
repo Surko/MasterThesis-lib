@@ -629,6 +629,31 @@ public class Utils {
 		return getNodes(root, new ArrayList<Node>());
 	}
 
+	public static boolean isValueProper(double instanceValue, Sign compare, double nodeValue) {
+		
+		if (compare == null) {
+			throw new IllegalArgumentException();
+		}
+		
+		switch (compare) {
+		case EQUALS:
+			return Double.compare(instanceValue, nodeValue) == 0;			
+		case GREATEQ:
+			return Double.compare(instanceValue, nodeValue) != -1;
+		case GREATER:
+			return Double.compare(instanceValue, nodeValue) == 1;			
+		case LESS:
+			return Double.compare(instanceValue, nodeValue) == -1;
+		case LESSEQ:
+			return Double.compare(instanceValue, nodeValue) != 1;
+		case NEQUALS:
+			return Double.compare(instanceValue, nodeValue) != 0;
+		}
+		
+		throw new IllegalStateException();
+		
+	}
+	
 	public static double getFilteredInstancesRegression(
 			GenLibInstances instances, Node root) {
 

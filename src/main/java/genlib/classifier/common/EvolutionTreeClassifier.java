@@ -64,6 +64,7 @@ public class EvolutionTreeClassifier implements Serializable {
 	private TreePopulationInitializator popInit;
 	private EvolutionAlgorithm<TreeIndividual> ea;
 	private TreeIndividual theBestIndividual;
+	private TreeIndividual startIndividual;
 
 	public EvolutionTreeClassifier(boolean isWeka) {
 		this.c = Config.getInstance();
@@ -98,7 +99,6 @@ public class EvolutionTreeClassifier implements Serializable {
 		random.setSeed(c.getSeed());
 		// making properties from string
 		makePropsFromString(data.numClasses() == -1);
-
 		// Shuffle data
 		data.randomize(random);
 		// create adapter Data around instances
@@ -110,17 +110,21 @@ public class EvolutionTreeClassifier implements Serializable {
 
 	}
 
-	private void commonBuildClassifier(Data workData) throws Exception {
+	private void commonBuildClassifier(Data workData) throws Exception {		
 		popInit.setRandomGenerator(new Random(random.nextLong()));
 		popInit.setInstances(workData);
 		popInit.initPopulation();
+				
 		// Population object that contains tree individuals from population
 		// initializator
 		IPopulation<TreeIndividual> population = makePopulation();
+		startIndividual = population.getSortedIndividuals(fitComp).get(0);		
 
+		System.out.println(mutSet.get(0));
+		
 		// Evolution algorithm that evolves population of tree individuals.
 		ea = new EvolutionAlgorithm<>(workData, population,
-				c.getPopulationSize());
+				c.getNumberOfGenerations());
 		// number of generations to be run through
 		ea.setNumberOfGenerations(c.getNumberOfGenerations());
 		// mates are selected with selector
@@ -137,16 +141,27 @@ public class EvolutionTreeClassifier implements Serializable {
 		ea.setFitnessComparator(fitComp);
 		// percentage of parents that stay into next generation
 		ea.setElitism(c.getElitismRate());
-		// run population evolving
+		// run population evolving		
 		ea.run();
 
-		theBestIndividual = population.getBestIndividual();
+		theBestIndividual = ea.getActualPopulation().getBestIndividual();
+		
 	}
 
 	public void setAdditionalParams(Data data) {
 		// set the data for fitness functions
 		for (FitnessFunction<TreeIndividual> function : fitFuncs) {
 			function.setData(data);
+		}
+		
+		// set the data for mutation operators
+		for (Operator<TreeIndividual> op : mutSet) {
+			op.setData(data);
+		}
+		
+		// set the data for xover operators
+		for (Operator<TreeIndividual> op : xoverSet) {
+			op.setData(data);
 		}
 	}
 
@@ -191,7 +206,8 @@ public class EvolutionTreeClassifier implements Serializable {
 
 		if (iPopClass != null) {
 			IPopulation<?> population = iPopClass.newInstance();
-			return population.makeNewInstance();
+			IPopulation<TreeIndividual> toReturn = population.makeNewInstance();			
+			toReturn.setIndividuals(popInit.getPopulation());
 		}
 
 		return new Population<>(popInit.getPopulation(), c.getPopulationSize());
@@ -321,17 +337,18 @@ public class EvolutionTreeClassifier implements Serializable {
 			fitComp = new SingleFitnessComparator<>();
 			break;
 		case WEIGHT:
-			fitComp = new WeightedFitnessComparator<>(fitFuncs.size());
-			if (parameters.length >= 2) {
-				fitComp.setParam(parameters[1]);
-			} else {
-				fitComp.setParam(null);
-			}
+			fitComp = new WeightedFitnessComparator<>(fitFuncs.size());			
 			break;
 		default:
 			break;
 		}
-
+		
+		if (fitComp != null) {
+			fitComp.setFitFuncs(fitFuncs);
+			if (parameters.length >= 2) {
+				fitComp.setParam(parameters[1]);
+			}
+		}
 	}
 
 	private void makeFitnessFunctionsSet(boolean isNumeric) throws Exception {
@@ -354,19 +371,19 @@ public class EvolutionTreeClassifier implements Serializable {
 				throw new FitnessStringFormatException(
 						TextResource.getString("eFitnessFormat"));
 			}
-
+			
 			// inner error
 			Class<? extends FitnessFunction<? extends Individual>> fitFuncClass = h
 					.get(parameters[i]);
-
+			
 			if (fitFuncClass == null) {
 				LOG.log(Level.SEVERE, String.format(
 						TextResource.getString(TextKeys.eNotDefClass),
-						parameters[0]));
-				// not defined class for pop init
+						parameters[i]));
+				// not defined class for fitness functions
 				throw new NotDefClassException(String.format(
 						TextResource.getString(TextKeys.eNotDefClass),
-						parameters[0]));
+						parameters[i]));
 			}
 
 			FitnessFunction<? extends Individual> genFunc = fitFuncClass
@@ -825,10 +842,18 @@ public class EvolutionTreeClassifier implements Serializable {
 		return c.getFitnessFunctions();
 	}
 
+	public TreeIndividual getStartIndividual() {
+		return startIndividual;
+	}
+	
 	public TreeIndividual getBestIndividual() {
 		return theBestIndividual;
 	}
 
+	public ArrayList<TreeIndividual> getActualIndividuals() {
+		return ea.getActualPopulation().getIndividuals();
+	}
+	
 	/**
 	 * Set seed for this run of classifier. Seed is further set from
 	 * buildClassifier function into Random object. It even serves purpose of

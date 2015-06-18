@@ -157,7 +157,8 @@ public class TreeIndividual extends Individual {
 	 *            node to set in this individual
 	 */
 	public void setRoot(Node root) {
-		this.root = root;
+		root.setParent(null);
+		this.root = root;		
 	}
 
 	/**

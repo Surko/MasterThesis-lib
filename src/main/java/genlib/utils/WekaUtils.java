@@ -6,6 +6,7 @@ import genlib.structures.trees.MultiWayNode;
 import genlib.structures.trees.Node;
 import genlib.utils.Utils.Sign;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -145,9 +146,9 @@ public class WekaUtils {
 						// already set the node, we should not reconfig it
 						nodes[edgeIndex]
 								.setValue(Double.parseDouble(m.group(4)));
-						edges[edgeIndex][0] = Integer.parseInt(m.group(2));						
-						nodes[edgeIndex].setSign(makeSign(m.group(3)));						
-					} else {						
+						edges[edgeIndex][0] = Integer.parseInt(m.group(2));
+						nodes[edgeIndex].setSign(makeSign(m.group(3)));
+					} else {
 						edges[edgeIndex][1] = Integer.parseInt(m.group(2));
 					}
 				} else {
@@ -156,7 +157,7 @@ public class WekaUtils {
 							.getAttribute()].get(m.group(4));
 					edges[edgeIndex][edgeNodeIndex] = Integer.parseInt(m
 							.group(2));
-					//nodes[edgeIndex].setSign(makeSign(m.group(3)));
+					// nodes[edgeIndex].setSign(makeSign(m.group(3)));
 				}
 
 			}
@@ -206,8 +207,8 @@ public class WekaUtils {
 					}
 					nodeIndex++;
 				}
-				
-				node = node.getParent();				
+
+				node = node.getParent();
 
 				switch (node.getSign()) {
 				case EQUALS:
@@ -302,72 +303,84 @@ public class WekaUtils {
 			boolean shouldAdd = true;
 			while (node.getParent() != null) {
 				int nodeIndex = 0;
+				if (node.getParent().getChilds() == null) {
+					System.out.println(node.getParent().isLeaf());
+					System.out.println(node);
+					System.out.println(Arrays.toString(node.getChilds()));
+				}
 				for (Node child : node.getParent().getChilds()) {
 					if (child == node) {
 						break;
 					}
 					nodeIndex++;
 				}
-				
-				node = node.getParent();				
 
-				switch (node.getSign()) {
-				case EQUALS:
-					if (nodeIndex == 0
-							^ Double.compare(
-									instance.value(node.getAttribute()),
-									node.getValue()) == 0) {
+				node = node.getParent();
+
+				if (node.getSign() == null) {
+					if (nodeIndex != instance.value(node.getAttribute())) {
 						shouldAdd = false;
+					}
+				} else {
+					System.out.println(node);
+					switch (node.getSign()) {
+					case EQUALS:
+						if (nodeIndex == 0
+								^ Double.compare(
+										instance.value(node.getAttribute()),
+										node.getValue()) == 0) {
+							shouldAdd = false;
+							break;
+						}
+						break;
+					case GREATEQ:
+						if (nodeIndex == 0
+								^ Double.compare(
+										instance.value(node.getAttribute()),
+										node.getValue()) == 1) {
+							shouldAdd = false;
+							break;
+						}
+						break;
+					case GREATER:
+						if (nodeIndex == 0
+								^ Double.compare(
+										instance.value(node.getAttribute()),
+										node.getValue()) != -1) {
+							shouldAdd = false;
+							break;
+						}
+						break;
+					case LESS:
+						if (nodeIndex == 0
+								^ Double.compare(
+										instance.value(node.getAttribute()),
+										node.getValue()) == -1) {
+							shouldAdd = false;
+							break;
+						}
+						break;
+					case LESSEQ:
+						if (nodeIndex == 0
+								^ Double.compare(
+										instance.value(node.getAttribute()),
+										node.getValue()) != 1) {
+							shouldAdd = false;
+							break;
+						}
+						break;
+					case NEQUALS:
+						if (nodeIndex == 0
+								^ Double.compare(
+										instance.value(node.getAttribute()),
+										node.getValue()) != 0) {
+							shouldAdd = false;
+							break;
+						}
+						break;
+					default:
 						break;
 					}
-					break;
-				case GREATEQ:
-					if (nodeIndex == 0
-							^ Double.compare(
-									instance.value(node.getAttribute()),
-									node.getValue()) == 1) {
-						shouldAdd = false;
-						break;
-					}
-					break;
-				case GREATER:
-					if (nodeIndex == 0
-							^ Double.compare(
-									instance.value(node.getAttribute()),
-									node.getValue()) != -1) {
-						shouldAdd = false;
-						break;
-					}
-					break;
-				case LESS:
-					if (nodeIndex == 0
-							^ Double.compare(
-									instance.value(node.getAttribute()),
-									node.getValue()) == -1) {
-						shouldAdd = false;
-						break;
-					}
-					break;
-				case LESSEQ:
-					if (nodeIndex == 0
-							^ Double.compare(
-									instance.value(node.getAttribute()),
-									node.getValue()) != 1) {
-						shouldAdd = false;
-						break;
-					}
-					break;
-				case NEQUALS:
-					if (nodeIndex == 0
-							^ Double.compare(
-									instance.value(node.getAttribute()),
-									node.getValue()) != 0) {
-						shouldAdd = false;
-						break;
-					}
-					break;
-				default:
-					break;
 				}
 
 				if (!shouldAdd) {

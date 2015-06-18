@@ -3,13 +3,18 @@ package genlib.classifier;
 import genlib.GenLib;
 import genlib.classifier.classifierextensions.GenLibClassifierExtension;
 import genlib.classifier.common.EvolutionTreeClassifier;
+import genlib.evolution.individuals.TreeIndividual;
 import genlib.exceptions.TypeParameterException;
+import genlib.exceptions.WrongDataException;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
 import genlib.structures.Data;
 import genlib.structures.data.GenLibInstance;
 import genlib.structures.data.GenLibInstances;
+import genlib.structures.trees.Node;
+import genlib.utils.Utils;
 
+import java.io.Serializable;
 import java.util.Enumeration;
 
 import weka.core.OptionHandler;
@@ -35,11 +40,11 @@ import weka.core.TechnicalInformationHandler;
  * @author Lukas Surin
  *
  */
-public class GenLibEvolutionTreeClassifier implements Classifier,
+public class GenLibEvolutionTreeClassifier implements Serializable, Classifier,
 		GenLibClassifierExtension {
-
+	
 	/** for serialization */
-	private static final long serialVersionUID = -7401696044193358731L;
+	private static final long serialVersionUID = 4737451154277087874L;
 	/** Evolution classificator not dependant on weka. */
 	private EvolutionTreeClassifier e_tree_class;
 
@@ -67,7 +72,7 @@ public class GenLibEvolutionTreeClassifier implements Classifier,
 		if (data.isGenLibInstances()) {
 			buildClassifier(data.toGenLibInstances());
 		} else {
-			throw new TypeParameterException(String.format(
+			throw new WrongDataException(String.format(
 					TextResource.getString(TextKeys.eTypeParameter),
 					GenLibInstances.class.getName(), data.getData().getClass()
 							.getName()));
@@ -76,12 +81,41 @@ public class GenLibEvolutionTreeClassifier implements Classifier,
 
 	@Override
 	public void setOptions(String[] options) {
-		String tmpStr;
-
+		
 	}
 
+	/**
+	 * Classifies an {@link GenLibInstance} with newly created
+	 * {@link TreeIndividual}.
+	 *
+	 * @param instance
+	 *            the instance to classify
+	 * @return the classification for the instance
+	 * @throws Exception
+	 *             if instance can't be classified successfully
+	 */
 	public double classifyInstance(GenLibInstance instance) throws Exception {
-		return 0;
+		TreeIndividual bestIndividual = e_tree_class.getBestIndividual();
+
+		Node root = bestIndividual.getRootNode();
+
+		while (!root.isLeaf()) {
+			if (instance.getAttribute(root.getAttribute()).isNumeric()) {
+				if (Utils.isValueProper(
+						instance.getValueOfAttribute(root.getAttribute()),
+						root.getSign(), root.getValue())) {
+					root = root.getChildAt(0);
+				} else {
+					root = root.getChildAt(1);
+				}
+			} else {
+				root = root.getChildAt((int) instance.getValueOfAttribute(root
+						.getAttribute()));
+			}
+		}
+
+		return root.getValue();
+
 	}
 
 	@Override
@@ -101,7 +135,7 @@ public class GenLibEvolutionTreeClassifier implements Classifier,
 			}
 			return classifications;
 		} else {
-			throw new TypeParameterException(String.format(
+			throw new WrongDataException(String.format(
 					TextResource.getString(TextKeys.eTypeParameter),
 					GenLibInstances.class.getName(), data.getData().getClass()
 							.getName()));

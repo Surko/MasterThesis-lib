@@ -110,28 +110,27 @@ public class SubTreeCrossover implements Operator<TreeIndividual> {
 			treeSize2 = Utils.computeSize(r2);
 			int i2 = random.nextInt(treeSize2);
 			subTree2 = Utils.getNode(r2, i2);
-		}
-
-		if (subTree1.getParent() == null) {
+		}		
+		
+		Node parent1 = subTree1.getParent();
+		Node parent2 = subTree2.getParent();
+		
+		if (parent1 == null) {
 			c1.setRoot(subTree2);
-		} else {
-			Node parent = subTree1.getParent();
-
-			for (int i = 0; i < parent.getChildCount(); i++) {
-				if (parent.getChildAt(i) == subTree1) {
-					parent.setChildAt(i, subTree2);
+		} else {					
+			for (int i = 0; i < parent1.getChildCount(); i++) {
+				if (parent1.getChildAt(i) == subTree1) {
+					parent1.setChildAt(i, subTree2);
 				}
 			}
 		}
 
-		if (subTree2.getParent() == null) {
+		if (parent2 == null) {
 			c2.setRoot(subTree1);
 		} else {
-			Node parent = subTree2.getParent();
-
-			for (int i = 0; i < parent.getChildCount(); i++) {
-				if (parent.getChildAt(i) == subTree2) {
-					parent.setChildAt(i, subTree1);
+			for (int i = 0; i < parent2.getChildCount(); i++) {
+				if (parent2.getChildAt(i) == subTree2) {
+					parent2.setChildAt(i, subTree1);
 				}
 			}
 		}

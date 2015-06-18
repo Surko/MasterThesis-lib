@@ -3,7 +3,10 @@ package genlib.classifier.popinit;
 import genlib.classifier.gens.DummyTreeGenerator;
 import genlib.classifier.gens.TreeGenerator;
 import genlib.evolution.individuals.TreeIndividual;
+import genlib.exceptions.WrongDataException;
 import genlib.locales.PermMessages;
+import genlib.locales.TextKeys;
+import genlib.locales.TextResource;
 import genlib.structures.data.GenLibInstances;
 import genlib.utils.Utils;
 
@@ -114,7 +117,10 @@ public class CompletedTrees extends TreePopulationInitializator {
 		if (data.isGenLibInstances()) {
 			initPopulation(data.toGenLibInstances());
 		} else {
-			throw new Exception(PermMessages._exc_badins);
+			throw new WrongDataException(String.format(
+					TextResource.getString(TextKeys.eTypeParameter),
+					GenLibInstances.class.getName(), data.getData().getClass()
+							.getName()));
 		}
 	}
 

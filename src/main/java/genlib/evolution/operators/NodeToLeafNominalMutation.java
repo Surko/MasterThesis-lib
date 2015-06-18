@@ -61,9 +61,12 @@ public class NodeToLeafNominalMutation implements Operator<TreeIndividual> {
 			if (random.nextDouble() < mProb) {
 				Node root = child.getRootNode();
 				Utils.getNodes(root, nodes);
-				mutateNode(nodes);
-				// change to recompute fitness
-				child.change();
+				if (nodes.size() > 0) {
+					mutateNode(nodes);
+					// change to recompute fitness
+					child.change();
+				}
+				
 			}
 			nodes.clear();
 		}		
@@ -74,7 +77,7 @@ public class NodeToLeafNominalMutation implements Operator<TreeIndividual> {
 
 	}
 
-	private void mutateNode(ArrayList<Node> nodes) {
+	private void mutateNode(ArrayList<Node> nodes) {				
 		int i = random.nextInt(nodes.size());
 
 		Node toMutate = nodes.get(i);
