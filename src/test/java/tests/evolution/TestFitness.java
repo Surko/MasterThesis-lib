@@ -24,6 +24,7 @@ import genlib.utils.Utils.Sign;
 import genlib.utils.WekaUtils;
 
 import java.util.HashMap;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,7 +58,7 @@ public class TestFitness {
 			RDG1 rdg = new RDG1();
 			rdg.setOptions(options);
 			rdg.defineDataFormat();
-			wekaData = new Data(rdg.generateExamples());
+			wekaData = new Data(rdg.generateExamples(), new Random(0));
 
 			HashMap<String, Integer> attrIndexMap = wekaData.getAttrIndexMap();
 			HashMap<String, Integer>[] attrValueIndexMap = wekaData
@@ -120,7 +121,7 @@ public class TestFitness {
 			rdg = new RDG1();
 			rdg.setOptions(options);
 			rdg.defineDataFormat();
-			wekaDataThree = new Data(rdg.generateExamples());
+			wekaDataThree = new Data(rdg.generateExamples(), new Random(0));
 
 			attrIndexMap = wekaDataThree.getAttrIndexMap();
 			attrValueIndexMap = wekaDataThree.getAttrValueIndexMap();
@@ -217,8 +218,12 @@ public class TestFitness {
 		assertTrue(function.objectInfo().equals("tAcc x"));
 		function.setParam("INDEX,0");
 		assertTrue(function.objectInfo().equals("tAcc INDEX,0"));
-		function.setParam("INDEX,0,AVERAGE,WEIGHTED");
+		function.setParam("INDEX,0,ACCURACY,WEIGHTED");
 		assertTrue(function.objectInfo().equals("tAcc INDEX,0"));
+		function.setParam("DATA,0,INDEX,0");
+		assertTrue(function.objectInfo().equals("tAcc INDEX,0,DATA,0"));
+		function.setParam("DATA,0,INDEX,0,ACCURACY,0");
+		assertTrue(function.objectInfo().equals("tAcc INDEX,0,DATA,0"));
 
 		function = new TreeSizeFitness();
 		assertTrue(function.objectInfo().equals("tSize x"));
@@ -236,6 +241,10 @@ public class TestFitness {
 				name + " INDEX,0,AVERAGE,WEIGHTED"));
 		function.setParam("MAXIMIZE,true");
 		assertTrue(function.objectInfo().equals(name + " MAXIMIZE,true"));
+		function.setParam("DATA,0,INDEX,0,AVERAGE,WEIGHTED");
+		assertTrue(function.objectInfo().equals(name + " INDEX,0,DATA,0,AVERAGE,WEIGHTED"));
+		function.setParam("DATA,0,INDEX,0,PREVAL,0,AVERAGE,WEIGHTED");
+		assertTrue(function.objectInfo().equals(name + " INDEX,0,DATA,0,AVERAGE,WEIGHTED"));
 
 		name = TreeFMeasureFitness.initName;
 		function = new TreeFMeasureFitness();		

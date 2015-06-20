@@ -1,29 +1,29 @@
 package tests.trees;
 
-
-import java.util.HashMap;
-
-import genlib.evolution.fitness.FitnessFunction;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.structures.Data;
 import genlib.structures.extensions.HeightExtension;
 import genlib.structures.trees.BinaryHeightNode;
 import genlib.structures.trees.MultiWayHeightNode;
 import genlib.utils.Utils;
-import genlib.utils.WekaUtils;
 import genlib.utils.Utils.Sign;
+import genlib.utils.WekaUtils;
+
+import java.util.HashMap;
+import java.util.Random;
 
 import org.junit.Test;
 
 import weka.datagenerators.classifiers.classification.RDG1;
-import static org.junit.Assert.*;
 
 public class TestTrees {
 
 	public static Data wekaData;
 	public static Data arrayData;
 	public static TreeIndividual wekaIndividual;
-	
+
 	static {
 
 		try {
@@ -35,7 +35,7 @@ public class TestTrees {
 			RDG1 rdg = new RDG1();
 			rdg.setOptions(options);
 			rdg.defineDataFormat();
-			wekaData = new Data(rdg.generateExamples());
+			wekaData = new Data(rdg.generateExamples(), new Random(0));
 
 			HashMap<String, Integer> attrIndexMap = wekaData.getAttrIndexMap();
 			HashMap<String, Integer>[] attrValueIndexMap = wekaData
@@ -92,7 +92,7 @@ public class TestTrees {
 		} catch (Exception e) {
 		}
 	}
-	
+
 	@Test
 	public void testNodeCreation() {
 		BinaryHeightNode bn = new BinaryHeightNode();
@@ -117,7 +117,7 @@ public class TestTrees {
 		assertTrue(bn instanceof HeightExtension);
 		assertTrue(bn.getTreeHeight() == 0);
 		assertTrue(bn.getAttribute() == 0);
-		assertTrue(bn.getChildCount() == 2);		
+		assertTrue(bn.getChildCount() == 2);
 		assertTrue(bn.getValue() == 1.234d);
 		assertTrue(bn.getSign() == Sign.EQUALS);
 		assertTrue(!bn.isLeaf());
@@ -149,18 +149,19 @@ public class TestTrees {
 		assertTrue(mn.getSign() == Sign.EQUALS);
 		assertTrue(!mn.isLeaf());
 		assertTrue(mn.getParent() == null);
-		
+
 		bn.makeLeaf();
 		assertTrue(bn.isLeaf());
 		assertNull(bn.getChilds());
 		mn.makeLeaf();
-		assertNull(mn.getChilds());	
+		assertNull(mn.getChilds());
 		assertTrue(mn.isLeaf());
 	}
 
 	@Test
 	public void testNodeHeight() {
-		BinaryHeightNode bn = BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE);
+		BinaryHeightNode bn = BinaryHeightNode.makeNode(0, null,
+				Integer.MIN_VALUE);
 		assertTrue(bn.getTreeHeight() == 0);
 		bn.setChildAt(0, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));
 		assertTrue(bn.getTreeHeight() == 1);
@@ -175,9 +176,9 @@ public class TestTrees {
 		assertTrue(bn.getTreeHeight() == 0);
 		assertTrue(bn.getChildAt(0) == null && bn.getChildAt(1) == null);
 
-		MultiWayHeightNode mn = new MultiWayHeightNode(5);		
+		MultiWayHeightNode mn = new MultiWayHeightNode(5);
 		assertTrue(mn.getTreeHeight() == 0);
-		mn.setChildAt(0, new MultiWayHeightNode(2));		
+		mn.setChildAt(0, new MultiWayHeightNode(2));
 		assertTrue(mn.getTreeHeight() == 1);
 		mn.setChildAt(1, new MultiWayHeightNode(3));
 		assertTrue(mn.getTreeHeight() == 1);
@@ -188,21 +189,22 @@ public class TestTrees {
 		assertTrue(mn.getTreeHeight() == 2);
 		mn.clearChilds();
 		assertTrue(mn.getTreeHeight() == 0);
-		assertTrue(mn.getChildAt(0) == null && mn.getChildAt(1) == null);	
-		
-		mn = (MultiWayHeightNode)wekaIndividual.getRootNode();
-		assertTrue(mn.getTreeHeight() == 6);		
+		assertTrue(mn.getChildAt(0) == null && mn.getChildAt(1) == null);
+
+		mn = (MultiWayHeightNode) wekaIndividual.getRootNode();
+		assertTrue(mn.getTreeHeight() == 6);
 	}
-	
+
 	@Test
 	public void testNodeHeightComputing() {
-		BinaryHeightNode bn = BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE);		
+		BinaryHeightNode bn = BinaryHeightNode.makeNode(0, null,
+				Integer.MIN_VALUE);
 		bn.setChildAt(0, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));
-		bn.setChildAt(1, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));				
+		bn.setChildAt(1, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));
 		bn.getChildAt(0).setChildAt(0, new BinaryHeightNode());
-		bn.getChildAt(1).setChildAt(1, new BinaryHeightNode());		
+		bn.getChildAt(1).setChildAt(1, new BinaryHeightNode());
 		assertTrue(Utils.computeHeight(bn) == 2);
-		
+
 		MultiWayHeightNode mn = new MultiWayHeightNode(5);
 		mn.setAttribute(0);
 		mn.setChildAt(0, new MultiWayHeightNode(2));
@@ -210,16 +212,17 @@ public class TestTrees {
 		mn.getChildAt(0).setAttribute(0);
 		mn.getChildAt(1).setAttribute(0);
 		mn.getChildAt(0).setChildAt(0, new MultiWayHeightNode());
-		mn.getChildAt(1).setChildAt(2, new MultiWayHeightNode());		
-		assertTrue(Utils.computeHeight(mn) == 2);	
-		
-		mn = (MultiWayHeightNode)wekaIndividual.getRootNode();
-		assertTrue(Utils.computeHeight(mn) == 6);	
+		mn.getChildAt(1).setChildAt(2, new MultiWayHeightNode());
+		assertTrue(Utils.computeHeight(mn) == 2);
+
+		mn = (MultiWayHeightNode) wekaIndividual.getRootNode();
+		assertTrue(Utils.computeHeight(mn) == 6);
 	}
-	
+
 	@Test
 	public void testTreeSize() {
-		BinaryHeightNode bn = BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE);
+		BinaryHeightNode bn = BinaryHeightNode.makeNode(0, null,
+				Integer.MIN_VALUE);
 		assertTrue(bn.getTreeSize() == 1);
 		bn.setChildAt(0, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));
 		assertTrue(bn.getTreeSize() == 2);
@@ -234,11 +237,11 @@ public class TestTrees {
 		bn.getChildAt(1).setChildAt(1, new BinaryHeightNode());
 		assertTrue(bn.getTreeSize() == 5);
 		bn.clearChilds();
-		assertTrue(bn.getTreeSize() == 1);		
+		assertTrue(bn.getTreeSize() == 1);
 
-		MultiWayHeightNode mn = new MultiWayHeightNode(5);		
+		MultiWayHeightNode mn = new MultiWayHeightNode(5);
 		assertTrue(mn.getTreeSize() == 1);
-		mn.setChildAt(0, new MultiWayHeightNode(2));		
+		mn.setChildAt(0, new MultiWayHeightNode(2));
 		assertTrue(mn.getTreeSize() == 2);
 		mn.setChildAt(1, new MultiWayHeightNode(3));
 		assertTrue(mn.getTreeSize() == 3);
@@ -255,21 +258,22 @@ public class TestTrees {
 		assertTrue(mn.getTreeSize() == 5);
 		mn.clearChilds();
 		assertTrue(mn.getTreeSize() == 1);
-		
-		mn = (MultiWayHeightNode)wekaIndividual.getRootNode();
-		assertTrue(mn.getTreeSize() == 21);			
-		assertTrue(Utils.computeSize(mn) == 21);	
+
+		mn = (MultiWayHeightNode) wekaIndividual.getRootNode();
+		assertTrue(mn.getTreeSize() == 21);
+		assertTrue(Utils.computeSize(mn) == 21);
 	}
 
 	@Test
 	public void testTreeSizeComputing() {
-		BinaryHeightNode bn = BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE);		
+		BinaryHeightNode bn = BinaryHeightNode.makeNode(0, null,
+				Integer.MIN_VALUE);
 		bn.setChildAt(0, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));
-		bn.setChildAt(1, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));				
+		bn.setChildAt(1, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));
 		bn.getChildAt(0).setChildAt(0, new BinaryHeightNode());
-		bn.getChildAt(1).setChildAt(1, new BinaryHeightNode());		
+		bn.getChildAt(1).setChildAt(1, new BinaryHeightNode());
 		assertTrue(Utils.computeSize(bn) == 5);
-		
+
 		MultiWayHeightNode mn = new MultiWayHeightNode(5);
 		mn.setAttribute(0);
 		mn.setChildAt(0, new MultiWayHeightNode(2));
@@ -277,20 +281,21 @@ public class TestTrees {
 		mn.getChildAt(0).setAttribute(0);
 		mn.getChildAt(1).setAttribute(0);
 		mn.getChildAt(0).setChildAt(0, new MultiWayHeightNode());
-		mn.getChildAt(1).setChildAt(2, new MultiWayHeightNode());		
+		mn.getChildAt(1).setChildAt(2, new MultiWayHeightNode());
 		assertTrue(Utils.computeSize(mn) == 5);
-		
+
 	}
-	
+
 	@Test
 	public void testNumNodesComputing() {
-		BinaryHeightNode bn = BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE);		
+		BinaryHeightNode bn = BinaryHeightNode.makeNode(0, null,
+				Integer.MIN_VALUE);
 		bn.setChildAt(0, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));
-		bn.setChildAt(1, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));				
+		bn.setChildAt(1, BinaryHeightNode.makeNode(0, null, Integer.MIN_VALUE));
 		bn.getChildAt(0).setChildAt(0, new BinaryHeightNode());
-		bn.getChildAt(1).setChildAt(1, new BinaryHeightNode());		
+		bn.getChildAt(1).setChildAt(1, new BinaryHeightNode());
 		assertTrue(Utils.computeNumNodes(bn) == 3);
-		
+
 		MultiWayHeightNode mn = new MultiWayHeightNode(5);
 		mn.setAttribute(0);
 		mn.setChildAt(0, new MultiWayHeightNode(2));
@@ -298,11 +303,11 @@ public class TestTrees {
 		mn.getChildAt(0).setAttribute(0);
 		mn.getChildAt(1).setAttribute(0);
 		mn.getChildAt(0).setChildAt(0, new MultiWayHeightNode());
-		mn.getChildAt(1).setChildAt(2, new MultiWayHeightNode());		
+		mn.getChildAt(1).setChildAt(2, new MultiWayHeightNode());
 		assertTrue(Utils.computeNumNodes(mn) == 3);
-		
-		mn = (MultiWayHeightNode)wekaIndividual.getRootNode();		
-		assertTrue(Utils.computeNumNodes(mn) == 10);	
+
+		mn = (MultiWayHeightNode) wekaIndividual.getRootNode();
+		assertTrue(Utils.computeNumNodes(mn) == 10);
 	}
-	
+
 }

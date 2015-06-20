@@ -37,7 +37,7 @@ public class TestEvolution {
 			RDG1 rdg = new RDG1();
 			rdg.setOptions(options);
 			rdg.defineDataFormat();
-			wekaData = new Data(rdg.generateExamples());
+			wekaData = new Data(rdg.generateExamples(), new Random(0));
 		} catch (Exception e) {
 		}
 	}

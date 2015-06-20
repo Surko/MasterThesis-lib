@@ -1,6 +1,9 @@
 package genlib.structures;
 
+import genlib.exceptions.MissingParamException;
+import genlib.exceptions.NotDefParamException;
 import genlib.exceptions.WrongDataException;
+import genlib.locales.PermMessages;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
 import genlib.structures.data.GenLibInstances;
@@ -24,11 +27,55 @@ import weka.core.Instances;
  */
 public class Data implements Serializable {
 
+	/**
+	 * DataEnum with enums of different params for creating train and validation
+	 * data.Defined kinds of params: </br> {@link DataEnum#RESAMPLE} </br>
+	 * {@link DataEnum#TRAINRATIO} </br>
+	 * 
+	 * 
+	 * @author Lukas Surin
+	 *
+	 */
+	public enum DataEnum {
+		/**
+		 * resample enum that shows if train and validation data should be
+		 * resampled from data object
+		 */
+		RESAMPLE,
+		/**
+		 * trainratio enum that shows if train and validation data should be
+		 * some ratio from data object
+		 */
+		TRAINRATIO;
+
+		public static DataEnum value(String name) {
+			if (name.equals(RESAMPLE.name())) {
+				return RESAMPLE;
+			}
+
+			if (name.equals(TRAINRATIO.name())) {
+				return TRAINRATIO;
+			}
+
+			return null;
+		}
+	}
+
 	/** for serialization */
 	private static final long serialVersionUID = 4437040173554934907L;
+	/** data object, final which is initialized in constructor */
 	private final Object data;
+	/** train data from data object */
+	private Data train;
+	/** validation data from data object */
+	private Data validation;
+	/** random object for this data */
+	private final Random random;
+	/** number of instances in data object */
 	private final int numInstances;
+	/** boolean to know if data is of type {@link Instances} */
 	private boolean isInstances = false;
+	/** class counts in data object */
 	private double[] classCounts;
 
 	/** Index of attribute values to access correct array values */
@@ -36,7 +83,10 @@ public class Data implements Serializable {
 	/** Index of attribute to access correct attribute from String */
 	public HashMap<String, Integer> attrIndexMap;
 
-	public Data(Instances data) {
+	public Data(Instances data, Random random) {
+		this.random = random;
+		this.train = this;
+		this.validation = this;
 		this.data = data;
 		this.numInstances = data.numInstances();
 		this.isInstances = true;
@@ -46,20 +96,38 @@ public class Data implements Serializable {
 		return data;
 	}
 
-	public Data(GenLibInstances data) {
+	public Data(GenLibInstances data, Random random) {
+		this.random = random;
+		this.train = this;
+		this.validation = this;
 		this.data = data;
 		this.numInstances = data.numInstances();
 		this.isInstances = false;
 	}
 
+	/**
+	 * Number of instances in data (GenLibInstances or Instances).
+	 * 
+	 * @return number of instances
+	 */
 	public int numInstances() {
 		return numInstances;
 	}
 
+	/**
+	 * Method that tests if data object is of type {@link Instances}.
+	 * 
+	 * @return true iff data is of type Instances
+	 */
 	public boolean isInstances() {
 		return isInstances;
 	}
 
+	/**
+	 * Method that tests if data object is of type {@link GenLibInstances}.
+	 * 
+	 * @return true iff instances are GenLibInstances
+	 */
 	public boolean isGenLibInstances() {
 		return !isInstances;
 	}
@@ -105,7 +173,7 @@ public class Data implements Serializable {
 	 * @see GenLibInstances
 	 * @see WrongDataException
 	 */
-	public void randomize(Random random) {
+	public void randomize() {
 		if (isInstances) {
 			((Instances) data).randomize(random);
 			return;
@@ -116,27 +184,100 @@ public class Data implements Serializable {
 	}
 
 	/**
-	 * Method which creates new data from instances pulled out of data object.
-	 * It throws unchecked exception if any other type from Instances or
-	 * GenLibInstances is pushed into data field.
+	 * Method which creates new datas from instances pulled out of this data
+	 * object.
 	 * 
-	 * @param numFolds
-	 *            Number of folds separating this instances
-	 * @return newly created data from test instances
-	 * 
+	 * @param resample
+	 *            if train and validation sets should be resamples
+	 * @param trainRatio
+	 *            what size should trainData have (respectively validation)
 	 */
-	public Data makeTestData(int numFolds) {
-		if (isInstances) {
-			Instances testInstances = ((Instances) data).testCV(numFolds,
-					numFolds - 1);
-			return new Data(testInstances);
+	private void createValidationAndTrainData(boolean resample,
+			double trainRatio) {
+		if (resample) {
+			if (isInstances) {
+				Instances instances = (Instances) data;
+				train = new Data(instances.resample(random), new Random(
+						random.nextLong()));
+				validation = new Data(instances.resample(random), new Random(
+						random.nextLong()));
+			} else {
+				GenLibInstances instances = (GenLibInstances) data;
+				train = new Data(instances.resample(random), new Random(
+						random.nextLong()));
+				validation = new Data(instances.resample(random), new Random(
+						random.nextLong()));
+			}
 		} else {
-			GenLibInstances testInstances = ((GenLibInstances) data).testData(
-					numFolds, numFolds - 1);
-			return new Data(testInstances);
+			if (isInstances) {
+				Instances instances = (Instances) data;
+				int trainCount = (int) (((double) instances.numInstances()) * trainRatio);
+
+				Instances train = new Instances(instances, 0, trainCount);
+				Instances validation = new Instances(instances, trainCount,
+						instances.numInstances() - trainCount);
+
+				this.train = new Data(train, new Random(random.nextLong()));
+				this.validation = new Data(validation, new Random(
+						random.nextLong()));
+
+			} else {
+				GenLibInstances instances = (GenLibInstances) data;
+				int trainCount = (int) (((double) instances.numInstances()) * trainRatio);
+
+				GenLibInstances train = instances.getPart(0, trainCount);
+				GenLibInstances validation = instances.getPart(trainCount,
+						instances.numInstances() - trainCount);
+
+				this.train = new Data(train, new Random(random.nextLong()));
+				this.validation = new Data(validation, new Random(
+						random.nextLong()));
+			}
 		}
+
 	}
 
+	/**
+	 * Getter to get trainData for this run.
+	 * 
+	 * @return train data of type Data
+	 */
+	public Data getTrainData() {
+		return train;
+	}
+
+	/**
+	 * Getter to get validationData for this run.
+	 * 
+	 * @return validation data of type Data
+	 */
+	public Data getValidationData() {
+		return validation;
+	}
+
+	/**
+	 * Getter which makes choice which data we return by its int param.
+	 * @param dataType int param (-1=this, 0=train, 1=validation)
+	 * @return data decided by param
+	 */
+	public Data getDataOfType(int dataType) {
+		switch (dataType) {
+		case -1:
+			return this;			
+		case 0:
+			return train;			
+		case 1:
+			return validation;			
+		default:
+			return this;			
+		}
+	}
+	
+	/**
+	 * Method which returns number of classes for this data object.
+	 * 
+	 * @return array with class counts
+	 */
 	public double[] getClassCounts() {
 		if (classCounts == null) {
 			if (isInstances) {
@@ -156,6 +297,12 @@ public class Data implements Serializable {
 		return classCounts;
 	}
 
+	/**
+	 * Method which returns index of attribute values to access correct array
+	 * values
+	 * 
+	 * @return hashmap with indeces 
+	 */
 	public HashMap<String, Integer>[] getAttrValueIndexMap() {
 		if (attrValueIndexMap != null) {
 			return attrValueIndexMap;
@@ -165,6 +312,12 @@ public class Data implements Serializable {
 		return attrValueIndexMap;
 	}
 
+	/**
+	 * Method which returns index of attribute to access correct attribute from
+	 * String
+	 * 
+	 * @return hashmap with indeces of string attribute
+	 */
 	public HashMap<String, Integer> getAttrIndexMap() {
 		if (attrIndexMap != null) {
 			return attrIndexMap;
@@ -191,6 +344,41 @@ public class Data implements Serializable {
 			attrIndexMap = Utils.makeAttrIndexMap((GenLibInstances) data);
 		}
 
+	}
+
+	public void setParam(String param) {
+		System.out.println(param);
+		if (param.equals(PermMessages._blank_param)) {
+			return;
+		}
+		
+		String[] parameters = param.split(Utils.oDELIM);
+
+		boolean resample = false;
+		double trainRatio = 1;
+
+		for (int i = 0; i < parameters.length; i += 2) {
+			if (parameters[i] == "") {
+				throw new MissingParamException();
+			}
+
+			DataEnum dataEnum = DataEnum.value(parameters[i]);
+
+			if (dataEnum == null) {
+				throw new NotDefParamException();
+			}
+
+			switch (dataEnum) {
+			case RESAMPLE:
+				resample = Boolean.valueOf(parameters[i + 1]);
+				break;
+			case TRAINRATIO:
+				trainRatio = Double.parseDouble(parameters[i + 1]);
+				break;
+			}
+		}
+
+		createValidationAndTrainData(resample, trainRatio);
 	}
 
 }

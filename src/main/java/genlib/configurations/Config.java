@@ -28,7 +28,7 @@ public class Config implements Serializable {
 	private static final long serialVersionUID = -3103934146617400619L;
 	/** Logger for Config file which configurations falls under root logger */
 	private static final Logger LOG = Logger.getLogger(Config.class.getName());
-	
+
 	/** Key in property file with loggable switch */
 	public static final String DEBUG = "debug";
 	/**
@@ -101,6 +101,8 @@ public class Config implements Serializable {
 	 * Key in property file with saved seed
 	 */
 	public static final String SEED = "seed";
+	/** Key in property file with data splitting */
+	public static final String DATA = "data";
 
 	/**
 	 * Singleton instance of this Config to guarantee uniqueness of config.
@@ -121,8 +123,8 @@ public class Config implements Serializable {
 	/**
 	 * Properties field with loaded configurations
 	 */
-	private Properties prop;	
-	
+	private Properties prop;
+
 	/**
 	 * Factory method of this class which returns unique instance of Config
 	 * 
@@ -143,11 +145,12 @@ public class Config implements Serializable {
 		return instance;
 	}
 
-	private Config() {}
-	
+	private Config() {
+	}
+
 	/**
-	 * Method that resets all the saved configs/properties and sets
-	 * default values.
+	 * Method that resets all the saved configs/properties and sets default
+	 * values.
 	 */
 	public void reset() {
 		prop.clear();
@@ -155,10 +158,10 @@ public class Config implements Serializable {
 	}
 
 	/**
-	 * Method configures this Config instance only iff it's not already configured.
-	 * It takes path to config.properties from PathManager and tries to
-	 * load properties into Properties instance. After this set the switch to true to
-	 * signal that now it is configured.  
+	 * Method configures this Config instance only iff it's not already
+	 * configured. It takes path to config.properties from PathManager and tries
+	 * to load properties into Properties instance. After this set the switch to
+	 * true to signal that now it is configured.
 	 */
 	public Config init() {
 		if (configured)
@@ -210,8 +213,8 @@ public class Config implements Serializable {
 		putIfAbsent(OPER_THREADS, "1");
 		putIfAbsent(FIT_COMPARATOR, "SINGLE 0");
 		putIfAbsent(FIT_FUNCTIONS, "tAcc x");
-		putIfAbsent(MUT_OPERATORS, "dtM 0.04");
-		putIfAbsent(XOVER_OPERATORS, "dtX 0.8");
+		putIfAbsent(MUT_OPERATORS, "dtM PROB,0.04");
+		putIfAbsent(XOVER_OPERATORS, "dtX PROB,0.8");
 		putIfAbsent(ELITISM, "0.15");
 		putIfAbsent(NUM_OF_GEN, "1");
 		putIfAbsent(SELECTORS, "Tmt x");
@@ -222,6 +225,7 @@ public class Config implements Serializable {
 		putIfAbsent(SEED, "28041991");
 		putIfAbsent(POP_TYPE, "typical x");
 		putIfAbsent(FILE_LOCALISE, "false");
+		putIfAbsent(DATA, "x");
 		putIfAbsent(LOCALE, "en");
 	}
 
@@ -268,12 +272,13 @@ public class Config implements Serializable {
 
 	/**
 	 * Getter returns true iff debug mode should be activated.
+	 * 
 	 * @return true iff active debugging
 	 */
 	public boolean isDebug() {
 		return Boolean.valueOf(prop.getProperty(DEBUG));
 	}
-	
+
 	/**
 	 * Getter which returns if locale files are out of app jar. It's pulled out
 	 * from config file.
@@ -344,15 +349,15 @@ public class Config implements Serializable {
 	}
 
 	/**
-	 * Getter which returns population value from config file. It can
-	 * be even plugin name.
+	 * Getter which returns population value from config file. It can be even
+	 * plugin name.
 	 * 
 	 * @return population type
 	 */
 	public String getPopulationType() {
-		return prop.getProperty(POP_TYPE); 
+		return prop.getProperty(POP_TYPE);
 	}
-	
+
 	/**
 	 * Getter which returns Number of generations value from config file
 	 * 
@@ -437,6 +442,15 @@ public class Config implements Serializable {
 		return prop.getProperty(FIT_FUNCTIONS);
 	}
 
+	/**
+	 * Getter which returns data string from config file
+	 * 
+	 * @return data parameter
+	 */
+	public String getData() {
+		return prop.getProperty(DATA);
+	}
+	
 	//
 	/*
 	 * SETTERS
@@ -503,6 +517,10 @@ public class Config implements Serializable {
 		prop.setProperty(OPER_THREADS, String.valueOf(operThreads));
 	}
 
+	public void setData(String dataString) {
+		prop.setProperty(DATA, dataString);
+	}
+	
 	public void setLocale(Locale locale) {
 		prop.setProperty(LOCALE, locale.toString());
 	}

@@ -79,12 +79,41 @@ public class TestClassifier {
 	public void testEvolutionTreeClassifier3() {
 		c.reset();
 		c.setAbsentProperties();
-
+		c.setMutationOperators("ntlNomM 0.04");
+		c.setXoverOperators("subTreeX 0.8");
+		c.setFitnessComparator("PRIORITY x");
+		c.setFitnessFunctions("tAcc x;tSize x");
 		try {
 			EvolutionTreeClassifier etc = new EvolutionTreeClassifier(true);
-			etc.setNumberOfGenerations(150);
+			etc.setNumberOfGenerations(10);
 			etc.buildClassifier(wekaData);
 			assertTrue(etc.getActualIndividuals().size() == 100);
+			//assertTrue(Double.compare(etc.getBestIndividual()
+			//		.getFitnessValue(0), 0.92d) == 0);
+			System.out.println(etc.getStartIndividual());
+			System.out.println(etc.getBestIndividual());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testEvolutionTreeClassifier4() {
+		c.reset();
+		c.setAbsentProperties();
+		c.setMutationOperators("ntlNomM 0.04;wekaDSM 0.04");
+		c.setXoverOperators("subTreeX 0.8");
+		c.setFitnessComparator("PRIORITY x");
+		c.setFitnessFunctions("tAcc x;tSize x");
+		try {
+			EvolutionTreeClassifier etc = new EvolutionTreeClassifier(true);
+			etc.setNumberOfGenerations(70);
+			etc.buildClassifier(wekaData);
+			assertTrue(etc.getActualIndividuals().size() == 100);
+			assertTrue(etc.getFitnessFunctions().size() == 2);
+			assertTrue(etc.getMutSet().size() == 2);
+			assertTrue(etc.getXoverSet().size() == 1);
 			//assertTrue(Double.compare(etc.getBestIndividual()
 			//		.getFitnessValue(0), 0.92d) == 0);
 			System.out.println(etc.getStartIndividual());

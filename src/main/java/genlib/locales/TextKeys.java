@@ -7,12 +7,14 @@ public class TextKeys {
 	public static final String _arg_ndparam = "_arg_ndparam";
 	// Weka text keys
 	public static final String wSeedTipText = "wSeedTipText";
+	public static final String wDataTipText = "wDataTipText";
 	public static final String wPopInitTipText = "wPopInitTipText";
 	public static final String wIndGenTipText = "wIndGenTipText";
 	public static final String wFitFuncTipText = "wFitFuncTipText";
 	public static final String wMutProbTipText = "wMutProbTipText";
 	public static final String wXoverProbTipText = "wXoverProbTipText";
 	public static final String wPopSizeTipText = "wPopSizeTipText";
+	public static final String wNumOfGens = "wNumOfGens";
 	public static final String wConfigTipText = "wConfigTipText";
 	public static final String wElitismTipText = "wElitismTipText";
 	public static final String wFitThreadsTipText = "wFitThreadsTipText";
@@ -20,6 +22,7 @@ public class TextKeys {
 	public static final String wGenThreadsTipText = "wGenThreadsTipText";
 	public static final String wSelectorTipText = "wSelectorTipText";
 	public static final String wEnvSelectorTipText = "wEnvSelectorTipText";
+	public static final String wElitism = "wElitism";
 	// Error, Warning keys
 	public static final String eIndexOutOfBounds = "eIndexOutOfBounds";	
 	public static final String eNodeCreation = "eNodeCreation";

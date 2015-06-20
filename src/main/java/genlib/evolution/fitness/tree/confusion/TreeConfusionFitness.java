@@ -3,7 +3,6 @@ package genlib.evolution.fitness.tree.confusion;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.exceptions.MissingParamException;
-import genlib.exceptions.NotDefParamException;
 import genlib.locales.PermMessages;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
@@ -52,12 +51,16 @@ public abstract class TreeConfusionFitness extends
 	 * ConfusionEnum that defines what kind of parameters are possible for
 	 * fitness function that are based on confusion matrix.</p> Defined kinds of
 	 * parameters: </br> {@link ConfusionEnum#AVERAGE} </br>
-	 * {@link ConfusionEnum#INDEX} </br> {@link ConfusionEnum#MAXIMIZe}
+	 * {@link ConfusionEnum#INDEX} </br> {@link ConfusionEnum#MAXIMIZE} </br> {@link ConfusionEnum#DATA}
 	 * 
 	 * @author Lukas Surin
 	 *
 	 */
 	protected enum ConfusionEnum {
+		/**
+		 * Data parameter to defined what kind of splitting we use.
+		 */
+		DATA,
 		/**
 		 * Average parameter to define what kind of averaging we use
 		 * 
@@ -74,8 +77,11 @@ public abstract class TreeConfusionFitness extends
 		 * hand treeSize should be minimized.
 		 */
 		MAXIMIZE;
-		
+
 		public static ConfusionEnum value(String name) {
+			if (name.equals(DATA.name())) {
+				return DATA;
+			}
 			if (name.equals(INDEX.name())) {
 				return INDEX;
 			}
@@ -85,7 +91,7 @@ public abstract class TreeConfusionFitness extends
 			if (name.equals(MAXIMIZE.name())) {
 				return MAXIMIZE;
 			}
-			
+
 			return null;
 		}
 	}
@@ -98,6 +104,8 @@ public abstract class TreeConfusionFitness extends
 	protected Boolean maximize = null;
 	protected AverageEnum averageEnum = null;
 	protected int attrIndex = -1;
+	/** type of data split used in computing fitness */
+	protected int typeOfData = -1;
 
 	/**
 	 * This method that overrides computeFitness from FitnessFunction class
@@ -137,7 +145,7 @@ public abstract class TreeConfusionFitness extends
 
 	@Override
 	public void setData(Data data) {
-		this.data = data;
+		this.data = data.getDataOfType(typeOfData);
 	}
 
 	/**
@@ -146,30 +154,32 @@ public abstract class TreeConfusionFitness extends
 	 * @param paramValue
 	 * @return true iff the parameters had been initialized
 	 */
-	protected boolean parseParamLabels(String paramLabel, String paramValue) {				
+	protected void parseParamLabels(String paramLabel, String paramValue) {
 		ConfusionEnum confusionEnum = ConfusionEnum.value(paramLabel);
 
 		if (confusionEnum == null) {
-			LOG.log(Level.INFO, String.format(
-					TextResource.getString(TextKeys.iExcessParam), paramLabel));
-			return false;
+			LOG.log(Level.INFO, String.format(TextResource
+					.getString(TextKeys.iExcessParam), String.format(
+					PermMessages._param_format, paramLabel, paramValue)));		
+			return;
 		}
 
 		switch (confusionEnum) {
+		case DATA:
+			this.typeOfData = Integer.parseInt(paramValue);
+			return;
 		case AVERAGE:
 			this.averageEnum = AverageEnum.valueOf(paramValue);
-			break;
+			return;
 		case INDEX:
 			this.attrIndex = Integer.parseInt(paramValue);
-			break;
+			return;
 		case MAXIMIZE:
 			this.maximize = Boolean.valueOf(paramValue);
-			break;
+			return;
 		default:
-			return false;
-		}
-
-		return true;
+			return;
+		}		
 	}
 
 	@Override
@@ -177,8 +187,8 @@ public abstract class TreeConfusionFitness extends
 		this.attrIndex = -1;
 		this.averageEnum = null;
 		this.maximize = null;
-		
-		if (param.equals(PermMessages._blank_param)) {			
+
+		if (param.equals(PermMessages._blank_param)) {
 			return;
 		}
 		String[] parts = param.split(Utils.pDELIM);
@@ -188,7 +198,7 @@ public abstract class TreeConfusionFitness extends
 		}
 
 		for (int i = 0; i < parts.length; i += 2) {
-			parseParamLabels(parts[i], parts[i + 1]);
+			this.parseParamLabels(parts[i], parts[i + 1]);
 		}
 	}
 
@@ -198,6 +208,15 @@ public abstract class TreeConfusionFitness extends
 		if (attrIndex > -1) {
 			paramString = String.format(PermMessages._param_format,
 					ConfusionEnum.INDEX, attrIndex);
+		}
+		if (typeOfData == 0 || typeOfData == 1) {
+			if (paramString.isEmpty()) {
+				paramString = String.format(PermMessages._param_format,
+						ConfusionEnum.DATA, typeOfData);
+			} else {
+				paramString = String.format(PermMessages._param_format,
+						paramString, ConfusionEnum.DATA + "," + typeOfData);
+			}
 		}
 		if (averageEnum != null) {
 			if (paramString.isEmpty()) {
@@ -236,7 +255,7 @@ public abstract class TreeConfusionFitness extends
 				attrIndex = 1;
 				return attributeConfusionValue(instances, individual);
 			}
-			
+
 			if (averageEnum == null) {
 				LOG.log(Level.WARNING, String.format(
 						TextResource.getString(TextKeys.eMissParam),
@@ -245,9 +264,9 @@ public abstract class TreeConfusionFitness extends
 						TextResource.getString(TextKeys.eMissParam),
 						ConfusionEnum.AVERAGE.name(), this.getFitnessName()));
 			}
-			
+
 			double fitness = 0d;
-			double[] criteria = totalConfusionValues(instances, individual);			
+			double[] criteria = totalConfusionValues(instances, individual);
 
 			switch (averageEnum) {
 			case OWNWEIGHT:
@@ -307,10 +326,10 @@ public abstract class TreeConfusionFitness extends
 						TextResource.getString(TextKeys.eMissParam),
 						ConfusionEnum.AVERAGE.name(), this.getFitnessName()));
 			}
-			
+
 			double fitness = 0d;
 			double[] criteria = totalConfusionValues(instances, individual);
-			
+
 			switch (averageEnum) {
 			case OWNWEIGHT:
 				for (int i = 0; i < criteria.length; i++) {
@@ -358,10 +377,10 @@ public abstract class TreeConfusionFitness extends
 		if (data.isInstances()) {
 			return totalConfusionValues(data.toInstances(), individual);
 		}
-		
+
 		return Utils.empty_double_array;
 	}
-	
+
 	/**
 	 * Method which return false. This is because all the fitness functions
 	 * based on confusion matrix are dependent on nominal attributes

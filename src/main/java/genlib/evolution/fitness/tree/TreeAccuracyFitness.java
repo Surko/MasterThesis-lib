@@ -9,6 +9,7 @@ import genlib.locales.TextResource;
 import genlib.structures.Data;
 import genlib.structures.data.GenLibInstances;
 import genlib.structures.trees.Node;
+import genlib.utils.Utils;
 
 import java.util.Enumeration;
 import java.util.logging.Level;
@@ -19,14 +20,33 @@ import weka.core.Instances;
 
 public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 
+	/**
+	 * AccuracyEnum that defines what kind of parameters are possible for
+	 * accuracy fitness function.</p> Defined kinds of parameters: </br>
+	 * {@link AccuracyEnum#DATA} </br> {@link AccuracyEnum#INDEX}
+	 * 
+	 * @author Lukas Surin
+	 *
+	 */
 	protected enum AccuracyEnum {
-		INDEX;
-				
+		/**
+		 * Index parameter of attribute for which we compute fitness
+		 */
+		INDEX,
+		/**
+		 * Data parameter to define what kind of splitting we use.
+		 */
+		DATA;
+
 		public static AccuracyEnum value(String name) {
 			if (name.equals(INDEX.name())) {
 				return INDEX;
 			}
-			
+
+			if (name.equals(DATA.name())) {
+				return DATA;
+			}
+
 			return null;
 		}
 	}
@@ -38,6 +58,7 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 	public static final String initName = "tAcc";
 	private Data data;
 	private int attrIndex = -1;
+	private int typeOfData = -1;
 
 	/**
 	 * This method that overrides computeFitness from FitnessFunction class
@@ -54,20 +75,20 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 		}
 
 		double fitness = 0d;
-		
+
 		if (data.isInstances()) {
 			fitness = computeFitness(data.toInstances(), individual);
 		}
 		if (data.isGenLibInstances()) {
 			fitness = computeFitness(data.toGenLibInstances(), individual);
 		}
-		
+
 		individual.setFitnessValue(index, fitness);
 		return fitness;
 
 	}
 
-	@SuppressWarnings("unchecked")	
+	@SuppressWarnings("unchecked")
 	private double computeFitness(Instances instances, TreeIndividual individual) {
 		Node root = individual.getRootNode();
 		double allData = instances.numInstances();
@@ -93,7 +114,7 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 			}
 			root = individual.getRootNode();
 		}
-		double val = correct / allData;		
+		double val = correct / allData;
 		return val;
 	}
 
@@ -103,15 +124,14 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 		Node root = individual.getRootNode();
 		double allData = instances.numInstances();
 		double correct = 0;
-		//TODO 
+		// TODO
 		double val = correct / allData;
 		return correct;
 	}
 
 	@Override
 	public void setData(Data data) {
-		this.data = data;
-
+		this.data = data.getDataOfType(typeOfData);
 	}
 
 	@Override
@@ -121,11 +141,13 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 
 	@Override
 	public void setParam(String param) {
+		this.attrIndex = -1;
+
 		if (param.equals(PermMessages._blank_param)) {
 			return;
 		}
 
-		String[] parts = param.split(",");
+		String[] parts = param.split(Utils.pDELIM);
 
 		// some kind of exception if it's not divisible by two
 
@@ -133,36 +155,51 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 			AccuracyEnum accEnum = AccuracyEnum.value(parts[i]);
 
 			if (accEnum == null) {
-				LOG.log(Level.INFO,
-						String.format(
-								TextResource.getString(TextKeys.iExcessParam),
-								parts[i]));
+				LOG.log(Level.INFO, String.format(TextResource
+						.getString(TextKeys.iExcessParam), String.format(
+						PermMessages._param_format, parts[i], parts[i + 1])));
 				continue;
 			}
 
 			switch (accEnum) {
-				case INDEX:
-					this.attrIndex = Integer.parseInt(parts[i + 1]);
-					break;
-				default:
-					break;
+			case INDEX:
+				this.attrIndex = Integer.parseInt(parts[i + 1]);
+				break;
+			case DATA:
+				this.typeOfData = Integer.parseInt(parts[i + 1]);
+				break;
+			default:
+				break;
 			}
 		}
 	}
 
 	@Override
 	public String objectInfo() {
-		if (attrIndex > -1) { 
-			String paramString = AccuracyEnum.INDEX + "," + attrIndex;
-			return String.format(PermMessages._fit_format, initName, paramString);
+		String paramString = "";
+		if (attrIndex > -1) {
+			paramString = String.format(PermMessages._param_format,
+					AccuracyEnum.INDEX, attrIndex);
 		}
-		return String.format(PermMessages._fit_format, initName, PermMessages._blank_param); 
+		if (typeOfData == 0 || typeOfData == 1) {
+			if (paramString.isEmpty()) {
+				paramString = String.format(PermMessages._param_format,
+						AccuracyEnum.DATA, typeOfData);
+			} else {
+				paramString = String.format(PermMessages._param_format,
+						paramString, AccuracyEnum.DATA + "," + typeOfData);
+			}
+		}
+		if (paramString.isEmpty()) {
+			return String.format(PermMessages._fit_format, initName,
+					PermMessages._blank_param);
+		}
+		return String.format(PermMessages._fit_format, initName, paramString);
 	}
 
-	
 	@Override
 	public boolean canHandleNumeric() {
 		return true;
 	}
-	
+
 }

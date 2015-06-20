@@ -5,6 +5,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Random;
+
 import genlib.classifier.popinit.CompletedTrees;
 import genlib.classifier.popinit.RandomStumpCombinator;
 import genlib.classifier.popinit.WekaCompletedTrees;
@@ -64,7 +67,7 @@ public class TestInitializators {
 		RDG1 rdg = new RDG1();
 		rdg.setOptions(options);
 		rdg.defineDataFormat();
-		wekaData = new Data(rdg.generateExamples());
+		wekaData = new Data(rdg.generateExamples(), new Random(0));
 
 		FitnessFunction.registeredFunctions = 2;
 		WekaCompletedTrees wct = new WekaCompletedTrees(200, 10, false);
@@ -88,7 +91,7 @@ public class TestInitializators {
 		RDG1 rdg = new RDG1();
 		rdg.setOptions(options);
 		rdg.defineDataFormat();
-		wekaData = new Data(rdg.generateExamples());
+		wekaData = new Data(rdg.generateExamples(), new Random(0));
 
 		FitnessFunction.registeredFunctions = 2;
 		WekaCompletedTrees wct = new WekaCompletedTrees(200, 10, false);

@@ -6,6 +6,8 @@ import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.population.IPopulation;
 import genlib.exceptions.PopulationInitializationException;
 import genlib.locales.PermMessages;
+import genlib.locales.TextKeys;
+import genlib.locales.TextResource;
 import genlib.structures.Data;
 import genlib.structures.trees.MultiWayHeightNode;
 import genlib.structures.trees.MultiWayNode;
@@ -14,6 +16,8 @@ import genlib.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Decision Stump Mutation is mutation class that implements the Operator
@@ -28,6 +32,9 @@ public class DecisionStumpMutation implements Operator<TreeIndividual> {
 
 	/** for serialization */
 	private static final long serialVersionUID = -2553678098269930119L;
+	/** logger for this class */
+	private static final Logger LOG = Logger
+			.getLogger(DecisionStumpMutation.class.getName());
 	/** name of this operator */
 	public static final String initName = "wekaDSM";
 	/** random object for this operator */
@@ -38,6 +45,8 @@ public class DecisionStumpMutation implements Operator<TreeIndividual> {
 	private TreeIndividual[] stumps;
 	/** data from which we create stumps */
 	private Data data;
+	/** type of data split used in operator */
+	protected int typeOfData = -1;
 
 	/**
 	 * {@inheritDoc}
@@ -78,11 +87,15 @@ public class DecisionStumpMutation implements Operator<TreeIndividual> {
 				Node leafToMutate = leaves.get(lIndex);
 				Node leafToMutateParent = leafToMutate.getParent();
 
-				for (int i = 0; i < leafToMutateParent.getChilds().length; i++) {
-					if (leafToMutateParent.getChildAt(i) == leafToMutate) {
-						leafToMutateParent.setChildAt(i,
-								stumps[sIndex].getRootNode());
-						break;
+				if (leafToMutateParent == null) {
+					child.setRoot(stumps[sIndex].getRootNode().copy());
+				} else {
+					for (int i = 0; i < leafToMutateParent.getChilds().length; i++) {
+						if (leafToMutateParent.getChildAt(i) == leafToMutate) {
+							leafToMutateParent.setChildAt(i, stumps[sIndex]
+									.getRootNode().copy());
+							break;
+						}
 					}
 				}
 				// change to recompute fitness
@@ -148,14 +161,53 @@ public class DecisionStumpMutation implements Operator<TreeIndividual> {
 	public Class<TreeIndividual> getIndividualClassType() {
 		return TreeIndividual.class;
 	}
-	
+
+	/**
+	 * {@inheritDoc} </p> It does use all enums from {@link OperEnum}.
+	 */
+	public void setParam(String param) {
+		this.mProb = 0;
+		this.typeOfData = -1;
+
+		if (param.equals(PermMessages._blank_param)) {
+			return;
+		}
+
+		String[] parts = param.split(Utils.pDELIM);
+
+		// some kind of exception if it's not divisible by two
+
+		for (int i = 0; i < parts.length; i += 2) {
+			OperEnum opEnum = OperEnum.value(parts[i]);
+
+			if (opEnum == null) {
+				LOG.log(Level.INFO,
+						String.format(
+								TextResource.getString(TextKeys.iExcessParam),
+								parts[i]));
+				continue;
+			}
+
+			switch (opEnum) {
+			case PROB:
+				this.mProb = Double.parseDouble(parts[i + 1]);
+				break;
+			case DATA:
+				this.typeOfData = Integer.parseInt(parts[i + 1]);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
 	/**
 	 * {@inheritDoc} </p> This operator does set the Data object but uses it
 	 * only to create decision stumps from them.
 	 */
 	@Override
 	public void setData(Data data) {
-		this.data = data;
+		this.data = data.getDataOfType(typeOfData);
 	}
 
 	/**
@@ -163,7 +215,25 @@ public class DecisionStumpMutation implements Operator<TreeIndividual> {
 	 */
 	@Override
 	public String objectInfo() {
-		return String.format(PermMessages._fit_format, initName, mProb);
+		String paramString = "";
+		if (mProb >= 0 && mProb <= 1) {
+			paramString = String.format(PermMessages._param_format,
+					OperEnum.PROB, mProb);
+		}
+		if (typeOfData == 0 || typeOfData == 1) {
+			if (paramString.isEmpty()) {
+				paramString = String.format(PermMessages._param_format,
+						OperEnum.DATA, typeOfData);
+			} else {
+				paramString = String.format(PermMessages._param_format,
+						paramString, OperEnum.DATA + "," + typeOfData);
+			}
+		}
+		if (paramString.isEmpty()) {
+			return String.format(PermMessages._fit_format, initName,
+					PermMessages._blank_param);
+		}
+		return String.format(PermMessages._fit_format, initName, paramString);
 	}
 
 	/**

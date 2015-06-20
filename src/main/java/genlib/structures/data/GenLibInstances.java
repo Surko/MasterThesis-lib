@@ -47,10 +47,35 @@ public interface GenLibInstances extends Serializable {
 	 */
 	public GenLibInstances testData(int numFolds, int numFold);
 
+	/**
+	 * Randomize instances with random object
+	 * 
+	 * @param random
+	 *            object with which we randomize
+	 */
 	public void randomize(Random random);
 
-	public GenLibInstances getPart(int allParts, int partNumber);
+	/**
+	 * Get part of this GenLibInstances bounded by indeces. We copy
+	 * <strong>count</strong> instances starting with index
+	 * <strong>from</strong>.
+	 * 
+	 * @param from
+	 *            index where we start copying
+	 * @param count
+	 *            how many instances we copy
+	 * @return new GenLibInstances with copied instances
+	 */
+	public GenLibInstances getPart(int from, int count);
 
+	/**
+	 * Creates a new dataset of the same size using random sampling with
+	 * replacement.
+	 *
+	 * @param random
+	 *            object with which we resample
+	 * @return newly created GenLibInstances with resampled
+	 */
 	public GenLibInstances resample(Random random);
 
 	public Enumeration<GenLibInstance> getInstances();

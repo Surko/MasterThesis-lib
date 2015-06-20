@@ -7,7 +7,6 @@ import genlib.configurations.Config;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.exceptions.ConfigInternalException;
 import genlib.exceptions.EmptyConfigParamException;
-import genlib.exceptions.TypeParameterException;
 import genlib.exceptions.WrongDataException;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
@@ -22,6 +21,7 @@ import weka.classifiers.Classifier;
 import weka.core.AdditionalMeasureProducer;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
+import weka.core.Drawable;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Option;
@@ -53,7 +53,7 @@ import weka.core.Utils;
  *
  */
 public class WekaEvolutionTreeClassifier extends Classifier implements
-		Randomizable, OptionHandler, TechnicalInformationHandler,
+		Randomizable, OptionHandler, TechnicalInformationHandler, Drawable,
 		AdditionalMeasureProducer, genlib.classifier.Classifier,
 		WekaClassifierExtension {
 
@@ -76,6 +76,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 		this.e_tree_class = new EvolutionTreeClassifier(true);
 	}
 
+	// OPTION HANDLER METHODS //
 	/**
 	 * List the available options which can be used for this classifier. It uses
 	 * Vector for backcompatibility with Weka. SuppressWarnings is here because
@@ -84,11 +85,15 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Enumeration listOptions() {
 
-		Vector newVector = new Vector(12);
+		Vector newVector = new Vector(16);
 
+		newVector.addElement(new Option("\tData splitting.\n"
+				+ "\t(default " + e_tree_class.getData()
+				+ ")", "D", 1, "-D <data_param value;data_param value>"));
+		
 		newVector.addElement(new Option("\tFitness functions.\n"
 				+ "\t(default " + e_tree_class.getFitnessFunctionsString()
-				+ ")", "FF", 1, "-FF <function probability>"));
+				+ ")", "FF", 1, "-FF <function probability;function probability;...>"));
 
 		newVector.addElement(new Option("\tFitness comparator.\n"
 				+ "\t(default " + e_tree_class.getFitnessComparatorString()
@@ -96,10 +101,10 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 
 		newVector.addElement(new Option("\tMutation probability.\n"
 				+ "\t(default " + e_tree_class.getMutString() + ")", "MP", 1,
-				"-MP <mutation probability>"));
+				"-MP <mutation probability;mutation probability;...>"));
 		newVector.addElement(new Option("\tCrossover probability.\n"
 				+ "\t(default " + e_tree_class.getXoverString() + ")", "XP", 1,
-				"-XP <xover probability>"));
+				"-XP <xover probability;xover probability;...>"));
 		newVector
 				.addElement(new Option("\tElitism rate.\n" + "\t(default "
 						+ e_tree_class.getElitism() + ")", "E", 1,
@@ -117,8 +122,10 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 				"-PopP <pop_params>"));
 		newVector.addElement(new Option("\tIndividual generator", "IG", 1,
 				"-IG <indgen_params>"));
-		newVector.addElement(new Option("\tPopulation size", "IP", 1,
-				"-IP <pop_size>"));
+		newVector.addElement(new Option("\tPopulation size", "PS", 1,
+				"-PS <pop_size>"));
+		newVector.addElement(new Option("\tNumber of generations", "NoG", 1,
+				"-NoG <num_of_gens>"));
 		newVector.addElement(new Option("\tFitness threads", "FT", 1,
 				"-FT <#threads>"));
 		newVector.addElement(new Option("\tGenerator threads", "GT", 1,
@@ -145,6 +152,10 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 
 		result = new Vector();
 
+		// stands for data splitting
+		result.add("-D");
+		result.add(getData());
+		
 		// stands for fitness functions
 		result.add("-FF");
 		result.add(getFitnessFunctions());
@@ -159,7 +170,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 
 		// stands for crossover probability
 		result.add("-XP");
-		result.add(getXoverOperatorsString());
+		result.add(getXoverOperators());
 
 		// stands for elitism
 		result.add("-E");
@@ -174,8 +185,12 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 		result.add("" + getEnvSelectors());
 
 		// stands for initial population size
-		result.add("-IP");
+		result.add("-PS");
 		result.add("" + getPopulationSize());
+
+		// stands for number of generations
+		result.add("-NoG");
+		result.add("" + getNumberOfGenerations());
 
 		// stands for population generator parameter
 		result.add("-PopP");
@@ -257,6 +272,11 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	public void setOptions(String[] options) throws Exception {
 		String tmpStr;
 
+		tmpStr = Utils.getOption("D", options);
+		if (tmpStr.length() != 0) {
+			e_tree_class.setData(tmpStr);
+		}
+		
 		tmpStr = Utils.getOption("FF", options);
 		if (tmpStr.length() != 0) {
 			e_tree_class.setFitFuncsString(tmpStr);
@@ -302,9 +322,14 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 			e_tree_class.setIndividualGeneratorString(tmpStr);
 		}
 
-		tmpStr = Utils.getOption("IP", options);
+		tmpStr = Utils.getOption("PS", options);
 		if (tmpStr.length() != 0) {
 			e_tree_class.setPopulationSize(Integer.parseInt(tmpStr));
+		}
+
+		tmpStr = Utils.getOption("NoG", options);
+		if (tmpStr.length() != 0) {
+			e_tree_class.setNumberOfGenerations(Integer.parseInt(tmpStr));
 		}
 
 		tmpStr = Utils.getOption('S', options);
@@ -322,6 +347,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 		Utils.checkForRemainingOptions(options);
 	}
 
+	// WEKA CLASSIFIER METHODS //
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -397,6 +423,85 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 
 	}
 
+	// GENLIB.CLASSIFIER METHODS //
+	/**
+	 * Build classifier for Data object. It test on {@link Instances} type a
+	 * calls {@link #buildClassifier(Instances)}.
+	 * 
+	 * @param data
+	 *            object with Instances inside
+	 */
+	@Override
+	public void buildClassifier(Data data) throws Exception {
+		if (data.isInstances()) {
+			buildClassifier(data.toInstances());
+		} else {
+			throw new WrongDataException(String.format(
+					TextResource.getString(TextKeys.eTypeParameter),
+					Instances.class.getName(), data.getData().getClass()
+							.getName()));
+		}
+	}
+
+	/**
+	 * Classify instance method for Data object. It classifies {@link Instances}
+	 * inside data object with created model. That's done by calling
+	 * {@link #classifyInstance(Instance)}
+	 * 
+	 * @param data
+	 *            object with Instances inside
+	 */
+	@Override
+	public double[] classifyData(Data data) throws Exception {
+		if (data.isInstances()) {
+			double[] classifications = new double[data.numInstances()];
+
+			Instances instances = data.toInstances();
+
+			// should be enumeration of instances
+			@SuppressWarnings("unchecked")
+			Enumeration<Instance> enumeration = (Enumeration<Instance>) instances
+					.enumerateInstances();
+
+			int index = 0;
+			while (enumeration.hasMoreElements()) {
+				classifications[index++] = classifyInstance(enumeration
+						.nextElement());
+			}
+			return classifications;
+		} else {
+			throw new WrongDataException(String.format(
+					TextResource.getString(TextKeys.eTypeParameter),
+					Instances.class.getName(), data.getData().getClass()
+							.getName()));
+		}
+	}
+
+	// DRAWABLE METHODS //
+	/**
+	 * Returns graph describing the tree.
+	 *
+	 * @return the graph describing the tree
+	 * @throws Exception
+	 *             if graph can't be computed
+	 */
+	@Override
+	public String graph() throws Exception {
+		return e_tree_class.getBestIndividual().toString();
+	}
+
+	/**
+	 * Returns the type of graph this classifier represents.
+	 * 
+	 * @return Drawable.Newick
+	 */
+	@Override
+	public int graphType() {
+		return Drawable.Newick;
+	}
+
+	// GETTERS SETTERS FOR OPTION HANDLER //
+
 	/**
 	 * Get the value of Seed.
 	 *
@@ -429,6 +534,37 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	}
 
 	/**
+	 * Getter method for the parameter D. It contains information about data splitting
+	 * into train and validation parts.
+	 * 
+	 * @return String value of parameter FF
+	 */
+	public String getData() {
+		return e_tree_class.getData();
+	}
+
+	/**
+	 * Setter method for the parameter D. It contains information about data splitting
+	 * into train and validation parts.
+	 * 
+	 * @param String
+	 *            value of parameter FF
+	 */
+	public void setData(String dataParam) {
+		e_tree_class.setData(dataParam);
+	}
+
+	/**
+	 * Return the tip text for this property
+	 * 
+	 * @return tip text for this property suitable for displaying in the
+	 *         explorer/experimenter gui
+	 */
+	public String dataTipText() {
+		return TextResource.getString(TextKeys.wDataTipText);
+	}
+	
+	/**
 	 * Getter method for the parameter FF. It contains information about fitness
 	 * functions.
 	 * 
@@ -456,7 +592,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	 *         explorer/experimenter gui
 	 */
 	public String fitnessFunctionsTipText() {
-		return TextResource.getString("wfitFuncTipText");
+		return TextResource.getString(TextKeys.wFitFuncTipText);
 	}
 
 	/**
@@ -487,7 +623,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	 *         explorer/experimenter gui
 	 */
 	public String fitCompTipText() {
-		return TextResource.getString("wfitCompTipText");
+		return TextResource.getString(TextKeys.wFitCompTipText);
 	}
 
 	/**
@@ -527,7 +663,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	 * 
 	 * @return String value of parameter XP
 	 */
-	public String getXoverOperatorsString() {
+	public String getXoverOperators() {
 		return e_tree_class.getXoverString();
 	}
 
@@ -583,7 +719,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	 *         explorer/experimenter gui
 	 */
 	public String elitismTipText() {
-		return TextResource.getString("wElitism");
+		return TextResource.getString(TextKeys.wElitism);
 	}
 
 	/**
@@ -674,7 +810,36 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	 *         explorer/experimenter gui
 	 */
 	public String populationSizeTipText() {
-		return TextResource.getString("wPopSizeTipText");
+		return TextResource.getString(TextKeys.wPopSizeTipText);
+	}
+
+	/**
+	 * Returns the number of generations which we are working with.
+	 * 
+	 * @return number of generations
+	 */
+	public int getNumberOfGenerations() {
+		return e_tree_class.getNumberOfGenerations();
+	}
+
+	/**
+	 * Sets the number of generations which we are going to work with.
+	 * 
+	 * @param populationSize
+	 *            new size of population
+	 */
+	public void setNumberOfGenerations(int numberOfGenerations) {
+		e_tree_class.setNumberOfGenerations(numberOfGenerations);
+	}
+
+	/**
+	 * Return the tip text for this property
+	 * 
+	 * @return tip text for this property suitable for displaying in the
+	 *         explorer/experimenter gui
+	 */
+	public String numberOfGenerationsTipText() {
+		return TextResource.getString(TextKeys.wNumOfGens);
 	}
 
 	/**
@@ -703,7 +868,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	 *         explorer/experimenter gui
 	 */
 	public String fitnessThreadsTipText() {
-		return TextResource.getString("wfitThreadsTipText");
+		return TextResource.getString(TextKeys.wFitThreadsTipText);
 	}
 
 	/**
@@ -869,6 +1034,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 				+ "For more information see: \n\n" + getTechnicalInformation();
 	}
 
+	// TECHNICAL INFORMATION METHODS //
 	/**
 	 * Method will built up the TechnicalInformation object with basic
 	 * information about this classificator that can be accessed from weka.
@@ -886,6 +1052,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 		return result;
 	}
 
+	// ADDITIONAL MEASURE PRODUCER METHODS //
 	/**
 	 * Returns an enumeration of the additional measure names
 	 * 
@@ -920,6 +1087,25 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 		}
 	}
 
+	// TOSTRING //
+	/**
+	 * Returns a description of the classifier.
+	 * 
+	 * @return a description of the classifier
+	 */
+	public String toString() {
+
+		if (e_tree_class.getBestIndividual() == null) {
+			return "No classifier built";
+		} else {
+			return "Start genetic tree\n------------------\n"
+					+ e_tree_class.getStartIndividual().toString()
+					+ "Created genetic tree\n------------------\n"
+					+ e_tree_class.getBestIndividual().toString();
+		}
+	}
+
+	// MAIN STATIC METHOD //
 	/**
 	 * Main method for testing this class
 	 *
@@ -930,43 +1116,4 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 		System.out.println("DONE");
 		runClassifier(new WekaEvolutionTreeClassifier(), argv);
 	}
-
-	@Override
-	public void buildClassifier(Data data) throws Exception {
-		if (data.isInstances()) {
-			buildClassifier(data.toInstances());
-		} else {
-			throw new WrongDataException(String.format(
-					TextResource.getString(TextKeys.eTypeParameter),
-					Instances.class.getName(), data.getData().getClass()
-							.getName()));
-		}
-	}
-
-	@Override
-	public double[] classifyData(Data data) throws Exception {
-		if (data.isInstances()) {
-			double[] classifications = new double[data.numInstances()];
-
-			Instances instances = data.toInstances();
-
-			// should be enumeration of instances
-			@SuppressWarnings("unchecked")
-			Enumeration<Instance> enumeration = (Enumeration<Instance>) instances
-					.enumerateInstances();
-
-			int index = 0;
-			while (enumeration.hasMoreElements()) {
-				classifications[index++] = classifyInstance(enumeration
-						.nextElement());
-			}
-			return classifications;
-		} else {
-			throw new WrongDataException(String.format(
-					TextResource.getString(TextKeys.eTypeParameter),
-					Instances.class.getName(), data.getData().getClass()
-							.getName()));
-		}
-	}
-
 }

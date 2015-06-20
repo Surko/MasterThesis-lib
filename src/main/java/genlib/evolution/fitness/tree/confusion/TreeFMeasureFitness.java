@@ -72,27 +72,30 @@ public class TreeFMeasureFitness extends TreeConfusionFitness {
 	 * {@inheritDoc} </p> Overriden to utilize Beta parameter.
 	 */
 	@Override
-	protected boolean parseParamLabels(String paramLabel, String paramValue) {
-		if (super.parseParamLabels(paramLabel, paramValue)) {
-			return true;
-		}
-
+	protected void parseParamLabels(String paramLabel, String paramValue) {
 		FMeasureEnum fMeasureEnum = FMeasureEnum.value(paramLabel);
-		if (fMeasureEnum == null) {
-			LOG.log(Level.INFO, String.format(
-					TextResource.getString(TextKeys.iExcessParam), paramLabel));
-			return false;
+		ConfusionEnum confusionEnum = ConfusionEnum.value(paramLabel);
+		if (fMeasureEnum == null && confusionEnum == null) {
+			LOG.log(Level.INFO, String.format(TextResource
+					.getString(TextKeys.iExcessParam), String.format(
+					PermMessages._param_format, paramLabel, paramValue)));				
+			return;
 		}
 
-		switch (fMeasureEnum) {
-		case BETA:
-			this.doubleBeta = Double.valueOf(paramValue);
-			this.doubleBeta *= this.doubleBeta;
-			break;
-		default:
-			return false;
+		if (fMeasureEnum != null) {
+			switch (fMeasureEnum) {
+			case BETA:
+				this.doubleBeta = Double.valueOf(paramValue);
+				this.doubleBeta *= this.doubleBeta;
+				return;
+			default:
+				return;
+			}
 		}
-		return true;
+		
+		if (confusionEnum != null) {
+			super.parseParamLabels(paramLabel, paramValue);
+		}
 	}
 
 	/**

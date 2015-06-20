@@ -1,14 +1,19 @@
 package genlib.evolution.operators;
 
-import java.util.Random;
-
 import genlib.evolution.individuals.TreeIndividual;
+import genlib.evolution.operators.Operator.OperEnum;
 import genlib.evolution.population.IPopulation;
 import genlib.locales.PermMessages;
+import genlib.locales.TextKeys;
+import genlib.locales.TextResource;
 import genlib.structures.Data;
 import genlib.structures.extensions.SizeExtension;
 import genlib.structures.trees.Node;
 import genlib.utils.Utils;
+
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The most used Tree Crossover with very simple functionality. It chooses
@@ -24,6 +29,9 @@ public class SubTreeCrossover implements Operator<TreeIndividual> {
 
 	/** for serialization */
 	private static final long serialVersionUID = -8132560526319441150L;
+	/** logger for this class */
+	private static final Logger LOG = Logger.getLogger(SubTreeCrossover.class
+			.getName());
 	/** name of this operator */
 	public static final String initName = "subTreeX";
 	/** probability of crossover */
@@ -63,14 +71,14 @@ public class SubTreeCrossover implements Operator<TreeIndividual> {
 
 			TreeIndividual child1 = parent1.copy();
 			TreeIndividual child2 = parent2.copy();
-			
+
 			if (random.nextDouble() < xProb) {
 				crossIndividuals(child1, child2);
 
 				child1.change();
-				child2.change();								
+				child2.change();
 			}
-			
+
 			childs.add(child1);
 			childs.add(child2);
 		}
@@ -110,14 +118,14 @@ public class SubTreeCrossover implements Operator<TreeIndividual> {
 			treeSize2 = Utils.computeSize(r2);
 			int i2 = random.nextInt(treeSize2);
 			subTree2 = Utils.getNode(r2, i2);
-		}		
-		
+		}
+
 		Node parent1 = subTree1.getParent();
 		Node parent2 = subTree2.getParent();
-		
+
 		if (parent1 == null) {
 			c1.setRoot(subTree2);
-		} else {					
+		} else {
 			for (int i = 0; i < parent1.getChildCount(); i++) {
 				if (parent1.getChildAt(i) == subTree1) {
 					parent1.setChildAt(i, subTree2);
@@ -159,21 +167,71 @@ public class SubTreeCrossover implements Operator<TreeIndividual> {
 	public Class<TreeIndividual> getIndividualClassType() {
 		return TreeIndividual.class;
 	}
-	
+
 	/**
-	 * {@inheritDoc}
-	 * </p>
-	 * This operator does not set the Data object.
+	 * {@inheritDoc} </p> It does not use {@link OperEnum#DATA} enum from {@link OperEnum}.
+	 */
+	public void setParam(String param) {
+		xProb = 0;
+
+		if (param.equals(PermMessages._blank_param)) {
+			return;
+		}
+
+		String[] parts = param.split(Utils.pDELIM);
+
+		// some kind of exception if it's not divisible by two
+
+		for (int i = 0; i < parts.length; i += 2) {
+			OperEnum opEnum = OperEnum.value(parts[i]);
+
+			if (opEnum == null) {
+				LOG.log(Level.INFO,
+						String.format(
+								TextResource.getString(TextKeys.iExcessParam),
+								parts[i]));
+				continue;
+			}
+
+			switch (opEnum) {
+			case PROB:
+				this.xProb = Double.parseDouble(parts[i + 1]);
+				break;
+			case DATA:
+				LOG.log(Level.INFO,
+						String.format(
+								TextResource.getString(TextKeys.iExcessParam),
+								parts[i]));
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc} </p> This operator does not set the Data object.
 	 */
 	@Override
-	public void setData(Data data) {}
-	
+	public void setData(Data data) {
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String objectInfo() {
-		return String.format(PermMessages._fit_format, initName, 1.0);
+		String paramString = "";
+		if (xProb >= 0 && xProb <= 1) {
+			paramString = String.format(PermMessages._param_format,
+					OperEnum.PROB, xProb);
+		}		
+		if (paramString.isEmpty()) {
+			return String.format(PermMessages._fit_format, initName,
+					PermMessages._blank_param);
+		}
+		return String.format(PermMessages._fit_format, initName,
+				paramString);
 	}
 
 	/**

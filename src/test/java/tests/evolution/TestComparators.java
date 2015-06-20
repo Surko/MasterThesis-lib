@@ -19,6 +19,7 @@ import genlib.utils.WekaUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Random;
 
 import org.junit.Test;
 
@@ -45,7 +46,7 @@ public class TestComparators {
 			RDG1 rdg = new RDG1();
 			rdg.setOptions(options);
 			rdg.defineDataFormat();
-			wekaData = new Data(rdg.generateExamples());
+			wekaData = new Data(rdg.generateExamples(), new Random(0));
 
 			HashMap<String, Integer> attrIndexMap = wekaData.getAttrIndexMap();
 			HashMap<String, Integer>[] attrValueIndexMap = wekaData

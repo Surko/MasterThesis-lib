@@ -5,7 +5,6 @@ import genlib.evolution.population.IPopulation;
 import genlib.structures.Data;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -29,7 +28,38 @@ import java.util.Random;
  * @author Lukas Surin
  *
  */
-public interface Operator<T extends Individual> extends Serializable {	
+public interface Operator<T extends Individual> extends Serializable {
+
+	/**
+	 * OperEnum that defines what kind of parameters are possible for
+	 * operators.</p> Defined kinds of parameters: </br> {@link OperEnum#DATA}
+	 * </br> {@link OperEnum#PROB}
+	 * 
+	 * @author Lukas Surin
+	 *
+	 */
+	public enum OperEnum {
+		/**
+		 * Probability parameter in which we apply operator on individuals
+		 */
+		PROB,
+		/**
+		 * Data parameter to define what kind of splitting we use.
+		 */
+		DATA;
+
+		public static OperEnum value(String name) {
+			if (name.equals(PROB.name())) {
+				return PROB;
+			}
+
+			if (name.equals(DATA.name())) {
+				return DATA;
+			}
+
+			return null;
+		}
+	}
 
 	/**
 	 * Method should return the tag of compatibility with weka for operator.
@@ -94,6 +124,14 @@ public interface Operator<T extends Individual> extends Serializable {
 	 *            population of created childs
 	 */
 	public void execute(IPopulation<T> parents, IPopulation<T> childs);
+
+	/**
+	 * Method which set the parameters for this operator
+	 * 
+	 * @param param
+	 *            to split the parameters
+	 */
+	public void setParam(String param);
 
 	/**
 	 * Method which should return the string representation of this object (info

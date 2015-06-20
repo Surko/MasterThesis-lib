@@ -74,6 +74,11 @@ public class DefaultTreeMutation implements Operator<TreeIndividual> {
 	
 	/**
 	 * {@inheritDoc}
+	 */
+	public void setParam(String param) {}
+	
+	/**
+	 * {@inheritDoc}
 	 * </p>
 	 * This operator does not set the Data object.
 	 */
@@ -85,7 +90,7 @@ public class DefaultTreeMutation implements Operator<TreeIndividual> {
 	 */
 	@Override
 	public String objectInfo() {
-		return String.format(PermMessages._fit_format, initName, 1.0);
+		return String.format(PermMessages._fit_format, initName, PermMessages._blank_param);
 	}
 
 	/**

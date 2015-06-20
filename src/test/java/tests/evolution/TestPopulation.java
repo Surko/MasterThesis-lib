@@ -13,6 +13,7 @@ import genlib.utils.Utils;
 import genlib.utils.Utils.Sign;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.junit.Test;
 
@@ -35,7 +36,7 @@ public class TestPopulation {
 			RDG1 rdg = new RDG1();
 			rdg.setOptions(options);
 			rdg.defineDataFormat();
-			wekaData = new Data(rdg.generateExamples());
+			wekaData = new Data(rdg.generateExamples(), new Random(0));
 		} catch (Exception e) {
 		}
 

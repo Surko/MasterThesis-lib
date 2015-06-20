@@ -81,9 +81,14 @@ public class DefaultTreeCrossover implements Operator<TreeIndividual> {
 	/**
 	 * {@inheritDoc}
 	 */
+	public void setParam(String param) {}
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String objectInfo() {
-		return String.format(PermMessages._fit_format, initName, 1.0);
+		return String.format(PermMessages._fit_format, initName, PermMessages._blank_param);
 	}
 
 	/**

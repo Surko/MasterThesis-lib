@@ -36,7 +36,7 @@ public class TestOperators {
 			RDG1 rdg = new RDG1();
 			rdg.setOptions(options);
 			rdg.defineDataFormat();
-			wekaData = new Data(rdg.generateExamples());
+			wekaData = new Data(rdg.generateExamples(), new Random(0));
 		} catch (Exception e) {}
 	}
 
@@ -44,7 +44,7 @@ public class TestOperators {
 	public void testDefaultMutationOperator() {
 		DefaultTreeMutation dtm = new DefaultTreeMutation();
 		assertTrue(dtm.objectInfo().equals(
-				DefaultTreeMutation.initName + " 1.0"));
+				DefaultTreeMutation.initName + " x"));
 		Population<TreeIndividual> childs = new Population<>();
 		dtm.execute(individuals, childs);
 		assertTrue(individuals != childs);
@@ -58,7 +58,7 @@ public class TestOperators {
 	public void testDefaultCrossOverOperator() {
 		DefaultTreeCrossover dtx = new DefaultTreeCrossover();
 		assertTrue(dtx.objectInfo().equals(
-				DefaultTreeCrossover.initName + " 1.0"));
+				DefaultTreeCrossover.initName + " x"));
 		Population<TreeIndividual> childs = new Population<>();
 		dtx.execute(individuals, childs);
 		assertTrue(individuals != childs);
@@ -74,12 +74,12 @@ public class TestOperators {
 		
 		NodeToLeafNominalMutation ntl = new NodeToLeafNominalMutation();
 		assertTrue(ntl.objectInfo().equals(
-				NodeToLeafNominalMutation.initName + " 0.0"));
+				NodeToLeafNominalMutation.initName + " PROB,0.0"));
 		ntl.setRandomGenerator(new Random(0L));
 		ntl.setOperatorProbability(1.0d);
 		ntl.setData(wekaData);
 		assertTrue(ntl.objectInfo().equals(
-				NodeToLeafNominalMutation.initName + " 1.0"));
+				NodeToLeafNominalMutation.initName + " PROB,1.0"));
 		Population<TreeIndividual> childs = new Population<>();
 		ntl.execute(copyOfIndividuals, childs);
 		assertTrue(copyOfIndividuals != childs);
@@ -100,12 +100,12 @@ public class TestOperators {
 		
 		DecisionStumpMutation dsm = new DecisionStumpMutation();
 		assertTrue(dsm.objectInfo().equals(
-				DecisionStumpMutation.initName + " 0.0"));
+				DecisionStumpMutation.initName + " PROB,0.0"));
 		dsm.setRandomGenerator(new Random(0L));
 		dsm.setOperatorProbability(1.0d);
 		dsm.setData(wekaData);
 		assertTrue(dsm.objectInfo().equals(
-				DecisionStumpMutation.initName + " 1.0"));
+				DecisionStumpMutation.initName + " PROB,1.0"));
 		Population<TreeIndividual> childs = new Population<>();
 		dsm.execute(copyOfIndividuals, childs);
 		assertTrue(copyOfIndividuals != childs);
