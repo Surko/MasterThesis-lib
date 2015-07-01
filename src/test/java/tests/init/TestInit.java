@@ -124,7 +124,7 @@ public class TestInit {
 		etc.makePropsFromString(false);			
 				
 		assertTrue(PluginManager.fitFuncs.size() == 13);
-		assertTrue(PluginManager.mutOper.size() == 4);
+		assertTrue(PluginManager.mutOper.size() == 5);
 		assertTrue(PluginManager.xOper.size() == 2);
 		assertTrue(PluginManager.selectors.size() == 3);
 		assertTrue(PluginManager.envSelectors.size() == 3);

@@ -1,6 +1,9 @@
 build/*
 final-structure/*.*
 final-structure/_logs
+final-structure/tests
+final-structure/tests
+final-structure/data
 libraries/*
 .*
 !.gitignore

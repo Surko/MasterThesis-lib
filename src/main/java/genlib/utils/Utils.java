@@ -52,7 +52,7 @@ public class Utils {
 		private Sign(String repr) {
 			this.repr = repr;
 		}
-		
+
 		public String getValue() {
 			return repr;
 		}
@@ -235,10 +235,28 @@ public class Utils {
 	 *            Value of a
 	 * @param b
 	 *            Value of b
+	 * @param threshold
+	 *            Value of threshold
+	 * @return True/False whether values are equal
+	 */
+	public static boolean eq(double a, double b, double threshold) {
+		return Double.compare(a, b) == 0
+				|| ((a - b) < threshold && (b - a) > threshold);
+	}
+
+	/**
+	 * Method which returns true/false accordingly whether a equals b. Equality
+	 * is even forced when there's only little difference between those values.
+	 * This little difference is called THRESHOLD.
+	 * 
+	 * @param a
+	 *            Value of a
+	 * @param b
+	 *            Value of b
 	 * @return True/False whether values are equal
 	 */
 	public static boolean eq(double a, double b) {
-		return a == b || ((a - b) < THRESHOLD && (a - b) > THRESHOLD);
+		return a == b || ((a - b) < THRESHOLD && (b - a) > THRESHOLD);
 	}
 
 	/**
@@ -307,7 +325,7 @@ public class Utils {
 		return 0;
 
 	}
-	
+
 	/**
 	 * Method which gets number of nodes of a given tree. Root must be of type
 	 * Node.
@@ -398,6 +416,84 @@ public class Utils {
 		}
 
 		return size;
+	}
+
+	/**
+	 * Post processing method that fixes attributes in node if the same
+	 * attribute was used with inconsistent value on path to root. </p> If there
+	 * is any inconsistency than it replace the node with child and calls the
+	 * fixNode on this replaced node.
+	 * 
+	 * @param root
+	 *            from which we start fixing
+	 */
+	public static void fixNode(Node root) {
+		if (root.isLeaf() || root.getParent() == null) {
+			return;
+		}
+
+		int attr = root.getAttribute();
+		double value = root.getValue();
+		Sign sign = root.getSign();
+
+		Node rootParent = root.getParent();
+		int rootIndex = 0;
+
+		for (int i = 0; i < rootParent.getChildCount(); i++) {
+			if (rootParent.getChildAt(i) == root) {
+				rootIndex = i;
+				break;
+			}
+		}
+
+		Node tempNode = root;
+		Node tempParent = rootParent;
+
+		while (tempParent != null) {
+			if (tempParent.getAttribute() == attr) {
+				if (tempParent.getSign() != null && sign != null) {
+					//
+					// switch (tempParent.getSign()) {
+					// case EQUALS :
+					//
+					//
+					// case GREATEQ :
+					// case GREATER :
+					// if (Sign.GREATER == sign || Sign.GREATEQ == sign) {
+					// if (tempParent.getValue() >= value) {
+					// rootParent.setChildAt(0, root.getChildAt(0));
+					// }
+					// }
+					// fixNode(rootParent.getChildAt(rootIndex));
+					// case LESS :
+					// case LESSEQ :
+					// if (Sign.LESS == sign || Sign.LESSEQ == sign) {
+					// if (tempParent.getValue() <= value) {
+					// rootParent.setChildAt(0, root.getChildAt(0));
+					// }
+					// }
+					// fixNode(rootParent.getChildAt(rootIndex));
+					// break;
+					// case NEQUALS :
+					// }
+				} else {
+					for (int i = 0; i < tempParent.getChildCount(); i++) {
+						if (tempParent.getChildAt(i) == tempNode) {
+							rootParent
+									.setChildAt(rootIndex, root.getChildAt(i));
+							break;
+						}
+					}
+
+					fixNode(rootParent.getChildAt(rootIndex));
+					return;
+				}
+
+			}
+
+			tempNode = tempParent;
+			tempParent = tempParent.getParent();
+		}
 	}
 
 	/**
@@ -629,19 +725,20 @@ public class Utils {
 		return getNodes(root, new ArrayList<Node>());
 	}
 
-	public static boolean isValueProper(double instanceValue, Sign compare, double nodeValue) {
-		
+	public static boolean isValueProper(double instanceValue, Sign compare,
+			double nodeValue) {
+
 		if (compare == null) {
 			throw new IllegalArgumentException();
 		}
-		
+
 		switch (compare) {
 		case EQUALS:
-			return Double.compare(instanceValue, nodeValue) == 0;			
+			return Double.compare(instanceValue, nodeValue) == 0;
 		case GREATEQ:
 			return Double.compare(instanceValue, nodeValue) != -1;
 		case GREATER:
-			return Double.compare(instanceValue, nodeValue) == 1;			
+			return Double.compare(instanceValue, nodeValue) == 1;
 		case LESS:
 			return Double.compare(instanceValue, nodeValue) == -1;
 		case LESSEQ:
@@ -649,11 +746,11 @@ public class Utils {
 		case NEQUALS:
 			return Double.compare(instanceValue, nodeValue) != 0;
 		}
-		
+
 		throw new IllegalStateException();
-		
+
 	}
-	
+
 	public static double getFilteredInstancesRegression(
 			GenLibInstances instances, Node root) {
 

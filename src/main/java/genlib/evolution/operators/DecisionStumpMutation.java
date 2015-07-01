@@ -9,6 +9,7 @@ import genlib.locales.PermMessages;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
 import genlib.structures.Data;
+import genlib.structures.extensions.SizeExtension;
 import genlib.structures.trees.MultiWayHeightNode;
 import genlib.structures.trees.MultiWayNode;
 import genlib.structures.trees.Node;
@@ -79,25 +80,36 @@ public class DecisionStumpMutation implements Operator<TreeIndividual> {
 				}
 
 				Node root = child.getRootNode();
-				Utils.getLeavesRecursive(root, leaves);
+				Node nodeToMutate = null;
+				
+				int treeSize = 0;
+				if (root instanceof SizeExtension) {
+					treeSize = ((SizeExtension) root).getTreeSize();
+					int nIndex = random.nextInt(treeSize);
+					nodeToMutate = Utils.getExtensionNode(root, nIndex);
+				} else {
+					treeSize = Utils.computeSize(root);
+					int nIndex = random.nextInt(treeSize);
+					nodeToMutate = Utils.getNode(root, nIndex);
+				}								
+				
+				int sIndex = random.nextInt(stumps.length);				
+				Node nodeToMutateParent = nodeToMutate.getParent();
 
-				int lIndex = random.nextInt(leaves.size());
-				int sIndex = random.nextInt(stumps.length);
-
-				Node leafToMutate = leaves.get(lIndex);
-				Node leafToMutateParent = leafToMutate.getParent();
-
-				if (leafToMutateParent == null) {
+				if (nodeToMutateParent == null) {
 					child.setRoot(stumps[sIndex].getRootNode().copy());
 				} else {
-					for (int i = 0; i < leafToMutateParent.getChilds().length; i++) {
-						if (leafToMutateParent.getChildAt(i) == leafToMutate) {
-							leafToMutateParent.setChildAt(i, stumps[sIndex]
+					for (int i = 0; i < nodeToMutateParent.getChilds().length; i++) {
+						if (nodeToMutateParent.getChildAt(i) == nodeToMutate) {
+							nodeToMutateParent.setChildAt(i, stumps[sIndex]
 									.getRootNode().copy());
+							Utils.fixNode(nodeToMutateParent.getChildAt(i));
 							break;
 						}
 					}
 				}
+				
+				
 				// change to recompute fitness
 				child.change();
 			}
@@ -120,7 +132,6 @@ public class DecisionStumpMutation implements Operator<TreeIndividual> {
 	private void createStumps(Node node) {
 		WekaSimpleStumpGenerator wekaSSGen = new WekaSimpleStumpGenerator();
 		wekaSSGen.setInstances(data.toInstances());
-		wekaSSGen.setSplitCriteria(InformationGainCriteria.getInstance());
 		if (node instanceof MultiWayNode) {
 			wekaSSGen.setAutoHeight(false);
 		}

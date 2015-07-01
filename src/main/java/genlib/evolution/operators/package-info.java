@@ -1,7 +1,7 @@
 @genlib.annotations.XOperatorAnnot(
 		toInjectNames = {
 				genlib.evolution.operators.DefaultTreeCrossover.initName,
-				genlib.evolution.operators.SubTreeCrossover.initName
+				genlib.evolution.operators.SubTreeCrossover.initName				
 		},
 		toInjectClasses = {
 				genlib.evolution.operators.DefaultTreeCrossover.class,
@@ -15,13 +15,15 @@
 				genlib.evolution.operators.DefaultTreeMutation.initName,
 				genlib.evolution.operators.NodeToLeafNominalMutation.initName,
 				genlib.evolution.operators.NodeToLeafNumericMutation.initName,
-				genlib.evolution.operators.DecisionStumpMutation.initName
+				genlib.evolution.operators.DecisionStumpMutation.initName,
+				genlib.evolution.operators.ValueChangeMutation.initName
 		},
 		toInjectClasses = {
 				genlib.evolution.operators.DefaultTreeMutation.class,
 				genlib.evolution.operators.NodeToLeafNominalMutation.class,
 				genlib.evolution.operators.NodeToLeafNumericMutation.class,
-				genlib.evolution.operators.DecisionStumpMutation.class
+				genlib.evolution.operators.DecisionStumpMutation.class,
+				genlib.evolution.operators.ValueChangeMutation.class
 		},
 		toInjectField = "mutOper",
 		toInjectClass = genlib.plugins.PluginManager.class

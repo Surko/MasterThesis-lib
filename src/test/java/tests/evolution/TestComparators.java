@@ -260,9 +260,9 @@ public class TestComparators {
 		// wekaIndividual 0.9538095238095239
 		// transIndividual 0.8400000000000001
 		// testIndividual 0.6966666666666667
-		assertTrue(comp.compare(wekaIndividual, transIndividual) < 0);
-		assertTrue(comp.compare(transIndividual, testIndividual) < 0);
 		assertTrue(comp.compare(wekaIndividual, testIndividual) < 0);
+		assertTrue(comp.compare(testIndividual, transIndividual) < 0);
+		assertTrue(comp.compare(wekaIndividual, transIndividual) < 0);
 
 		assertFalse(transIndividual.hasChanged());
 		assertFalse(testIndividual.hasChanged());

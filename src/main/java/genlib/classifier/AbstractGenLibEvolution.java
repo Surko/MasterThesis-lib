@@ -4,7 +4,6 @@ import genlib.GenLib;
 import genlib.classifier.classifierextensions.GenLibClassifierExtension;
 import genlib.classifier.common.EvolutionTreeClassifier;
 import genlib.evolution.individuals.TreeIndividual;
-import genlib.exceptions.TypeParameterException;
 import genlib.exceptions.WrongDataException;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
@@ -15,6 +14,7 @@ import genlib.structures.trees.Node;
 import genlib.utils.Utils;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Enumeration;
 
 import weka.core.OptionHandler;
@@ -22,9 +22,9 @@ import weka.core.Randomizable;
 import weka.core.TechnicalInformationHandler;
 
 /**
- * Classifier which extends from weka class {@link Classifier}. It has usual
- * methods from there which we implement. Here in this class, we follow some
- * established principles for example implementing necessary methods </br>
+ * Classifier which extends from weka class {@link Classifier}. It implements
+ * usual methods from there. Here in this class, we follow some established
+ * principles for example implementing necessary methods </br>
  * <p>
  * {@link #buildClassifier} - to build our classifier, </br> {@link #setOptions}
  * - to set options from inside the weka, </br> {@link #listOptions} - to list
@@ -40,9 +40,9 @@ import weka.core.TechnicalInformationHandler;
  * @author Lukas Surin
  *
  */
-public class GenLibEvolutionTreeClassifier implements Serializable, Classifier,
-		GenLibClassifierExtension {
-	
+public abstract class AbstractGenLibEvolution implements Serializable,
+		Classifier, GenLibClassifierExtension {
+
 	/** for serialization */
 	private static final long serialVersionUID = 4737451154277087874L;
 	/** Evolution classificator not dependant on weka. */
@@ -57,7 +57,7 @@ public class GenLibEvolutionTreeClassifier implements Serializable, Classifier,
 	 * @throws Exception
 	 *             Throws exception if
 	 */
-	public GenLibEvolutionTreeClassifier() throws Exception {
+	public AbstractGenLibEvolution() throws Exception {
 		GenLib.reconfig();
 		this.e_tree_class = new EvolutionTreeClassifier(false);
 	}
@@ -79,11 +79,6 @@ public class GenLibEvolutionTreeClassifier implements Serializable, Classifier,
 		}
 	}
 
-	@Override
-	public void setOptions(String[] options) {
-		
-	}
-
 	/**
 	 * Classifies an {@link GenLibInstance} with newly created
 	 * {@link TreeIndividual}.
@@ -95,26 +90,79 @@ public class GenLibEvolutionTreeClassifier implements Serializable, Classifier,
 	 *             if instance can't be classified successfully
 	 */
 	public double classifyInstance(GenLibInstance instance) throws Exception {
-		TreeIndividual bestIndividual = e_tree_class.getBestIndividual();
-
-		Node root = bestIndividual.getRootNode();
-
-		while (!root.isLeaf()) {
-			if (instance.getAttribute(root.getAttribute()).isNumeric()) {
-				if (Utils.isValueProper(
-						instance.getValueOfAttribute(root.getAttribute()),
-						root.getSign(), root.getValue())) {
-					root = root.getChildAt(0);
+		int treesToClassify = e_tree_class.getClassify();
+		
+		if (treesToClassify == 1) {
+			TreeIndividual bestIndividual = e_tree_class.getBestIndividuals().get(0);
+			Node root = bestIndividual.getRootNode();
+			while (!root.isLeaf()) {
+				if (instance.getAttribute(root.getAttribute()).isNumeric()) {
+					if (Utils.isValueProper(
+							instance.getValueOfAttribute(root.getAttribute()),
+							root.getSign(), root.getValue())) {
+						root = root.getChildAt(0);
+					} else {
+						root = root.getChildAt(1);
+					}
 				} else {
-					root = root.getChildAt(1);
-				}
-			} else {
-				root = root.getChildAt((int) instance.getValueOfAttribute(root
-						.getAttribute()));
+					root = root.getChildAt((int) instance.getValueOfAttribute(root
+							.getAttribute()));
+				}								
 			}
+			
+			return root.getValue();
+		}
+		
+		boolean nominal = instance.getClassAttribute().isNominal();
+		double[] numOfClassifications;
+		ArrayList<TreeIndividual> bestIndividuals = e_tree_class.getBestIndividuals();
+		
+		if (nominal) {
+			numOfClassifications = new double[instance.getClassAttribute().numOfValues()];
+		} else {
+			numOfClassifications = new double[1];
 		}
 
-		return root.getValue();
+		for (int i = 0; i < treesToClassify; i++) {
+			TreeIndividual bestIndividual = bestIndividuals.get(i);
+			Node root = bestIndividual.getRootNode();
+			while (!root.isLeaf()) {
+				if (instance.getAttribute(root.getAttribute()).isNumeric()) {
+					if (Utils.isValueProper(
+							instance.getValueOfAttribute(root.getAttribute()),
+							root.getSign(), root.getValue())) {
+						root = root.getChildAt(0);
+					} else {
+						root = root.getChildAt(1);
+					}
+				} else {
+					root = root.getChildAt((int) instance.getValueOfAttribute(root
+							.getAttribute()));
+				}								
+			}
+			
+			if (nominal) {
+				numOfClassifications[(int) root.getValue()]++;
+			} else {
+				numOfClassifications[0] += root.getValue();
+			}
+		}
+		
+		int maxIndex = 0;
+		if (nominal) {
+			double maxValue = numOfClassifications[0];					
+			for (int i = 1; i < numOfClassifications.length; i++) {
+				if (numOfClassifications[i] > maxValue) {
+					maxValue = numOfClassifications[i];
+					maxIndex = i;
+				}
+			}			
+		} else {
+			// only one value in numOfClassifications
+			numOfClassifications[0] /= treesToClassify;
+		}
+		
+		return numOfClassifications[maxIndex];
 
 	}
 
@@ -142,4 +190,10 @@ public class GenLibEvolutionTreeClassifier implements Serializable, Classifier,
 		}
 
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public abstract void setOptions(String[] options);
 }

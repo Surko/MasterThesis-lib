@@ -45,6 +45,29 @@ public class TestWekaUtils {
 	}
 
 	@Test
+	public void testDataParse() {
+		Instances parsed = wekaData.testCV(100, 1);
+		
+		assertTrue(parsed.numInstances() == 1);
+		assertTrue(parsed.numClasses() == 2);
+		assertTrue(parsed.numDistinctValues(0) == 2);
+		assertTrue(parsed.numDistinctValues(2) == 2);
+		assertTrue(parsed.numDistinctValues(4) == 2);
+		assertTrue(parsed.numDistinctValues(6) == 2);
+		assertTrue(parsed.numDistinctValues(8) == 2);
+		
+		if (TestProperties.testPrints) {
+			System.out.println("NumOfInstances " + parsed.numInstances());
+			System.out.println("NumOfClasses " + parsed.numClasses());
+			System.out.println("NumOfAttr0 " + parsed.numDistinctValues(0));
+			System.out.println("NumOfAttr2 " + parsed.numDistinctValues(2));
+			System.out.println("NumOfAttr4 " + parsed.numDistinctValues(4));
+			System.out.println("NumOfAttr6 " + parsed.numDistinctValues(6));
+			System.out.println("NumOfAttr8 " + parsed.numDistinctValues(8));			
+		}
+	}
+
+	@Test
 	public void testAttrMaps() throws Exception {
 		HashMap<String, Integer> attrIndexMap = WekaUtils
 				.makeAttrIndexMap(wekaData);

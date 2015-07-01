@@ -457,8 +457,8 @@ public class TestFitness {
 
 		assertTrue(f1 != 0);
 		assertTrue(f2 != 0);
-		assertTrue(Double.compare(f1, 1 / 3d) == 0);
-		assertTrue(Double.compare(f2, 1 / 21d) == 0);
+		assertTrue(Double.compare(f1, 1 / 8d) == 0);
+		assertTrue(Double.compare(f2, 1 / Math.pow(2, 21d)) == 0);
 		assertTrue(testIndividual.getFitnessValue(fIndex) != 0);
 		assertTrue(wekaIndividual.getFitnessValue(fIndex) != 0);
 		assertTrue(testIndividual.getFitnessValue(fIndex) == f1);

@@ -23,6 +23,7 @@ public class TextKeys {
 	public static final String wSelectorTipText = "wSelectorTipText";
 	public static final String wEnvSelectorTipText = "wEnvSelectorTipText";
 	public static final String wElitism = "wElitism";
+	public static final String wClassify = "wClassify";
 	// Error, Warning keys
 	public static final String eIndexOutOfBounds = "eIndexOutOfBounds";	
 	public static final String eNodeCreation = "eNodeCreation";

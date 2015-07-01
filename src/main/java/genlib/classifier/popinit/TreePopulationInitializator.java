@@ -17,7 +17,7 @@ public abstract class TreePopulationInitializator implements
 		PopulationInitializator<TreeIndividual> {
 
 	enum PopInitEnum {
-		RESAMPLE, AUTOHEIGHT, DIVIDEPARAM, MAXHEIGHT;
+		RESAMPLE, AUTOHEIGHT, DIVIDEPARAM, MAXHEIGHT, DATA;
 
 		public static PopInitEnum value(String name) {
 			if (RESAMPLE.name().equals(name)) {
@@ -69,6 +69,8 @@ public abstract class TreePopulationInitializator implements
 	protected Data data;
 	/** Final population size */
 	protected int popSize;
+	/** type of data split used in creating population */
+	protected int typeOfData = -1;
 
 	/**
 	 * Method that returns population of generated individuals from
@@ -152,8 +154,8 @@ public abstract class TreePopulationInitializator implements
 	}
 
 	@Override
-	public void setInstances(Data data) {
-		this.data = data;
+	public void setData(Data data) {
+		this.data = data.getDataOfType(typeOfData);
 	}
 
 	@Override
@@ -190,6 +192,9 @@ public abstract class TreePopulationInitializator implements
 				break;
 			case RESAMPLE:
 				this.resample = Boolean.parseBoolean(params[i + 1]);
+				break;
+			case DATA:
+				this.typeOfData = Integer.parseInt(params[i + 1]);
 				break;
 			default:
 				break;

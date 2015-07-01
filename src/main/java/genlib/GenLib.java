@@ -7,6 +7,7 @@ import genlib.locales.PermMessages;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
 import genlib.plugins.PluginManager;
+import genlib.structures.Data;
 
 import java.io.File;
 import java.util.Arrays;
@@ -114,6 +115,8 @@ public class GenLib {
 		LOG.info(PermMessages._arg_pars);
 		// COMMAND LINE
 		int _counter = 0;
+		String trainString = "";
+		String testString = "";
 
 		try {
 			while (_counter < args.length) {
@@ -138,9 +141,28 @@ public class GenLib {
 							.getRootPath(), "GenTree.log");
 					logFile.deleteOnExit();
 					_counter++;
+					break;	
+				case "-tr":
+					_counter++;
+					trainString = args[_counter];
+					if (trainString == null || trainString.isEmpty()) {
+						printHelp();
+						exit();
+					}
+					_counter++;
 					break;
-				case "-classifier":
-					String className = args[_counter++];
+				case "-ts":
+					_counter++;
+					testString = args[_counter];
+					if (testString == null || testString.isEmpty()) {
+						printHelp();
+						exit();
+					}
+					_counter++;
+					break;	
+				case "-c":
+					_counter++;
+					String className = args[_counter];
 					Class<? extends Classifier> classifierClass = PluginManager.classifiers
 							.get(className);
 
@@ -149,13 +171,30 @@ public class GenLib {
 								TextResource.getString(TextKeys.eNotDefClass),
 								className));
 						break;
-					}
-
+					}					
+						
+					// parameters are not mandatory and can be blank,
+					// default config is from config file
 					String[] restOfParams = Arrays.copyOfRange(args, _counter,
 							args.length);
 					Classifier classifier = classifierClass.newInstance();
 					classifier.setOptions(restOfParams);
-
+					// loading train dataset
+					Data trainData = classifier.makeDataFromFile(trainString);
+					// create classifier from dataset
+					classifier.buildClassifier(trainData);
+					// print builded classifier
+					System.out.println(classifier.toString());
+					// print train data classification
+					System.out.println(classifier.classifyData(trainData));
+					if (!testString.isEmpty()) {
+						// loading test dataset
+						Data testData = classifier.makeDataFromFile(testString);
+						// print test data classification
+						System.out.println(classifier.classifyData(testData));
+					}
+					
+					_counter++;
 					break;
 				default:
 					System.out.printf(TextResource.getString("_arg_ndparam"),
@@ -196,7 +235,9 @@ public class GenLib {
 		System.out.println("	-h, -?			print this help message");
 		System.out.println("	-version		prints application version");
 		System.out.println("	-no-logging		logging is disabled for this run");
-		System.out.println("	-classifier	class-name params	classify with classificator of name class-name and params");
+		System.out.println("	-tr				file with train data to be classified");
+		System.out.println("	-ts				file with test data to be classified");
+		System.out.println("	-c	class-name params	classify with classificator of name class-name and params");
 	}
 
 	/**

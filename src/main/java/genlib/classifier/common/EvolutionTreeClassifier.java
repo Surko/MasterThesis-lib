@@ -63,8 +63,17 @@ public class EvolutionTreeClassifier implements Serializable {
 	private boolean isWeka;
 	private TreePopulationInitializator popInit;
 	private EvolutionAlgorithm<TreeIndividual> ea;
-	private TreeIndividual theBestIndividual;
+	private ArrayList<TreeIndividual> theBestIndividuals;
 	private TreeIndividual startIndividual;
+
+	private String populationTypeString, populationInitString, indGenString;
+	private String selectorsString, envSelectorsString, fitCompString;
+	private String fitFunctionsString, xOverOpString, mutOpString, dataString;
+	private int classify;
+	private int populationSizeInt, numOfGensInt, fitThreadsInt, genThreadsInt,
+			operThreadsInt;
+	private double elitismRateDouble;
+	private long seed;
 
 	public EvolutionTreeClassifier(boolean isWeka) {
 		this.c = Config.getInstance();
@@ -74,17 +83,42 @@ public class EvolutionTreeClassifier implements Serializable {
 		this.xoverSet = new ArrayList<>();
 		this.selectors = new ArrayList<>();
 		this.envSelectors = new ArrayList<>();
-		this.random = Utils.randomGen;
+
+		this.seed = c.getSeed();
+		this.dataString = c.getData();
+		this.classify = c.getClassify();
+
+		this.populationTypeString = c.getPopulationType();
+		this.populationInitString = c.getPopulationInit();
+		this.populationSizeInt = c.getPopulationSize();
+		this.indGenString = c.getIndGenerators();
+		this.genThreadsInt = c.getGenNumOfThreads();
+
+		this.selectorsString = c.getSelectors();
+		this.envSelectorsString = c.getEnvSelectors();
+
+		this.fitCompString = c.getFitnessComparator();
+		this.fitFunctionsString = c.getFitnessFunctions();
+		this.fitThreadsInt = c.getFitNumOfThreads();
+
+		this.xOverOpString = c.getXoverOperators();
+		this.mutOpString = c.getMutationOperators();
+		this.operThreadsInt = c.getOperNumOfThreads();
+
+		this.elitismRateDouble = c.getElitismRate();
+		this.numOfGensInt = c.getNumberOfGenerations();
+
+		this.random = new Random(seed);
 	}
 
-	public void buildClassifier(Instances data) throws Exception {
-		theBestIndividual = null;
+	public void buildClassifier(Instances data) throws Exception {		
+		theBestIndividuals = null;
+		startIndividual = null;
 
-		random = new Random(Utils.randomGen.nextLong());
 		// create adapter Data around instances
 		Data workData = new Data(data, new Random(random.nextLong()));
 		// split the data into train and validation
-		workData.setParam(c.getData());
+		workData.setParam(dataString);
 		// making properties from string
 		makePropsFromString(data.classAttribute().isNumeric());
 		// Shuffle data
@@ -96,13 +130,13 @@ public class EvolutionTreeClassifier implements Serializable {
 	}
 
 	public void buildClassifier(GenLibInstances data) throws Exception {
-		theBestIndividual = null;
+		theBestIndividuals = null;
+		startIndividual = null;
 
-		random = new Random(Utils.randomGen.nextLong());
 		// create adapter Data around instances
 		Data workData = new Data(data, new Random(random.nextLong()));
 		// split the data into train and validation
-		workData.setParam(c.getData());
+		workData.setParam(dataString);
 		// making properties from string
 		makePropsFromString(data.numClasses() == -1);
 		// Shuffle data
@@ -116,19 +150,18 @@ public class EvolutionTreeClassifier implements Serializable {
 
 	private void commonBuildClassifier(Data workData) throws Exception {
 		popInit.setRandomGenerator(new Random(random.nextLong()));
-		popInit.setInstances(workData);
+		popInit.setData(workData);
 		popInit.initPopulation();
 
 		// Population object that contains tree individuals from population
 		// initializator
 		IPopulation<TreeIndividual> population = makePopulation();
-		startIndividual = population.getSortedIndividuals(fitComp).get(0);
+		startIndividual = population.getSortedIndividuals(fitComp).get(0).copy();
 
 		// Evolution algorithm that evolves population of tree individuals.
-		ea = new EvolutionAlgorithm<>(workData, population,
-				c.getNumberOfGenerations());
+		ea = new EvolutionAlgorithm<>(workData, population, numOfGensInt);
 		// number of generations to be run through
-		ea.setNumberOfGenerations(c.getNumberOfGenerations());
+		ea.setNumberOfGenerations(numOfGensInt);
 		// mates are selected with selector
 		ea.setSelectors(selectors);
 		// selectors for environment selection
@@ -142,12 +175,39 @@ public class EvolutionTreeClassifier implements Serializable {
 		// fitness functions are evaluated by one comparator
 		ea.setFitnessComparator(fitComp);
 		// percentage of parents that stay into next generation
-		ea.setElitism(c.getElitismRate());
+		ea.setElitism(elitismRateDouble);
 		// run population evolving
 		ea.run();
 
-		theBestIndividual = ea.getActualPopulation().getBestIndividual();
+		theBestIndividuals = ea.getActualPopulation().getSortedIndividuals(
+				fitComp);
+	}
 
+	public void reconfig() {
+		this.seed = c.getSeed();
+		this.dataString = c.getData();
+
+		this.populationTypeString = c.getPopulationType();
+		this.populationInitString = c.getPopulationInit();
+		this.populationSizeInt = c.getPopulationSize();
+		this.indGenString = c.getIndGenerators();
+		this.genThreadsInt = c.getGenNumOfThreads();
+
+		this.selectorsString = c.getSelectors();
+		this.envSelectorsString = c.getEnvSelectors();
+
+		this.fitCompString = c.getFitnessComparator();
+		this.fitFunctionsString = c.getFitnessFunctions();
+		this.fitThreadsInt = c.getFitNumOfThreads();
+
+		this.xOverOpString = c.getXoverOperators();
+		this.mutOpString = c.getMutationOperators();
+		this.operThreadsInt = c.getOperNumOfThreads();
+
+		this.elitismRateDouble = c.getElitismRate();
+		this.numOfGensInt = c.getNumberOfGenerations();
+
+		this.random = new Random(seed);
 	}
 
 	public void setAdditionalParams(Data data) {
@@ -168,34 +228,34 @@ public class EvolutionTreeClassifier implements Serializable {
 	}
 
 	public void makePropsFromString(boolean isNumeric) throws Exception {
-		if (c.getFitnessFunctions() != null) {
+		if (fitFunctionsString != null) {
 			makeFitnessFunctionsSet(isNumeric);
 		}
-		if (c.getFitnessComparator() != null) {
+		if (fitCompString != null) {
 			makeFitnessCompSet();
 		}
-		if (c.getXoverOperators() != null) {
+		if (xOverOpString != null) {
 			makeXoverOperatorSet();
 		}
-		if (c.getMutationOperators() != null) {
+		if (mutOpString != null) {
 			makeMutationOperatorSet();
 		}
-		if (c.getPopulationInit() != null) {
+		if (populationInitString != null) {
 			makePopInitializator();
 		}
-		if (c.getIndGenerators() != null) {
+		if (indGenString != null) {
 			makeGenerators();
 		}
-		if (c.getSelectors() != null) {
+		if (selectorsString != null) {
 			makeSelectorSet();
 		}
-		if (c.getEnvSelectors() != null) {
+		if (envSelectorsString != null) {
 			makeEnvSelectorSet();
 		}
 	}
 
 	public IPopulation<TreeIndividual> makePopulation() throws Exception {
-		String[] parameters = c.getPopulationType().split(Utils.oDELIM);
+		String[] parameters = populationTypeString.split(Utils.oDELIM);
 
 		if (parameters.length < 2) {
 			throw new PopulationTypeStringFormatException(
@@ -212,7 +272,7 @@ public class EvolutionTreeClassifier implements Serializable {
 			toReturn.setIndividuals(popInit.getPopulation());
 		}
 
-		return new Population<>(popInit.getPopulation(), c.getPopulationSize());
+		return new Population<>(popInit.getPopulation(), populationSizeInt);
 	}
 
 	/**
@@ -226,9 +286,8 @@ public class EvolutionTreeClassifier implements Serializable {
 	 *             if there isn't config for selectors
 	 */
 	private void makeSelectorSet() throws Exception {
-		String param = c.getSelectors();
 		selectors.clear();
-		String[] parameters = param.split(Utils.oDELIM);
+		String[] parameters = selectorsString.split(Utils.oDELIM);
 		if (parameters.length % 2 != 0) {
 			// bad format
 			throw new SelectorStringFormatException(
@@ -277,9 +336,8 @@ public class EvolutionTreeClassifier implements Serializable {
 	 *             if there isn't config for env selectors
 	 */
 	private void makeEnvSelectorSet() throws Exception {
-		String param = c.getEnvSelectors();
 		envSelectors.clear();
-		String[] parameters = param.split(Utils.oDELIM);
+		String[] parameters = envSelectorsString.split(Utils.oDELIM);
 		if (parameters.length % 2 != 0) {
 			// bad format
 			throw new SelectorStringFormatException(
@@ -316,9 +374,8 @@ public class EvolutionTreeClassifier implements Serializable {
 	}
 
 	private void makeFitnessCompSet() throws Exception {
-		String param = c.getFitnessComparator();
 		fitComp = null;
-		String[] parameters = param.split(Utils.oDELIM);
+		String[] parameters = fitCompString.split(Utils.oDELIM);
 
 		if (parameters.length <= 0 || parameters.length > 2) {
 			// bad format
@@ -354,9 +411,8 @@ public class EvolutionTreeClassifier implements Serializable {
 	}
 
 	private void makeFitnessFunctionsSet(boolean isNumeric) throws Exception {
-		String param = c.getFitnessFunctions();
 		fitFuncs.clear();
-		String[] parameters = param.split(Utils.oDELIM);
+		String[] parameters = fitFunctionsString.split(Utils.oDELIM);
 		if (parameters.length % 2 != 0) {
 			// bad format
 			throw new FitnessStringFormatException(
@@ -441,9 +497,8 @@ public class EvolutionTreeClassifier implements Serializable {
 	 *             compatible with weka when we use weka.
 	 */
 	private void makeXoverOperatorSet() throws Exception {
-		String param = c.getXoverOperators();
 		xoverSet.clear();
-		String[] parameters = param.split(Utils.oDELIM);
+		String[] parameters = xOverOpString.split(Utils.oDELIM);
 		if (parameters.length % 2 != 0) {
 			// bad format
 			throw new OperatorStringFormatException(
@@ -531,9 +586,8 @@ public class EvolutionTreeClassifier implements Serializable {
 	 *             compatible with weka when we use weka.
 	 */
 	private void makeMutationOperatorSet() throws Exception {
-		String param = c.getMutationOperators();
 		mutSet.clear();
-		String[] parameters = param.split(Utils.oDELIM);
+		String[] parameters = mutOpString.split(Utils.oDELIM);
 		if (parameters.length % 2 != 0) {
 			// bad format
 			throw new OperatorStringFormatException(
@@ -616,9 +670,8 @@ public class EvolutionTreeClassifier implements Serializable {
 	 */
 	private void makePopInitializator() throws InstantiationException,
 			IllegalAccessException {
-		String popInitString = c.getPopulationInit();
 		popInit = null;
-		String[] parameters = popInitString.split(Utils.oDELIM);
+		String[] parameters = populationInitString.split(Utils.oDELIM);
 
 		if (parameters.length % 2 != 0) {
 			// bad format
@@ -671,8 +724,8 @@ public class EvolutionTreeClassifier implements Serializable {
 			popInit.setParam(parameters[1]);
 		}
 
-		popInit.setPopulationSize(c.getPopulationSize());
-		popInit.setNumOfThreads(c.getGenNumOfThreads());
+		popInit.setPopulationSize(populationSizeInt);
+		popInit.setNumOfThreads(genThreadsInt);
 	}
 
 	/**
@@ -693,8 +746,7 @@ public class EvolutionTreeClassifier implements Serializable {
 	 *             if the generator is dependent on weka
 	 */
 	private void makeGenerators() throws Exception {
-		String indGen = c.getIndGenerators();
-		String[] parameters = indGen.split(Utils.oDELIM);
+		String[] parameters = indGenString.split(Utils.oDELIM);
 
 		if (popInit == null) {
 			throw new NotInitializedFieldException();
@@ -755,8 +807,8 @@ public class EvolutionTreeClassifier implements Serializable {
 		popInit.setGenerator(genList);
 	}
 
-	public int getSeed() {
-		return c.getSeed();
+	public long getSeed() {
+		return seed;
 	}
 
 	public Random getRandom() {
@@ -764,27 +816,31 @@ public class EvolutionTreeClassifier implements Serializable {
 	}
 
 	public String getData() {
-		return c.getData();
+		return dataString;
+	}
+
+	public int getClassify() {
+		return classify;
 	}
 	
 	public int getGeneratorThreads() {
-		return c.getGenNumOfThreads();
+		return genThreadsInt;
 	}
 
 	public int getOperatorThreads() {
-		return c.getOperNumOfThreads();
+		return operThreadsInt;
 	}
 
 	public int getFitnessThreads() {
-		return c.getFitNumOfThreads();
+		return fitThreadsInt;
 	}
 
 	public int getNumberOfGenerations() {
-		return c.getNumberOfGenerations();
+		return numOfGensInt;
 	}
 
 	public double getElitism() {
-		return c.getElitismRate();
+		return elitismRateDouble;
 	}
 
 	public ArrayList<Operator<TreeIndividual>> getMutSet() {
@@ -792,7 +848,7 @@ public class EvolutionTreeClassifier implements Serializable {
 	}
 
 	public String getMutString() {
-		return c.getMutationOperators();
+		return mutOpString;
 	}
 
 	public ArrayList<Operator<TreeIndividual>> getXoverSet() {
@@ -800,11 +856,11 @@ public class EvolutionTreeClassifier implements Serializable {
 	}
 
 	public String getXoverString() {
-		return c.getXoverOperators();
+		return xOverOpString;
 	}
 
 	public int getPopulationSize() {
-		return c.getPopulationSize();
+		return populationSizeInt;
 	}
 
 	public double getImprovementRate() {
@@ -812,19 +868,19 @@ public class EvolutionTreeClassifier implements Serializable {
 	}
 
 	public String getIndividualGeneratorString() {
-		return c.getIndGenerators();
+		return indGenString;
 	}
 
 	public String getPopInitString() {
-		return c.getPopulationInit();
+		return populationInitString;
 	}
 
 	public String getSelectorsString() {
-		return c.getSelectors();
+		return selectorsString;
 	}
 
 	public String getEnvSelectorsString() {
-		return c.getEnvSelectors();
+		return envSelectorsString;
 	}
 
 	public TreePopulationInitializator getPopInitializator() {
@@ -836,7 +892,7 @@ public class EvolutionTreeClassifier implements Serializable {
 	}
 
 	public String getFitnessComparatorString() {
-		return c.getFitnessComparator();
+		return fitCompString;
 	}
 
 	public ArrayList<FitnessFunction<TreeIndividual>> getFitnessFunctions() {
@@ -844,15 +900,15 @@ public class EvolutionTreeClassifier implements Serializable {
 	}
 
 	public String getFitnessFunctionsString() {
-		return c.getFitnessFunctions();
+		return fitFunctionsString;
 	}
 
 	public TreeIndividual getStartIndividual() {
 		return startIndividual;
 	}
 
-	public TreeIndividual getBestIndividual() {
-		return theBestIndividual;
+	public ArrayList<TreeIndividual> getBestIndividuals() {
+		return theBestIndividuals;
 	}
 
 	public ArrayList<TreeIndividual> getActualIndividuals() {
@@ -868,55 +924,63 @@ public class EvolutionTreeClassifier implements Serializable {
 	 * @param seed
 	 *            Seed to be set
 	 */
-	public void setSeed(int seed) {
-		Utils.randomGen.setSeed(seed);
-		if (c.getSeed() != seed) {
-			c.setSeed(seed);
-		}
+	public void setSeed(long seed) {
+		this.seed = seed;
+		random.setSeed(seed);
 	}
 
-	public void setData(String dataParam) {
-		c.setData(dataParam);
+	public void setData(String dataString) {
+		this.dataString = dataString;
 	}
-	
+
+	/**
+	 * Set the how many of the best individuals are used in classification.
+	 * 
+	 * @param classify
+	 *            as number of instances used in classification
+	 */
+	public void setClassify(int classify) {
+		this.classify = classify;
+	}
+
 	public void setFitnessThreads(int fitThreads) {
-		c.setFitnessThreads(fitThreads);
+		this.fitThreadsInt = fitThreads;
 	}
 
 	public void setGeneratorThreads(int genThreads) {
-		c.setGeneratorThreads(genThreads);
+		this.genThreadsInt = genThreads;
 	}
 
 	public void setOperatorThreads(int operThreads) {
-		c.setOperatorThreads(operThreads);
+		this.operThreadsInt = operThreads;
 	}
 
 	public void setNumberOfGenerations(int numberOfGenerations) {
-		c.setNumberOfGenerations(numberOfGenerations);
+		this.numOfGensInt = numberOfGenerations;
 	}
 
 	public void setFitFuncsString(String fitFuncsString) {
-		c.setFitnessFunctions(fitFuncsString);
+		this.fitFunctionsString = fitFuncsString;
 	}
 
 	public void setFitCompString(String fitCompString) {
-		c.setFitnessComparator(fitCompString);
+		this.fitCompString = fitCompString;
 	}
 
 	public void setMutString(String mutString) {
-		c.setMutationOperators(mutString);
+		this.mutOpString = mutString;
 	}
 
 	public void setElitism(double elitism) {
-		c.setElitismRate(elitism);
+		this.elitismRateDouble = elitism;
 	}
 
 	public void setXoverString(String xoverString) {
-		c.setXoverOperators(xoverString);
+		this.xOverOpString = xoverString;
 	}
 
 	public void setPopulationSize(int populationSize) {
-		c.setPopulationSize(populationSize);
+		this.populationSizeInt = populationSize;
 	}
 
 	public void setImprovementRate(double improvementRate) {
@@ -924,23 +988,22 @@ public class EvolutionTreeClassifier implements Serializable {
 	}
 
 	public void setIndividualGeneratorString(String indGenString) {
-		c.setIndGenerators(indGenString);
+		this.indGenString = indGenString;
 	}
 
 	public void setPopInitString(String popInitString) throws Exception {
-		c.setPopulationInit(popInitString);
+		this.populationInitString = popInitString;
 	}
 
 	public void setSelectorsString(String selectorString) {
-		c.setSelectors(selectorString);
+		this.selectorsString = selectorString;
 	}
 
 	public void setEnvSelectorsString(String envSelectorString) {
-		c.setEnvSelectors(envSelectorString);
+		this.envSelectorsString = envSelectorString;
 	}
 
 	public void setPopInitializator(TreePopulationInitializator popInit) {
 		this.popInit = popInit;
-		c.setPopulationInit(popInit.objectInfo());
 	}
 }

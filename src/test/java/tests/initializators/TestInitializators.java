@@ -71,7 +71,7 @@ public class TestInitializators {
 
 		FitnessFunction.registeredFunctions = 2;
 		WekaCompletedTrees wct = new WekaCompletedTrees(200, 10, false);
-		wct.setInstances(wekaData);
+		wct.setData(wekaData);
 		wct.initPopulation();
 		assertTrue(wct.getAttrIndexMap().size() == 11);
 		assertTrue(wct.getAttrValueIndexMap().length == 11);
@@ -97,7 +97,7 @@ public class TestInitializators {
 		WekaCompletedTrees wct = new WekaCompletedTrees(200, 10, false);
 		assertTrue(wct.getDivideParam() == 10);
 		assertFalse(wct.isResampling());
-		wct.setInstances(wekaData);
+		wct.setData(wekaData);
 		wct.initPopulation();
 		assertTrue(wct.getAttrIndexMap().size() == 11);
 		assertTrue(wct.getAttrValueIndexMap().length == 11);
@@ -108,7 +108,7 @@ public class TestInitializators {
 		assertTrue(wct.getPopulation().length == 200);
 
 		wct.setPopulationSize(1);
-		wct.setInstances(wekaData);
+		wct.setData(wekaData);
 		wct.initPopulation();
 		assertTrue(wct.getPopulation().length == 1);
 	}

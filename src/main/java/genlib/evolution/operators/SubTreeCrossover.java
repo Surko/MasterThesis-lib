@@ -129,6 +129,7 @@ public class SubTreeCrossover implements Operator<TreeIndividual> {
 			for (int i = 0; i < parent1.getChildCount(); i++) {
 				if (parent1.getChildAt(i) == subTree1) {
 					parent1.setChildAt(i, subTree2);
+					Utils.fixNode(parent1.getChildAt(i));
 				}
 			}
 		}
@@ -139,6 +140,7 @@ public class SubTreeCrossover implements Operator<TreeIndividual> {
 			for (int i = 0; i < parent2.getChildCount(); i++) {
 				if (parent2.getChildAt(i) == subTree2) {
 					parent2.setChildAt(i, subTree1);
+					Utils.fixNode(parent2.getChildAt(i));
 				}
 			}
 		}

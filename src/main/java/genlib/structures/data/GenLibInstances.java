@@ -30,7 +30,7 @@ public interface GenLibInstances extends Serializable {
 
 	/**
 	 * Number of classes for class attribute. If the class attribute is numeric
-	 * than -1.
+	 * than 1.
 	 * 
 	 * @return number of class values
 	 */

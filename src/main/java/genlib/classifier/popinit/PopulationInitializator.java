@@ -38,7 +38,7 @@ public interface PopulationInitializator<T extends Individual> extends
 
 	public void setParam(String param);
 
-	public void setInstances(Data data);
+	public void setData(Data data);
 
 	public void setRandomGenerator(Random random);
 

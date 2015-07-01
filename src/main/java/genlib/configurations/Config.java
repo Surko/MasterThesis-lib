@@ -103,6 +103,8 @@ public class Config implements Serializable {
 	public static final String SEED = "seed";
 	/** Key in property file with data splitting */
 	public static final String DATA = "data";
+	/** Key in property file with data splitting */
+	public static final String CLASSIFY = "classify";
 
 	/**
 	 * Singleton instance of this Config to guarantee uniqueness of config.
@@ -207,6 +209,7 @@ public class Config implements Serializable {
 	}
 
 	public void setAbsentProperties() {
+		putIfAbsent(CLASSIFY, "1");
 		putIfAbsent(DEBUG, "false");
 		putIfAbsent(FIT_THREADS, "1");
 		putIfAbsent(GEN_THREADS, "1");
@@ -451,6 +454,15 @@ public class Config implements Serializable {
 		return prop.getProperty(DATA);
 	}
 	
+	/**
+	 * Getter which returns classify integer from config file
+	 * 
+	 * @return classify parameter
+	 */
+	public int getClassify() {
+		return Integer.parseInt(prop.getProperty(CLASSIFY));
+	}
+	
 	//
 	/*
 	 * SETTERS
@@ -519,6 +531,10 @@ public class Config implements Serializable {
 
 	public void setData(String dataString) {
 		prop.setProperty(DATA, dataString);
+	}
+	
+	public void setClassify(String classify) {
+		prop.setProperty(CLASSIFY, classify);
 	}
 	
 	public void setLocale(Locale locale) {

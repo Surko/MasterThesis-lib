@@ -199,10 +199,10 @@ public class BinaryNode implements Node, SizeExtension {
 	 * Make this node a leaf.
 	 */
 	public void makeLeaf() {
-		this.sign = null;
-		this.treeSize = 1;
+		this.sign = null;		
 		this.attribute = -1;
 		this.childs = null;
+		updateTreeSize(1 - this.treeSize);
 	}
 
 	/**

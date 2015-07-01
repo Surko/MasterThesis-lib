@@ -2,14 +2,6 @@ package tests.plugins;
 
 import static org.junit.Assert.assertTrue;
 import genlib.GenLib;
-import genlib.classifier.Classifier;
-import genlib.classifier.gens.PopGenerator;
-import genlib.classifier.popinit.TreePopulationInitializator;
-import genlib.classifier.splitting.SplitCriteria;
-import genlib.evolution.fitness.FitnessFunction;
-import genlib.evolution.operators.Operator;
-import genlib.evolution.population.Population;
-import genlib.evolution.selectors.Selector;
 import genlib.plugins.PluginManager;
 
 import java.util.logging.Level;
@@ -31,11 +23,11 @@ public class TestPlugins {
 	public void testInternalPlugins() {
 		PluginManager.initPlugins();
 
-		assertTrue(PluginManager.classifiers.size() == 2);
+		assertTrue(PluginManager.classifiers.size() == 1);
 		assertTrue(PluginManager.gens.size() == 3);
 		assertTrue(PluginManager.popInits.size() == 4);
 		assertTrue(PluginManager.fitFuncs.size() == 13);
-		assertTrue(PluginManager.mutOper.size() == 4);
+		assertTrue(PluginManager.mutOper.size() == 5);
 		assertTrue(PluginManager.xOper.size() == 2);
 		assertTrue(PluginManager.envSelectors.size() == 3);
 		assertTrue(PluginManager.selectors.size() == 3);

@@ -13,8 +13,7 @@ public class InformationGainCriteria extends
 		EntropyBasedCriteria<Instances, Distribution> {
 
 	/** for serialization */
-	private static final long serialVersionUID = -7729464952878929743L;
-	private InfoGainSplitCrit infoGain;
+	private static final long serialVersionUID = -7729464952878929743L;	
 	public static final String initName = "infoGain";
 	private final static InformationGainCriteria instance = new InformationGainCriteria();
 
@@ -30,94 +29,6 @@ public class InformationGainCriteria extends
 	 * Default Constructor
 	 */
 	private InformationGainCriteria() {
-		infoGain = new InfoGainSplitCrit();
-	}
-
-	@Override
-	public Distribution handleEnumeratedAttribute(Instances dataPart,
-			int attIndex, int complexity) throws Exception {
-		Instance instance;
-		Distribution distribution = new Distribution(complexity,
-				dataPart.numClasses());
-		infoGain.splitCritValue(distribution);		
-		Enumeration<?> enu = dataPart.enumerateInstances();
-		while (enu.hasMoreElements()) {
-			instance = (Instance) enu.nextElement();
-			if (!instance.isMissing(attIndex))
-				distribution.add((int) instance.value(attIndex), instance);
-		}
-
-		return distribution;
-	}
-
-	@Override
-	public Distribution handleNumericAttribute(Instances dataPart,
-			int attIndex, int complexity) throws Exception {
-		Instance instance;
-		int fstMissing = 0;
-		double minBagCount;
-
-		double criteriaValue = 0d;		
-		Distribution distribution = new Distribution(2, dataPart.numClasses());
-
-		Enumeration<?> enu = dataPart.enumerateInstances();
-		while (enu.hasMoreElements()) {
-			instance = (Instance) enu.nextElement();
-			if (instance.isMissing(attIndex))
-				break;
-			distribution.add(1, instance);
-			fstMissing++;
-		}
-
-		minBagCount = (distribution.total() / complexity / 10);
-		minBagCount = minBagCount <= 2 ? 2 : (minBagCount >= 25 ? 25
-				: minBagCount);
-
-		if (fstMissing < minBagCount * 2)
-			return distribution;
-
-		double oldEntropy = oldEnt(distribution);
-
-		// Consistency with weka
-		double sumOfWeights = dataPart.sumOfWeights();
-		double actualInfo = 0d;
-		int bestSplit = -1;
-		int start = 0;
-		int i = (int) Math.ceil(minBagCount);
-
-		while (i < fstMissing) {
-			if (dataPart.instance(i - 1).value(attIndex) < dataPart.instance(i)
-					.value(attIndex)) {
-				distribution.shiftRange(1, 0, dataPart, start, i);
-
-				if (distribution.perBag(1) >= minBagCount) {
-					actualInfo = computeInfo(distribution, sumOfWeights,
-							oldEntropy);
-
-					if (Utils.gt(actualInfo, criteriaValue)) {
-						criteriaValue = actualInfo;
-						bestSplit = i - 1;
-					}
-				}
-				start = i;
-			}
-			i++;
-		}
-
-		if (bestSplit == -1 || criteriaValue == 0)
-			return null;
-
-		//splitPoint = (dataPart.instance(bestSplit + 1).value(attIndex) + dataPart
-		//		.instance(bestSplit).value(attIndex)) / 2;
-
-		/*
-		 * Final setting of distribution with appropriate splitting point
-		 */
-		distribution = new Distribution(2, dataPart.numClasses());
-		distribution.addRange(0, dataPart, 0, bestSplit + 1);
-		distribution.addRange(1, dataPart, bestSplit + 1, fstMissing);
-
-		return distribution;
 	}
 
 	/**

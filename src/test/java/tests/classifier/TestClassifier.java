@@ -3,11 +3,13 @@ package tests.classifier;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 import genlib.classifier.common.EvolutionTreeClassifier;
+import genlib.classifier.weka.WekaEvolutionTreeClassifier;
 import genlib.configurations.Config;
 import genlib.evolution.fitness.comparators.FitnessComparator;
 import genlib.evolution.fitness.comparators.WeightedFitnessComparator;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.plugins.PluginManager;
+import genlib.structures.Data;
 
 import org.junit.Test;
 
@@ -66,9 +68,9 @@ public class TestClassifier {
 			EvolutionTreeClassifier etc = new EvolutionTreeClassifier(true);
 			etc.buildClassifier(wekaData);
 			assertTrue(etc.getActualIndividuals().size() == 100);
-			assertTrue(Double.compare(etc.getBestIndividual()
-					.getFitnessValue(0), 0.9d) == 0);
-			System.out.println(etc.getBestIndividual());
+			assertTrue(Double.compare(etc.getBestIndividuals().get(0)
+					.getFitnessValue(0), 0.91d) == 0);
+			System.out.println(etc.getBestIndividuals());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -91,7 +93,7 @@ public class TestClassifier {
 			//assertTrue(Double.compare(etc.getBestIndividual()
 			//		.getFitnessValue(0), 0.92d) == 0);
 			System.out.println(etc.getStartIndividual());
-			System.out.println(etc.getBestIndividual());
+			System.out.println(etc.getBestIndividuals());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -117,10 +119,18 @@ public class TestClassifier {
 			//assertTrue(Double.compare(etc.getBestIndividual()
 			//		.getFitnessValue(0), 0.92d) == 0);
 			System.out.println(etc.getStartIndividual());
-			System.out.println(etc.getBestIndividual());
+			System.out.println(etc.getBestIndividuals());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+
+	@Test(expected=Exception.class)
+	public void testLoadingFile() throws Exception {
+		WekaEvolutionTreeClassifier wetc = new WekaEvolutionTreeClassifier();
+		Data data = wetc.makeDataFromFile("");
+		System.out.println(data);
+	}
+
 }

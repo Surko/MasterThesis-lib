@@ -135,4 +135,5 @@ public class TestDummy {
 
 		assertNotNull(splitCriteria);
 	}
+
 }

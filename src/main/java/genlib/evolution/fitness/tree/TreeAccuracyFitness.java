@@ -52,13 +52,14 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 	}
 
 	private static final Logger LOG = Logger
-			.getLogger(TreePrevalenceFitness.class.getName());
+			.getLogger(TreeAccuracyFitness.class.getName());
 	/** for serialization */
 	private static final long serialVersionUID = 7900391876130772354L;
 	public static final String initName = "tAcc";
 	private Data data;
 	private int attrIndex = -1;
-	private int typeOfData = -1;
+	/** type of data split used in computing fitness */
+	protected int typeOfData = -1;
 
 	/**
 	 * This method that overrides computeFitness from FitnessFunction class
@@ -99,7 +100,9 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 			Instance instance = eInstances.nextElement();
 			while (!root.isLeaf()) {
 				if (instance.attribute(root.getAttribute()).isNumeric()) {
-					if (instance.value(root.getAttribute()) < root.getValue()) {
+					if (genlib.utils.Utils.isValueProper(
+							instance.value(root.getAttribute()), root.getSign(),
+							root.getValue())) {
 						root = root.getChildAt(0);
 					} else {
 						root = root.getChildAt(1);

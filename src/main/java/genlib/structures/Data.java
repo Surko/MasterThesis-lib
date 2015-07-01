@@ -73,6 +73,8 @@ public class Data implements Serializable {
 	private final Random random;
 	/** number of instances in data object */
 	private final int numInstances;
+	/** number of classes in data object */
+	private final int numClasses;
 	/** boolean to know if data is of type {@link Instances} */
 	private boolean isInstances = false;
 	/** class counts in data object */
@@ -89,6 +91,7 @@ public class Data implements Serializable {
 		this.validation = this;
 		this.data = data;
 		this.numInstances = data.numInstances();
+		this.numClasses = data.numClasses();
 		this.isInstances = true;
 	}
 
@@ -102,6 +105,7 @@ public class Data implements Serializable {
 		this.validation = this;
 		this.data = data;
 		this.numInstances = data.numInstances();
+		this.numClasses = data.numClasses();
 		this.isInstances = false;
 	}
 
@@ -112,6 +116,15 @@ public class Data implements Serializable {
 	 */
 	public int numInstances() {
 		return numInstances;
+	}
+
+	/**
+	 * Number of classes in data (GenLibInstances or Instances).
+	 * 
+	 * @return number of classes
+	 */
+	public int numClasses() {
+		return numClasses;
 	}
 
 	/**
@@ -257,22 +270,24 @@ public class Data implements Serializable {
 
 	/**
 	 * Getter which makes choice which data we return by its int param.
-	 * @param dataType int param (-1=this, 0=train, 1=validation)
+	 * 
+	 * @param dataType
+	 *            int param (-1=this, 0=train, 1=validation)
 	 * @return data decided by param
 	 */
 	public Data getDataOfType(int dataType) {
 		switch (dataType) {
 		case -1:
-			return this;			
+			return this;
 		case 0:
-			return train;			
+			return train == null ? this : train;
 		case 1:
-			return validation;			
+			return validation == null ? this : validation;
 		default:
-			return this;			
+			return this;
 		}
 	}
-	
+
 	/**
 	 * Method which returns number of classes for this data object.
 	 * 
@@ -301,7 +316,7 @@ public class Data implements Serializable {
 	 * Method which returns index of attribute values to access correct array
 	 * values
 	 * 
-	 * @return hashmap with indeces 
+	 * @return hashmap with indeces
 	 */
 	public HashMap<String, Integer>[] getAttrValueIndexMap() {
 		if (attrValueIndexMap != null) {
@@ -346,13 +361,12 @@ public class Data implements Serializable {
 
 	}
 
-	public void setParam(String param) {
-		System.out.println(param);
+	public void setParam(String param) {		
 		if (param.equals(PermMessages._blank_param)) {
 			return;
 		}
-		
-		String[] parameters = param.split(Utils.oDELIM);
+
+		String[] parameters = param.split(Utils.pDELIM);
 
 		boolean resample = false;
 		double trainRatio = 1;

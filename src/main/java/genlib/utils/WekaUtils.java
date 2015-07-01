@@ -322,7 +322,6 @@ public class WekaUtils {
 						shouldAdd = false;
 					}
 				} else {
-					System.out.println(node);
 					switch (node.getSign()) {
 					case EQUALS:
 						if (nodeIndex == 0

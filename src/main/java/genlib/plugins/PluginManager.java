@@ -8,7 +8,6 @@ import genlib.annotations.MateSelectAnnot;
 import genlib.annotations.PopInitAnnot;
 import genlib.annotations.XOperatorAnnot;
 import genlib.classifier.Classifier;
-import genlib.classifier.GenLibEvolutionTreeClassifier;
 import genlib.classifier.gens.PopGenerator;
 import genlib.classifier.popinit.PopulationInitializator;
 import genlib.classifier.splitting.InformationGainCriteria;
@@ -53,9 +52,9 @@ public class PluginManager {
 	public static final HashMap<String, Class<? extends Selector>> envSelectors = new HashMap<>();
 	/** loaded population types */
 	@SuppressWarnings("rawtypes")
-	public static final HashMap<String, Class<? extends IPopulation>> populationTypes = new HashMap<>();	
-	/** loaded split criterias	 */
-	public static final HashMap<String, SplitCriteria<?,?>> splitCriterias = new HashMap<>();
+	public static final HashMap<String, Class<? extends IPopulation>> populationTypes = new HashMap<>();
+	/** loaded split criterias */
+	public static final HashMap<String, SplitCriteria<?, ?>> splitCriterias = new HashMap<>();
 
 	/** logger for this class */
 	private static final Logger LOG = Logger.getLogger(PluginManager.class
@@ -95,12 +94,6 @@ public class PluginManager {
 		LOG.log(Level.INFO, String.format(PermMessages._classifierclass_loaded,
 				WekaEvolutionTreeClassifier.class.getName(),
 				WekaEvolutionTreeClassifier.class.getName()));
-		classLoaded++;
-		classifiers.put(GenLibEvolutionTreeClassifier.class.getName(),
-				GenLibEvolutionTreeClassifier.class);
-		LOG.log(Level.INFO, String.format(PermMessages._classifierclass_loaded,
-				GenLibEvolutionTreeClassifier.class.getName(),
-				GenLibEvolutionTreeClassifier.class.getName()));
 		classLoaded++;
 
 		// loading jar plugins inside plugin directory
@@ -199,7 +192,8 @@ public class PluginManager {
 		int classLoaded = 0;
 		int plugLoaded = 0;
 
-		PluginManager.populationTypes.put(Population.initName, Population.class);
+		PluginManager.populationTypes
+				.put(Population.initName, Population.class);
 		LOG.log(Level.INFO, String.format(
 				PermMessages._populationcontainer_loaded,
 				Population.class.getName(), Population.initName));

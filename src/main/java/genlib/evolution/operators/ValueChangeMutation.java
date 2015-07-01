@@ -8,7 +8,6 @@ import genlib.locales.TextResource;
 import genlib.structures.Data;
 import genlib.structures.trees.Node;
 import genlib.utils.Utils;
-import genlib.utils.WekaUtils;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -16,28 +15,29 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Node to Leaf Mutation is mutation class that implements the Operator
- * interface. When the mutation is applied, the randomly chosen tree is changed
- * into leaf (with most frequent class)
+ * Value Change Mutation is mutation class that implements the Operator
+ * interface. When the mutation is applied, the randomly chosen leaf value is
+ * changed.
  * 
  * @see Operator
  * @author Lukas Surin
  *
  */
-public class NodeToLeafNominalMutation implements Operator<TreeIndividual> {
+public class ValueChangeMutation implements Operator<TreeIndividual> {
+
 
 	/** for serialization */
-	private static final long serialVersionUID = 6616737516801855707L;
+	private static final long serialVersionUID = -8545768446148248971L;
 	/** logger for this class */
 	private static final Logger LOG = Logger
-			.getLogger(NodeToLeafNominalMutation.class.getName());
+			.getLogger(ValueChangeMutation.class.getName());
 	/** name of this operator */
-	public static final String initName = "ntlNomM";
+	public static final String initName = "valueMut";
 	/** random object for this operator */
 	private Random random;
 	/** probability of this operator */
 	private double mProb = 0d;
-	/** data from which we take the most frequent class */
+	/** data from which we create stumps */
 	private Data data;
 	/** type of data split used in operator */
 	protected int typeOfData = -1;
@@ -59,63 +59,37 @@ public class NodeToLeafNominalMutation implements Operator<TreeIndividual> {
 	}
 
 	/**
-	 * {@inheritDoc} </p> This mutation will change the randomly chosen node to
-	 * leaf with the most frequent class.
+	 * {@inheritDoc} </p> This mutation will change the randomly chosen leaf to
+	 * randomly chosen decision stump.
 	 */
 	@Override
 	public void execute(IPopulation<TreeIndividual> parents,
 			IPopulation<TreeIndividual> childs) {
-		ArrayList<Node> nodes = new ArrayList<>();
+		ArrayList<Node> leaves = new ArrayList<>();
 		for (TreeIndividual child : parents.getIndividuals()) {
 			if (random.nextDouble() < mProb) {
-				Node root = child.getRootNode();
-				Utils.getNodesRecursive(root, nodes);
-				if (nodes.size() > 0) {
-					mutateNode(nodes);
-					// change to recompute fitness
-					child.change();
+				Utils.getLeavesRecursive(child.getRootNode(), leaves);
+
+				int lIndex = random.nextInt(leaves.size());
+				Node leaf = leaves.get(lIndex);
+
+				if (data.numClasses() > 1) {
+					leaf.setValue(random.nextInt(data.numClasses()));
+				} else {
+					leaf.setValue(leaf.getValue() + 2 * random.nextDouble()
+							- 0.5);
 				}
 
+				// change to recompute fitness
+				child.change();
 			}
-			nodes.clear();
+
+			leaves.clear();
 		}
 
 		if (childs != null) {
 			childs.addAll(parents);
 		}
-
-	}
-
-	private void mutateNode(ArrayList<Node> nodes) {
-		int i = random.nextInt(nodes.size());
-
-		Node toMutate = nodes.get(i);
-		double[] classes = null;
-
-		if (data.isGenLibInstances()) {
-			classes = Utils.getFilteredInstancesClasses(
-					data.toGenLibInstances(), toMutate);
-		} else if (data.isInstances()) {
-			classes = WekaUtils.getFilteredInstancesClasses(data.toInstances(),
-					toMutate);
-		}
-
-		if (classes.length == 0) {
-			return;
-		}
-
-		double max = 0;
-		double maxIndex = 0;
-		for (int index = 0; index < classes.length; index++) {
-			if (classes[index] > max) {
-				max = classes[index];
-				maxIndex = index;
-			}
-		}
-
-		toMutate.makeLeaf();
-		toMutate.setValue(maxIndex);
-
 	}
 
 	/**
@@ -181,7 +155,8 @@ public class NodeToLeafNominalMutation implements Operator<TreeIndividual> {
 	}
 
 	/**
-	 * {@inheritDoc} </p> This operator sets the Data object into field data.
+	 * {@inheritDoc} </p> This operator does set the Data object but uses it
+	 * only to create decision stumps from them.
 	 */
 	@Override
 	public void setData(Data data) {

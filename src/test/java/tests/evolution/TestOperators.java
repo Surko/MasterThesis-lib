@@ -1,22 +1,23 @@
 package tests.evolution;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
-
-import java.util.Random;
-
+import static org.junit.Assert.assertTrue;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.operators.DecisionStumpMutation;
 import genlib.evolution.operators.DefaultTreeCrossover;
 import genlib.evolution.operators.DefaultTreeMutation;
 import genlib.evolution.operators.NodeToLeafNominalMutation;
+import genlib.evolution.operators.ValueChangeMutation;
 import genlib.evolution.population.Population;
 import genlib.structures.Data;
 import genlib.utils.Utils;
 import genlib.utils.Utils.Sign;
 
+import java.util.Random;
+
 import org.junit.Test;
 
+import tests.TestProperties;
 import weka.datagenerators.classifiers.classification.RDG1;
 
 public class TestOperators {
@@ -26,7 +27,7 @@ public class TestOperators {
 
 	static {
 		individuals = Utils.debugTreePopulation();
-		
+
 		try {
 			String[] options = new String[] {
 					"-r",
@@ -37,14 +38,14 @@ public class TestOperators {
 			rdg.setOptions(options);
 			rdg.defineDataFormat();
 			wekaData = new Data(rdg.generateExamples(), new Random(0));
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 	}
 
 	@Test
 	public void testDefaultMutationOperator() {
 		DefaultTreeMutation dtm = new DefaultTreeMutation();
-		assertTrue(dtm.objectInfo().equals(
-				DefaultTreeMutation.initName + " x"));
+		assertTrue(dtm.objectInfo().equals(DefaultTreeMutation.initName + " x"));
 		Population<TreeIndividual> childs = new Population<>();
 		dtm.execute(individuals, childs);
 		assertTrue(individuals != childs);
@@ -57,8 +58,8 @@ public class TestOperators {
 	@Test
 	public void testDefaultCrossOverOperator() {
 		DefaultTreeCrossover dtx = new DefaultTreeCrossover();
-		assertTrue(dtx.objectInfo().equals(
-				DefaultTreeCrossover.initName + " x"));
+		assertTrue(dtx.objectInfo()
+				.equals(DefaultTreeCrossover.initName + " x"));
 		Population<TreeIndividual> childs = new Population<>();
 		dtx.execute(individuals, childs);
 		assertTrue(individuals != childs);
@@ -67,11 +68,12 @@ public class TestOperators {
 			assertTrue(individuals.getIndividual(i) != childs.getIndividual(i));
 		}
 	}
-	
+
 	@Test
 	public void testNodeToLeafMutation() {
-		Population<TreeIndividual> copyOfIndividuals = new Population<TreeIndividual>(individuals);
-		
+		Population<TreeIndividual> copyOfIndividuals = new Population<TreeIndividual>(
+				individuals);
+
 		NodeToLeafNominalMutation ntl = new NodeToLeafNominalMutation();
 		assertTrue(ntl.objectInfo().equals(
 				NodeToLeafNominalMutation.initName + " PROB,0.0"));
@@ -83,9 +85,12 @@ public class TestOperators {
 		Population<TreeIndividual> childs = new Population<>();
 		ntl.execute(copyOfIndividuals, childs);
 		assertTrue(copyOfIndividuals != childs);
-		System.out.println(copyOfIndividuals.getActualPopSize());
-		System.out.println(childs.getActualPopSize());
-		assertTrue(copyOfIndividuals.getActualPopSize() == childs.getActualPopSize());
+		if (TestProperties.testPrints) {
+			System.out.println(copyOfIndividuals.getActualPopSize());
+			System.out.println(childs.getActualPopSize());
+		}
+		assertTrue(copyOfIndividuals.getActualPopSize() == childs
+				.getActualPopSize());
 		for (int i = 0; i < childs.getActualPopSize(); i++) {
 			assertTrue(childs.getIndividual(i).getRootNode().isLeaf());
 			assertTrue(childs.getIndividual(i).getRootNode().getAttribute() == -1);
@@ -93,11 +98,12 @@ public class TestOperators {
 			assertNull(childs.getIndividual(i).getRootNode().getSign());
 		}
 	}
-	
+
 	@Test
 	public void testDecisionStumpMutation() {
-		Population<TreeIndividual> copyOfIndividuals = new Population<TreeIndividual>(individuals);
-		
+		Population<TreeIndividual> copyOfIndividuals = new Population<TreeIndividual>(
+				individuals);
+
 		DecisionStumpMutation dsm = new DecisionStumpMutation();
 		assertTrue(dsm.objectInfo().equals(
 				DecisionStumpMutation.initName + " PROB,0.0"));
@@ -109,13 +115,48 @@ public class TestOperators {
 		Population<TreeIndividual> childs = new Population<>();
 		dsm.execute(copyOfIndividuals, childs);
 		assertTrue(copyOfIndividuals != childs);
-		System.out.println(copyOfIndividuals.getActualPopSize());
-		System.out.println(childs.getActualPopSize());
-		assertTrue(copyOfIndividuals.getActualPopSize() == childs.getActualPopSize());
-		for (int i = 0; i < childs.getActualPopSize(); i++) {			
+		if (TestProperties.testPrints) {
+			System.out.println(copyOfIndividuals.getActualPopSize());
+			System.out.println(childs.getActualPopSize());
+		}
+		assertTrue(copyOfIndividuals.getActualPopSize() == childs
+				.getActualPopSize());
+		for (int i = 0; i < childs.getActualPopSize(); i++) {
+			if (TestProperties.testPrints) {
+				System.out.println(childs.getIndividual(i));
+			}
+		}
+	}
+
+	@Test
+	public void testValueChangeMutation() {
+		Population<TreeIndividual> copyOfIndividuals = new Population<TreeIndividual>(
+				individuals);
+
+		ValueChangeMutation vcm = new ValueChangeMutation();
+		assertTrue(vcm.objectInfo().equals(
+				ValueChangeMutation.initName + " PROB,0.0"));
+		vcm.setRandomGenerator(new Random(0L));
+		vcm.setOperatorProbability(1.0d);
+		vcm.setData(wekaData);
+		assertTrue(vcm.objectInfo().equals(
+				ValueChangeMutation.initName + " PROB,1.0"));
+		Population<TreeIndividual> childs = new Population<>();
+		vcm.execute(copyOfIndividuals, childs);
+		assertTrue(copyOfIndividuals != childs);
+		if (TestProperties.testPrints) {
+			System.out.println(copyOfIndividuals.getActualPopSize());
+			System.out.println(childs.getActualPopSize());
+		}
+		assertTrue(copyOfIndividuals.getActualPopSize() == childs
+				.getActualPopSize());
+		for (int i = 0; i < childs.getActualPopSize(); i++) {
 			assertTrue(childs.getIndividual(i).getRootNode().getAttribute() == 1);
-			assertTrue(childs.getIndividual(i).getRootNode().getValue() == 20d);
+			assertTrue(childs.getIndividual(i).getRootNode().getValue() == 20.0);
 			assertTrue(childs.getIndividual(i).getRootNode().getSign() == Sign.LESS);
+			if (TestProperties.testPrints) {
+				System.out.println(childs.getIndividual(i));
+			}
 		}
 	}
 

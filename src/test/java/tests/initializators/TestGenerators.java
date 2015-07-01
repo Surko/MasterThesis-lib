@@ -76,13 +76,9 @@ public class TestGenerators {
 	public void testWekaSimpleStumpGenerator() throws Exception  {
 		PluginManager.splitCriterias.put(InformationGainCriteria.initName, InformationGainCriteria.getInstance());
 		WekaSimpleStumpGenerator wssg = new WekaSimpleStumpGenerator();
-		assertTrue(wssg.getGeneratorHeight() == 1);
-		assertNull(wssg.getSplitCriteria());
+		assertTrue(wssg.getGeneratorHeight() == 1);		
 		assertFalse(wssg.isAutoHeight());
-		assertNull(wssg.getPopulationInitializator());
-		wssg.setParam("SPLIT,infoGain");
-		assertNotNull(wssg.getSplitCriteria());
-		assertTrue(wssg.getSplitCriteria() == InformationGainCriteria.getInstance());
+		assertNull(wssg.getPopulationInitializator());			
 		wssg.setAutoHeight(true);
 		assertTrue(wssg.isAutoHeight());		
 	}
