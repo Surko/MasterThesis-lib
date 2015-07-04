@@ -13,6 +13,7 @@ import genlib.locales.TextResource;
 import genlib.structures.Data;
 import genlib.structures.data.GenLibInstance;
 import genlib.structures.trees.Node;
+import genlib.utils.WekaUtils;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -133,8 +134,8 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 				"-FT <#threads>"));
 		newVector.addElement(new Option("\tGenerator threads", "GT", 1,
 				"-GT <#threads>"));
-		newVector.addElement(new Option("\tNumber of instances to classify?", "NtC", 1,
-				"-NtC <#number to classify>"));
+		newVector.addElement(new Option("\tNumber of instances to classify?",
+				"NtC", 1, "-NtC <#number to classify>"));
 		newVector.addElement(new Option("\tForced Reconfiguration?", "C", 1,
 				"-C <True|False>"));
 
@@ -220,7 +221,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 		// stands for number of instances to classify
 		result.add("-NtC");
 		result.add("" + getClassify());
-		
+
 		// stands for configuration configured :)
 		result.add("-C");
 		result.add("" + getConfigured());
@@ -340,7 +341,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 		if (tmpStr.length() != 0) {
 			e_tree_class.setNumberOfGenerations(Integer.parseInt(tmpStr));
 		}
-		
+
 		tmpStr = Utils.getOption('S', options);
 		if (tmpStr.length() != 0) {
 			e_tree_class.setSeed(Integer.parseInt(tmpStr));
@@ -350,7 +351,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 		if (tmpStr.length() != 0) {
 			e_tree_class.setClassify(Integer.parseInt(tmpStr));
 		}
-		
+
 		tmpStr = Utils.getOption('C', options);
 		if (tmpStr.length() != 0) {
 			setConfigured(Boolean.parseBoolean(tmpStr));
@@ -415,69 +416,70 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	 */
 	public double classifyInstance(Instance instance) throws Exception {
 		int treesToClassify = e_tree_class.getClassify();
-		
+
 		if (treesToClassify == 1) {
-			TreeIndividual bestIndividual = e_tree_class.getBestIndividuals().get(0);
+			TreeIndividual bestIndividual = e_tree_class.getBestIndividuals()
+					.get(0);
 			Node root = bestIndividual.getRootNode();
-	
+
 			while (!root.isLeaf()) {
 				if (instance.attribute(root.getAttribute()).isNumeric()) {
 					if (genlib.utils.Utils.isValueProper(
-							instance.value(root.getAttribute()), root.getSign(),
-							root.getValue())) {
+							instance.value(root.getAttribute()),
+							root.getSign(), root.getValue())) {
 						root = root.getChildAt(0);
 					} else {
 						root = root.getChildAt(1);
 					}
 				} else {
-					root = root
-							.getChildAt((int) instance.value(root.getAttribute()));
+					root = root.getChildAt((int) instance.value(root
+							.getAttribute()));
 				}
 			}
-			
+
 			return root.getValue();
 		}
-		
+
 		boolean nominal = instance.numClasses() > 1;
 		double[] numOfClassifications;
-		ArrayList<TreeIndividual> bestIndividuals = e_tree_class.getBestIndividuals();
-		
+		ArrayList<TreeIndividual> bestIndividuals = e_tree_class
+				.getBestIndividuals();
+
 		if (nominal) {
 			numOfClassifications = new double[instance.numClasses()];
 		} else {
 			numOfClassifications = new double[1];
 		}
-		
+
 		for (int i = 0; i < treesToClassify; i++) {
 			TreeIndividual bestIndividual = bestIndividuals.get(i);
 			Node root = bestIndividual.getRootNode();
-	
+
 			while (!root.isLeaf()) {
 				if (instance.attribute(root.getAttribute()).isNumeric()) {
 					if (genlib.utils.Utils.isValueProper(
-							instance.value(root.getAttribute()), root.getSign(),
-							root.getValue())) {
+							instance.value(root.getAttribute()),
+							root.getSign(), root.getValue())) {
 						root = root.getChildAt(0);
 					} else {
 						root = root.getChildAt(1);
 					}
 				} else {
-					root = root
-							.getChildAt((int) instance.value(root.getAttribute()));
+					root = root.getChildAt((int) instance.value(root
+							.getAttribute()));
 				}
 			}
-			
+
 			if (nominal) {
 				numOfClassifications[(int) root.getValue()]++;
 			} else {
 				numOfClassifications[0] += root.getValue();
 			}
 		}
-		
-		
+
 		if (nominal) {
 			int maxIndex = 0;
-			double maxValue = numOfClassifications[0];					
+			double maxValue = numOfClassifications[0];
 			for (int i = 1; i < numOfClassifications.length; i++) {
 				if (numOfClassifications[i] > maxValue) {
 					maxValue = numOfClassifications[i];
@@ -490,7 +492,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 			numOfClassifications[0] /= treesToClassify;
 			return numOfClassifications[0];
 		}
-				
+
 	}
 
 	// GENLIB.CLASSIFIER METHODS //
@@ -566,7 +568,13 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	 */
 	@Override
 	public String graph() throws Exception {
-		return e_tree_class.getBestIndividuals().toString();
+		StringBuilder b = new StringBuilder("graph EvolutionTreeClassifier {\n");
+		b.append(WekaUtils.convertIntoGraphStructure(e_tree_class
+				.getBestIndividuals().get(0).getRootNode(), e_tree_class
+				.getWorkData().toInstances(), 0));
+
+		return b.toString() + "}\n";
+
 	}
 
 	/**
@@ -576,7 +584,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	 */
 	@Override
 	public int graphType() {
-		return Drawable.Newick;
+		return Drawable.TREE;
 	}
 
 	// GETTERS SETTERS FOR OPTION HANDLER //
@@ -1056,8 +1064,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	/**
 	 * Gets the number of tree used in classification.
 	 * 
-	 * @return classify
-	 *            number of tree used in classification
+	 * @return classify number of tree used in classification
 	 */
 	public int getClassify() {
 		return e_tree_class.getClassify();
@@ -1072,7 +1079,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	public String classifyTipText() {
 		return TextResource.getString("wClassify");
 	}
-	
+
 	/**
 	 * Sets if this classifier is already configured.
 	 * 
@@ -1204,9 +1211,11 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	 * @return a description of the classifier
 	 */
 	public String toString() {
-
+		try {
+			return graph();
+		} catch (Exception e) {}
 		if (e_tree_class.getBestIndividuals() == null) {
-			return "No classifier built";
+			return "No classifier built \n";
 		} else {
 			return "Start genetic tree\n------------------\n"
 					+ e_tree_class.getStartIndividual().toString() + "\n"
@@ -1214,10 +1223,14 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 					+ e_tree_class.getStartIndividual().getNumLeaves() + "\n"
 					+ e_tree_class.getStartIndividual().getTreeHeight() + "\n"
 					+ "Created genetic tree\n------------------\n"
-					+ e_tree_class.getBestIndividuals().get(0).toString() + "\n"
-					+ e_tree_class.getBestIndividuals().get(0).getTreeSize() + "\n"
-					+ e_tree_class.getBestIndividuals().get(0).getNumLeaves() + "\n"
-					+ e_tree_class.getBestIndividuals().get(0).getTreeHeight() + "\n";
+					+ e_tree_class.getBestIndividuals().get(0).toString()
+					+ "\n"
+					+ e_tree_class.getBestIndividuals().get(0).getTreeSize()
+					+ "\n"
+					+ e_tree_class.getBestIndividuals().get(0).getNumLeaves()
+					+ "\n"
+					+ e_tree_class.getBestIndividuals().get(0).getTreeHeight()
+					+ "\n\n";
 		}
 	}
 

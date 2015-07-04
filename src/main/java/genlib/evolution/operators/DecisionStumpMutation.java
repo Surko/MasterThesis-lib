@@ -1,13 +1,13 @@
 package genlib.evolution.operators;
 
-import genlib.classifier.gens.WekaSimpleStumpGenerator;
-import genlib.classifier.splitting.InformationGainCriteria;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.population.IPopulation;
 import genlib.exceptions.PopulationInitializationException;
+import genlib.generators.WekaSimpleStumpGenerator;
 import genlib.locales.PermMessages;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
+import genlib.splitfunctions.InformationGainCriteria;
 import genlib.structures.Data;
 import genlib.structures.extensions.SizeExtension;
 import genlib.structures.trees.MultiWayHeightNode;

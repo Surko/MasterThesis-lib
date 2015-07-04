@@ -1,8 +1,8 @@
-package genlib.classifier.gens;
+package genlib.generators;
 
-import genlib.classifier.splitting.SplitCriteria;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.locales.PermMessages;
+import genlib.splitfunctions.SplitCriteria;
 import genlib.structures.trees.MultiWayHeightNode;
 
 public class DummyTreeGenerator extends TreeGenerator {	/** for serialization */

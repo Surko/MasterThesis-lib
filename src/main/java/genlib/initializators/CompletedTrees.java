@@ -1,38 +1,38 @@
-package genlib.classifier.popinit;
+package genlib.initializators;
 
-import genlib.classifier.gens.TreeGenerator;
-import genlib.classifier.gens.WekaJ48TreeGenerator;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.exceptions.WrongDataException;
+import genlib.generators.DummyTreeGenerator;
+import genlib.generators.TreeGenerator;
 import genlib.locales.PermMessages;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
 import genlib.structures.data.GenLibInstances;
+import genlib.utils.Utils;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-import weka.core.Instances;
-
-public class WekaCompletedTrees extends CompletedTrees {
+public class CompletedTrees extends TreePopulationInitializator {
 
 	/** for serialization */
-	private static final long serialVersionUID = 6362474859353821356L;
+	private static final long serialVersionUID = 1312621842322682763L;
 	/** name of this initializator */
-	public static final String initName = "wCompTree";
-
-	public WekaCompletedTrees() {
+	public static final String initName = "CompTree";
+	
+	public CompletedTrees() {
 	}
 
-	public WekaCompletedTrees(int popSize, int divideParam, boolean resample) {
-		super(popSize, divideParam, resample);
+	public CompletedTrees(int popSize, int divideParam, boolean resample) {
+		this.popSize = popSize;
+		this.divideParam = divideParam;
+		this.resample = resample;
+		this.random = Utils.randomGen;
 	}
-
-	private void initPopulation(Instances data) throws Exception {
+	
+	private void initPopulation(GenLibInstances data) throws Exception {
 		if (gen == null) {
-			this.gen = new WekaJ48TreeGenerator(new String[] { "-C", "0.25",
-					"-M", "2"});
+			this.gen = new DummyTreeGenerator();
 			this.gen.setPopulationInitializator(this);
 		}
 
@@ -44,10 +44,10 @@ public class WekaCompletedTrees extends CompletedTrees {
 			ExecutorService es = Executors.newFixedThreadPool(nThreads);
 
 			for (int i = 0; i < divideParam; i++) {
-				Instances dataPart;
+				GenLibInstances dataPart = null;
 				if (!resample) {
 					// size of instances = data.length / divideParam.
-					dataPart = data.testCV(divideParam, i);
+					dataPart = data.getPart(divideParam, i);
 				} else {
 					// instances of same length as training data. Sampling with
 					// replacement
@@ -64,21 +64,20 @@ public class WekaCompletedTrees extends CompletedTrees {
 
 			es.shutdown();
 
-			// Here we should be waiting for generating to stop.
-			try {
-				es.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-			} catch (InterruptedException e) {
-
+			// Here we should be waiting for generating to stop. it's not done!!
+			synchronized (gen) {
+				while (!es.isTerminated())
+					gen.wait();
 			}
 
 			population = gen.getIndividuals();
 		} else {
 			gen.setPopulationInitializator(this);
 			for (int i = 0; i < divideParam; i++) {
-				Instances dataPart;
+				GenLibInstances dataPart = null;
 				if (!resample) {
 					// size of instances = data.length / divideParam.
-					dataPart = data.testCV(divideParam, i);
+					dataPart = data.getPart(divideParam, i);
 				} else {
 					// instances of same length as training data. Sampling with
 					// replacement
@@ -97,21 +96,42 @@ public class WekaCompletedTrees extends CompletedTrees {
 		fillPopulation();
 	}
 
+	protected void fillPopulation() {
+		TreeIndividual[] filledPopulation = new TreeIndividual[popSize];
+
+		int max = population.length;
+
+		for (int j = 0; j < popSize; j++) {
+			TreeIndividual chosen = population[random.nextInt(max)];
+
+			TreeIndividual tree = new TreeIndividual(chosen);
+
+			filledPopulation[j] = tree;
+		}
+
+		this.population = filledPopulation;
+	}
+
 	@Override
 	public void initPopulation() throws Exception {
-		if (data.isInstances()) {
-			initPopulation(data.toInstances());
+		if (data.isGenLibInstances()) {
+			initPopulation(data.toGenLibInstances());
 		} else {
 			throw new WrongDataException(String.format(
 					TextResource.getString(TextKeys.eTypeParameter),
-					Instances.class.getName(), data.getData().getClass()
+					GenLibInstances.class.getName(), data.getData().getClass()
 							.getName()));
 		}
 	}
 
 	@Override
 	public boolean isWekaCompatible() {
-		return true;
+		return false;
+	}
+
+	@Override
+	public String getInitName() {
+		return initName;
 	}
 
 	@Override
@@ -122,9 +142,8 @@ public class WekaCompletedTrees extends CompletedTrees {
 				nThreads);
 	}
 
-	@Override
-	public String getInitName() {
-		return initName;
+	public CompletedTrees copy() {
+		return new CompletedTrees();
 	}
 
 }

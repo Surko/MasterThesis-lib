@@ -6,7 +6,6 @@ import genlib.structures.trees.MultiWayNode;
 import genlib.structures.trees.Node;
 import genlib.utils.Utils.Sign;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -18,6 +17,8 @@ import weka.core.Instance;
 import weka.core.Instances;
 
 public class WekaUtils {
+
+	private static int counter = 0;
 
 	@SuppressWarnings("unchecked")
 	public static double[][] instacesToArray(Instances instances) {
@@ -303,11 +304,11 @@ public class WekaUtils {
 			boolean shouldAdd = true;
 			while (node.getParent() != null) {
 				int nodeIndex = 0;
-				//if (node.getParent().getChilds() == null) {
-				//	System.out.println(node.getParent().isLeaf());
-				//	System.out.println(node);
-				//	System.out.println(Arrays.toString(node.getChilds()));
-				//}
+				// if (node.getParent().getChilds() == null) {
+				// System.out.println(node.getParent().isLeaf());
+				// System.out.println(node);
+				// System.out.println(Arrays.toString(node.getChilds()));
+				// }
 				for (Node child : node.getParent().getChilds()) {
 					if (child == node) {
 						break;
@@ -437,6 +438,78 @@ public class WekaUtils {
 				}
 				attrValueIndexMap[attr.index()] = attrValueMap;
 			}
+		}
+	}
+
+	/**
+	 * Method that converts the tree defined by the root node into tree
+	 * representation as in weka. It uses {@link Instances} to get attribute
+	 * names and other attribute stuff.
+	 * 
+	 * @param root
+	 *            of the tree which we convert
+	 * @param data
+	 *            instances from which we take attributes to fill the structure
+	 * @param n
+	 *            number from where we start counting nodes (usually 0)
+	 * @return string representation of the tree
+	 */
+	public static String convertIntoGraphStructure(Node root,
+			final Instances data, int n) {
+		counter = n;
+		return convertIntoGraphStructure(root, data);
+	}
+
+	/**
+	 * Method that converts the tree defined by the root node into tree
+	 * representation as in weka. It uses {@link Instances} to get attribute
+	 * names and other attribute stuff. It is called by
+	 * {@link #convertIntoGraphStructure(Node, Instances, int)}.
+	 * 
+	 * @param root
+	 *            of the tree which we convert
+	 * @param data
+	 *            instances from which we take attributes to fill the structure
+	 * @return string representation of the tree
+	 */
+	private static String convertIntoGraphStructure(Node root,
+			final Instances data) {
+		int n = counter;
+		if (root.isLeaf()) {
+			Attribute cAttr = data.classAttribute();
+			if (data.numClasses() == 1) {
+				return String.format(
+						"N%s [label=\"\'%s\'\" shape=box style=filled ]\n", n,
+						root.getValue());
+			} else {
+				return String.format(
+						"N%s [label=\"\'%s\'\" shape=box style=filled ]\n", n,
+						cAttr.value((int) root.getValue()));
+			}
+		} else {
+			Attribute attr = data.attribute(root.getAttribute());
+			if (attr.isNominal()) {
+				StringBuilder s = new StringBuilder(String.format(
+						"N%s [label=\"%s\"]\n", n, attr.name()));
+				for (int i = 0; i < root.getChildCount(); i++) {
+					s.append(String.format("N%s->N%s [label=\"\'= %s\'\"]\n",
+							n, ++counter, attr.value(i)));
+					s.append(convertIntoGraphStructure(root.getChildAt(i), data));
+				}
+
+				return s.toString();
+			} else {
+				StringBuilder s = new StringBuilder(String.format(
+						"N%s [label=\"%s\"]\n", n, attr.name()));
+				for (int i = 0; i < root.getChildCount(); i++) {
+					s.append(String.format("N%s->N%s [label=\"\'%s %s\'\"]\n",
+							n, ++counter, root.getSign().getValue(),
+							root.getValue()));
+					s.append(convertIntoGraphStructure(root.getChildAt(i), data));
+				}
+				return s.toString();
+			}
+
 		}
 	}
 

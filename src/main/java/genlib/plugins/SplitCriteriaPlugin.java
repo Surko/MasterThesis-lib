@@ -1,6 +1,6 @@
 package genlib.plugins;
 
-import genlib.classifier.splitting.SplitCriteria;
+import genlib.splitfunctions.SplitCriteria;
 
 import java.util.HashMap;
 

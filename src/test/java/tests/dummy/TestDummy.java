@@ -5,14 +5,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import genlib.GenLib;
 import genlib.annotations.PopInitAnnot;
-import genlib.classifier.popinit.CompletedTrees;
-import genlib.classifier.popinit.PopulationInitializator;
-import genlib.classifier.splitting.InformationGainCriteria;
-import genlib.classifier.splitting.SplitCriteria;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.population.IPopulation;
 import genlib.evolution.population.Population;
+import genlib.initializators.CompletedTrees;
+import genlib.initializators.PopulationInitializator;
 import genlib.plugins.PluginManager;
+import genlib.splitfunctions.InformationGainCriteria;
+import genlib.splitfunctions.SplitCriteria;
 import genlib.structures.trees.MultiWayHeightNode;
 import genlib.structures.trees.MultiWayNode;
 
@@ -80,7 +80,7 @@ public class TestDummy {
 
 	@Test
 	public void test4() {
-		Package p = Package.getPackage("genlib.classifier.popinit");
+		Package p = Package.getPackage("genlib.initializators");
 		if (p.getAnnotations() == null) {
 			return;
 		}

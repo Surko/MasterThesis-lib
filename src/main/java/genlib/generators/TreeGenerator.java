@@ -1,11 +1,11 @@
-package genlib.classifier.gens;
+package genlib.generators;
 
-import genlib.classifier.popinit.PopulationInitializator;
-import genlib.classifier.popinit.TreePopulationInitializator;
-import genlib.classifier.splitting.SplitCriteria;
 import genlib.evolution.individuals.TreeIndividual;
+import genlib.initializators.PopulationInitializator;
+import genlib.initializators.TreePopulationInitializator;
+import genlib.splitfunctions.SplitCriteria;
 
-public abstract class TreeGenerator implements PopGenerator<TreeIndividual> {
+public abstract class TreeGenerator implements Generator<TreeIndividual> {
 
 	/** for serialization */
 	private static final long serialVersionUID = -7452763095100232747L;
@@ -72,7 +72,7 @@ public abstract class TreeGenerator implements PopGenerator<TreeIndividual> {
 	}
 
 	@Override
-	public void setGatherGen(PopGenerator<TreeIndividual> gatherGen) {
+	public void setGatherGen(Generator<TreeIndividual> gatherGen) {
 		if (gatherGen instanceof TreeGenerator)
 			this.gatherGen = (TreeGenerator) gatherGen;
 	}

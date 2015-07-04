@@ -1,9 +1,5 @@
 package genlib.classifier.common;
 
-import genlib.classifier.gens.PopGenerator;
-import genlib.classifier.gens.TreeGenerator;
-import genlib.classifier.popinit.PopulationInitializator;
-import genlib.classifier.popinit.TreePopulationInitializator;
 import genlib.configurations.Config;
 import genlib.evolution.EvolutionAlgorithm;
 import genlib.evolution.fitness.FitnessFunction;
@@ -30,6 +26,10 @@ import genlib.exceptions.format.OperatorStringFormatException;
 import genlib.exceptions.format.PopulationInitStringFormatException;
 import genlib.exceptions.format.PopulationTypeStringFormatException;
 import genlib.exceptions.format.SelectorStringFormatException;
+import genlib.generators.Generator;
+import genlib.generators.TreeGenerator;
+import genlib.initializators.PopulationInitializator;
+import genlib.initializators.TreePopulationInitializator;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
 import genlib.plugins.PluginManager;
@@ -52,18 +52,36 @@ public class EvolutionTreeClassifier implements Serializable {
 	/** for serialization */
 	private static final long serialVersionUID = -762451118775604722L;
 
+	private Data workData;
+
 	/* Random generator for this run */
 	private Random random;
+	/** config for this run from which we load the configurations */
 	private Config c;
-	private double improvementRate;
+	/** fitness comparator to be used in sorting individuals */
 	private FitnessComparator<TreeIndividual> fitComp;
+	/** fitness functions which we evaluate and use in fitComp */
 	private ArrayList<FitnessFunction<TreeIndividual>> fitFuncs;
-	private ArrayList<Operator<TreeIndividual>> mutSet, xoverSet;
-	private ArrayList<Selector> selectors, envSelectors;
+	/** mutation operators which are used in reproduction stage */
+	private ArrayList<Operator<TreeIndividual>> mutSet;
+	/** crossover operators which are used in reproduction stage */
+	private ArrayList<Operator<TreeIndividual>> xoverSet;
+	/** selectors that select the individuals to be reproduced */
+	private ArrayList<Selector> selectors;
+	/** envselectors that select the offspring into next generation */
+	private ArrayList<Selector> envSelectors;
+	/** tag if we are using weka */
 	private boolean isWeka;
+	/** population initializator that created the first individuals */
 	private TreePopulationInitializator popInit;
+	/**
+	 * object with evolution algorithm to which we set all the
+	 * operators,selectors,... and evaluate.
+	 */
 	private EvolutionAlgorithm<TreeIndividual> ea;
+	/** individuals with the sorted individuals from the last population */
 	private ArrayList<TreeIndividual> theBestIndividuals;
+	/** the best start individual from the starting population */
 	private TreeIndividual startIndividual;
 
 	private String populationTypeString, populationInitString, indGenString;
@@ -111,12 +129,12 @@ public class EvolutionTreeClassifier implements Serializable {
 		this.random = new Random(seed);
 	}
 
-	public void buildClassifier(Instances data) throws Exception {		
+	public void buildClassifier(Instances data) throws Exception {
 		theBestIndividuals = null;
 		startIndividual = null;
 
 		// create adapter Data around instances
-		Data workData = new Data(data, new Random(random.nextLong()));
+		this.workData = new Data(data, new Random(random.nextLong()));
 		// split the data into train and validation
 		workData.setParam(dataString);
 		// making properties from string
@@ -134,7 +152,7 @@ public class EvolutionTreeClassifier implements Serializable {
 		startIndividual = null;
 
 		// create adapter Data around instances
-		Data workData = new Data(data, new Random(random.nextLong()));
+		this.workData = new Data(data, new Random(random.nextLong()));
 		// split the data into train and validation
 		workData.setParam(dataString);
 		// making properties from string
@@ -156,7 +174,8 @@ public class EvolutionTreeClassifier implements Serializable {
 		// Population object that contains tree individuals from population
 		// initializator
 		IPopulation<TreeIndividual> population = makePopulation();
-		startIndividual = population.getSortedIndividuals(fitComp).get(0).copy();
+		startIndividual = population.getSortedIndividuals(fitComp).get(0)
+				.copy();
 
 		// Evolution algorithm that evolves population of tree individuals.
 		ea = new EvolutionAlgorithm<>(workData, population, numOfGensInt);
@@ -756,7 +775,7 @@ public class EvolutionTreeClassifier implements Serializable {
 			throw new PopulationInitStringFormatException();
 		}
 
-		HashMap<String, Class<? extends PopGenerator<? extends Individual>>> h = PluginManager.gens;
+		HashMap<String, Class<? extends Generator<? extends Individual>>> h = PluginManager.gens;
 		ArrayList<TreeGenerator> genList = new ArrayList<>();
 
 		for (int i = 0; i < parameters.length; i += 2) {
@@ -767,7 +786,7 @@ public class EvolutionTreeClassifier implements Serializable {
 			}
 
 			// inner error
-			Class<? extends PopGenerator<? extends Individual>> genClass = h
+			Class<? extends Generator<? extends Individual>> genClass = h
 					.get(parameters[i]);
 
 			if (genClass == null) {
@@ -780,7 +799,7 @@ public class EvolutionTreeClassifier implements Serializable {
 						parameters[0]));
 			}
 
-			PopGenerator<? extends Individual> genGenerator = genClass
+			Generator<? extends Individual> genGenerator = genClass
 					.newInstance();
 			if (!(genGenerator instanceof TreeGenerator)) {
 				throw new TypeParameterException(String.format(
@@ -822,7 +841,7 @@ public class EvolutionTreeClassifier implements Serializable {
 	public int getClassify() {
 		return classify;
 	}
-	
+
 	public int getGeneratorThreads() {
 		return genThreadsInt;
 	}
@@ -861,10 +880,6 @@ public class EvolutionTreeClassifier implements Serializable {
 
 	public int getPopulationSize() {
 		return populationSizeInt;
-	}
-
-	public double getImprovementRate() {
-		return improvementRate;
 	}
 
 	public String getIndividualGeneratorString() {
@@ -915,6 +930,10 @@ public class EvolutionTreeClassifier implements Serializable {
 		return ea.getActualPopulation().getIndividuals();
 	}
 
+	public Data getWorkData() {
+		return workData;
+	}
+	
 	/**
 	 * Set seed for this run of classifier. Seed is further set from
 	 * buildClassifier function into Random object. It even serves purpose of
@@ -983,10 +1002,6 @@ public class EvolutionTreeClassifier implements Serializable {
 		this.populationSizeInt = populationSize;
 	}
 
-	public void setImprovementRate(double improvementRate) {
-		this.improvementRate = improvementRate;
-	}
-
 	public void setIndividualGeneratorString(String indGenString) {
 		this.indGenString = indGenString;
 	}
@@ -1006,4 +1021,5 @@ public class EvolutionTreeClassifier implements Serializable {
 	public void setPopInitializator(TreePopulationInitializator popInit) {
 		this.popInit = popInit;
 	}
+
 }

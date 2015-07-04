@@ -6,8 +6,6 @@ import java.io.File;
 
 import genlib.GenLib;
 import genlib.classifier.common.EvolutionTreeClassifier;
-import genlib.classifier.gens.WekaJ48TreeGenerator;
-import genlib.classifier.popinit.TreePopulationInitializator;
 import genlib.configurations.Config;
 import genlib.configurations.PathManager;
 import genlib.evolution.fitness.FitnessFunction;
@@ -17,6 +15,8 @@ import genlib.evolution.operators.DefaultTreeCrossover;
 import genlib.evolution.operators.DefaultTreeMutation;
 import genlib.evolution.operators.Operator;
 import genlib.evolution.selectors.Selector;
+import genlib.generators.WekaJ48TreeGenerator;
+import genlib.initializators.TreePopulationInitializator;
 import genlib.locales.TextResource;
 import genlib.plugins.PluginManager;
 

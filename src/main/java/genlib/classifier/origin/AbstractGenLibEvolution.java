@@ -1,6 +1,7 @@
-package genlib.classifier;
+package genlib.classifier.origin;
 
 import genlib.GenLib;
+import genlib.classifier.Classifier;
 import genlib.classifier.classifierextensions.GenLibClassifierExtension;
 import genlib.classifier.common.EvolutionTreeClassifier;
 import genlib.evolution.individuals.TreeIndividual;

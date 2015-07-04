@@ -1,4 +1,4 @@
-package genlib.classifier.splitting;
+package genlib.splitfunctions;
 
 import genlib.utils.Utils;
 import weka.classifiers.trees.j48.Distribution;

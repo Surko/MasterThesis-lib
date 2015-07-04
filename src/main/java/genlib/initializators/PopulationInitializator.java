@@ -1,7 +1,7 @@
-package genlib.classifier.popinit;
+package genlib.initializators;
 
-import genlib.classifier.gens.PopGenerator;
 import genlib.evolution.individuals.Individual;
+import genlib.generators.Generator;
 import genlib.structures.Data;
 
 import java.io.Serializable;
@@ -25,7 +25,7 @@ import java.util.Random;
  * @author Lukas Surin
  * @param <T>
  *            Type of generator for population (TreeGenerator,...)
- * @see PopGenerator
+ * @see Generator
  */
 public interface PopulationInitializator<T extends Individual> extends
 		Serializable {
@@ -44,11 +44,11 @@ public interface PopulationInitializator<T extends Individual> extends
 
 	public void setPopulationSize(int popSize);
 
-	public void setGenerator(ArrayList<? extends PopGenerator<T>> generator);
+	public void setGenerator(ArrayList<? extends Generator<T>> generator);
 
 	public int getPopulationSize();
 
-	public PopGenerator<T> getGenerator();
+	public Generator<T> getGenerator();
 
 	public String getInitName();
 

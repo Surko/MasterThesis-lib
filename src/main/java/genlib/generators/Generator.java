@@ -1,10 +1,10 @@
-package genlib.classifier.gens;
+package genlib.generators;
 
 import genlib.evolution.individuals.Individual;
 
 import java.io.Serializable;
 
-public interface PopGenerator<T extends Individual> extends Runnable,
+public interface Generator<T extends Individual> extends Runnable,
 		Serializable {
 
 	public T[] getIndividuals();
@@ -17,7 +17,7 @@ public interface PopGenerator<T extends Individual> extends Runnable,
 
 	public void setInstances(Object data);
 
-	public void setGatherGen(PopGenerator<T> gatherGen);
+	public void setGatherGen(Generator<T> gatherGen);
 
 	public void setAdditionalOptions(String[] options) throws Exception;
 

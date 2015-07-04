@@ -1,8 +1,8 @@
-package genlib.classifier.gens;
+package genlib.generators;
 
-import genlib.classifier.splitting.SplitCriteria;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.exceptions.PopulationInitializationException;
+import genlib.splitfunctions.SplitCriteria;
 import genlib.structures.trees.Node;
 import genlib.utils.Utils;
 import genlib.utils.Utils.Sign;

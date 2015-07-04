@@ -1,7 +1,7 @@
 package genlib.plugins;
 
-import genlib.classifier.popinit.PopulationInitializator;
 import genlib.evolution.individuals.Individual;
+import genlib.initializators.PopulationInitializator;
 
 import java.util.HashMap;
 

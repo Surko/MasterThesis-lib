@@ -8,10 +8,6 @@ import genlib.annotations.MateSelectAnnot;
 import genlib.annotations.PopInitAnnot;
 import genlib.annotations.XOperatorAnnot;
 import genlib.classifier.Classifier;
-import genlib.classifier.gens.PopGenerator;
-import genlib.classifier.popinit.PopulationInitializator;
-import genlib.classifier.splitting.InformationGainCriteria;
-import genlib.classifier.splitting.SplitCriteria;
 import genlib.classifier.weka.WekaEvolutionTreeClassifier;
 import genlib.configurations.PathManager;
 import genlib.evolution.fitness.FitnessFunction;
@@ -20,7 +16,11 @@ import genlib.evolution.operators.Operator;
 import genlib.evolution.population.IPopulation;
 import genlib.evolution.population.Population;
 import genlib.evolution.selectors.Selector;
+import genlib.generators.Generator;
+import genlib.initializators.PopulationInitializator;
 import genlib.locales.PermMessages;
+import genlib.splitfunctions.InformationGainCriteria;
+import genlib.splitfunctions.SplitCriteria;
 import genlib.utils.Utils;
 
 import java.io.File;
@@ -39,7 +39,7 @@ public class PluginManager {
 	/** loaded population initializators */
 	public static final HashMap<String, Class<? extends PopulationInitializator<? extends Individual>>> popInits = new HashMap<>();
 	/** loaded population initializators */
-	public static final HashMap<String, Class<? extends PopGenerator<? extends Individual>>> gens = new HashMap<>();
+	public static final HashMap<String, Class<? extends Generator<? extends Individual>>> gens = new HashMap<>();
 	/** loaded fitness functions */
 	public static final HashMap<String, Class<? extends FitnessFunction<? extends Individual>>> fitFuncs = new HashMap<>();
 	/** hashmap with crossover tree operators */
@@ -243,7 +243,7 @@ public class PluginManager {
 		int plugLoaded = 0;
 		int classLoaded = 0;
 
-		Package p = Package.getPackage("genlib.classifier.popinit");
+		Package p = Package.getPackage("genlib.initializators");
 		if (p.getAnnotations() == null) {
 			return;
 		}
@@ -355,11 +355,11 @@ public class PluginManager {
 	private static void initGeneratorPlugins() {
 		LOG.log(Level.INFO,
 				String.format(PermMessages._s_geninit,
-						PopGenerator.class.getName()));
+						Generator.class.getName()));
 		int plugLoaded = 0;
 		int classLoaded = 0;
 
-		Package p = Package.getPackage("genlib.classifier.gens");
+		Package p = Package.getPackage("genlib.generators");
 		if (p.getAnnotations() == null) {
 			return;
 		}

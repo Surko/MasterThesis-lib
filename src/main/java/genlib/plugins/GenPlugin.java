@@ -1,18 +1,18 @@
 package genlib.plugins;
 
-import genlib.classifier.gens.PopGenerator;
 import genlib.evolution.individuals.Individual;
+import genlib.generators.Generator;
 
 import java.util.HashMap;
 
 public abstract class GenPlugin implements
-		Plugin<Class<? extends PopGenerator<? extends Individual>>> {
+		Plugin<Class<? extends Generator<? extends Individual>>> {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final HashMap<String, Class<? extends PopGenerator<? extends Individual>>> getStorage() {
+	public final HashMap<String, Class<? extends Generator<? extends Individual>>> getStorage() {
 		return PluginManager.gens;
 	}
 
@@ -21,7 +21,7 @@ public abstract class GenPlugin implements
 	 */
 	@Override
 	public final void addPlugin(String key,
-			Class<? extends PopGenerator<? extends Individual>> pluginClass) {
+			Class<? extends Generator<? extends Individual>> pluginClass) {
 		PluginManager.gens.put(key, pluginClass);
 	}
 

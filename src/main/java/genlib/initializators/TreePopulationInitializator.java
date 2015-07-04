@@ -1,8 +1,8 @@
-package genlib.classifier.popinit;
+package genlib.initializators;
 
-import genlib.classifier.gens.PopGenerator;
-import genlib.classifier.gens.TreeGenerator;
 import genlib.evolution.individuals.TreeIndividual;
+import genlib.generators.Generator;
+import genlib.generators.TreeGenerator;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
 import genlib.structures.Data;
@@ -147,7 +147,7 @@ public abstract class TreePopulationInitializator implements
 
 	@Override
 	public void setGenerator(
-			ArrayList<? extends PopGenerator<TreeIndividual>> gen) {
+			ArrayList<? extends Generator<TreeIndividual>> gen) {
 		if (gen.size() > 0) {
 			this.gen = (TreeGenerator) gen.get(0);
 		}

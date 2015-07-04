@@ -1,4 +1,4 @@
-package genlib.classifier.splitting;
+package genlib.splitfunctions;
 
 import java.io.Serializable;
 import java.util.HashMap;

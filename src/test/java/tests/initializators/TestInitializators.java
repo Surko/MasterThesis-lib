@@ -8,11 +8,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Random;
 
-import genlib.classifier.popinit.CompletedTrees;
-import genlib.classifier.popinit.RandomStumpCombinator;
-import genlib.classifier.popinit.WekaCompletedTrees;
-import genlib.classifier.popinit.WekaRandomStumpCombinator;
 import genlib.evolution.fitness.FitnessFunction;
+import genlib.initializators.CompletedTrees;
+import genlib.initializators.RandomStumpCombinator;
+import genlib.initializators.WekaCompletedTrees;
+import genlib.initializators.WekaRandomStumpCombinator;
 import genlib.plugins.PluginManager;
 import genlib.structures.Data;
 

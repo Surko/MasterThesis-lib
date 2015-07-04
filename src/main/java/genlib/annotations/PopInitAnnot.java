@@ -1,6 +1,6 @@
 package genlib.annotations;
 
-import genlib.classifier.popinit.PopulationInitializator;
+import genlib.initializators.PopulationInitializator;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

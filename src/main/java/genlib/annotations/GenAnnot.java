@@ -1,6 +1,6 @@
 package genlib.annotations;
 
-import genlib.classifier.gens.PopGenerator;
+import genlib.generators.Generator;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 public @interface GenAnnot {
 	boolean[] wekaCompatibility();
 	String[] toInjectNames();
-	Class<? extends PopGenerator>[] toInjectClasses();
+	Class<? extends Generator>[] toInjectClasses();
 	String toInjectField();
 	Class<?> toInjectClass();
 }

@@ -1,11 +1,11 @@
 package tests.initializators;
 
-import genlib.classifier.gens.WekaJ48TreeGenerator;
-import genlib.classifier.gens.WekaSimpleStumpGenerator;
-import genlib.classifier.gens.WekaTreeGenerator;
-import genlib.classifier.splitting.InformationGainCriteria;
-import genlib.classifier.splitting.SplitCriteria;
+import genlib.generators.WekaJ48TreeGenerator;
+import genlib.generators.WekaSimpleStumpGenerator;
+import genlib.generators.WekaTreeGenerator;
 import genlib.plugins.PluginManager;
+import genlib.splitfunctions.InformationGainCriteria;
+import genlib.splitfunctions.SplitCriteria;
 import genlib.structures.data.GenLibInstances;
 
 import org.junit.Test;

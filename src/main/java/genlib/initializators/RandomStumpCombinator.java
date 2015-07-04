@@ -1,8 +1,8 @@
-package genlib.classifier.popinit;
+package genlib.initializators;
 
-import genlib.classifier.gens.DummyTreeGenerator;
-import genlib.classifier.gens.TreeGenerator;
 import genlib.evolution.individuals.TreeIndividual;
+import genlib.generators.DummyTreeGenerator;
+import genlib.generators.TreeGenerator;
 import genlib.locales.PermMessages;
 import genlib.locales.TextResource;
 import genlib.structures.data.GenLibInstances;

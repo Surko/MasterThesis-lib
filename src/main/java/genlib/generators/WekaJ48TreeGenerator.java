@@ -1,7 +1,7 @@
-package genlib.classifier.gens;
+package genlib.generators;
 
-import genlib.classifier.splitting.SplitCriteria;
 import genlib.evolution.individuals.TreeIndividual;
+import genlib.splitfunctions.SplitCriteria;
 import genlib.utils.Utils;
 import genlib.utils.WekaUtils;
 import weka.classifiers.trees.J48;
