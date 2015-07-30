@@ -13,6 +13,14 @@ import java.util.concurrent.TimeUnit;
 
 import weka.core.Instances;
 
+/**
+ * Class that implements TreePopulationInitializator to create TreeIndividuals.
+ * Generated trees from individual generator is inserted into population without
+ * any further processing. This class is designated for weka use.
+ * 
+ * @author Lukas Surin
+ *
+ */
 public class WekaCompletedTrees extends CompletedTrees {
 
 	/** for serialization */
@@ -20,13 +28,37 @@ public class WekaCompletedTrees extends CompletedTrees {
 	/** name of this initializator */
 	public static final String initName = "wCompTree";
 
+	/**
+	 * Default constructor
+	 */
 	public WekaCompletedTrees() {
 	}
 
+	/**
+	 * Constructor that initializes population size, divide param and resample
+	 * tag
+	 * 
+	 * @param popSize
+	 *            population size
+	 * @param divideParam
+	 *            how many time dataset is divided
+	 * @param resample
+	 *            if dataset is resampled
+	 */
 	public WekaCompletedTrees(int popSize, int divideParam, boolean resample) {
 		super(popSize, divideParam, resample);
 	}
 
+	/**
+	 * Method initialized the population using Instances. Divided or
+	 * resampled dataset is used to construct decision trees. Construction can
+	 * be done with multiple threads. No further processing takes place.
+	 * 
+	 * @param data
+	 *            to be used to initialize
+	 * @throws Exception
+	 *             thrown if problem occured initializing population
+	 */
 	private void initPopulation(Instances data) throws Exception {
 		if (gen == null) {
 			this.gen = new WekaJ48TreeGenerator(new String[] { "-C", "0.25",
@@ -95,6 +127,9 @@ public class WekaCompletedTrees extends CompletedTrees {
 		fillPopulation();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void initPopulation() throws Exception {
 		if (data.isInstances()) {
@@ -107,11 +142,17 @@ public class WekaCompletedTrees extends CompletedTrees {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean isWekaCompatible() {
 		return true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String objectInfo() {
 		return String.format(
@@ -120,6 +161,9 @@ public class WekaCompletedTrees extends CompletedTrees {
 				nThreads);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getInitName() {
 		return initName;

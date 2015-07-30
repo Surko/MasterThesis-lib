@@ -289,8 +289,11 @@ public abstract class TreeConfusionFitness extends
 		// attributes
 		if (attrIndex == -1) {
 			if (instances.numClasses() == 2) {
+				// default is index 1, because at default classification
+				// to false or true (false is 0 and true is 1)
 				attrIndex = 1;
-				return attributeConfusionValue(instances, individual);
+				double value = attributeConfusionValue(instances, individual);				
+				return Double.isNaN(value) ? 0 : value;
 			}
 
 			if (averageEnum == null) {
@@ -341,7 +344,8 @@ public abstract class TreeConfusionFitness extends
 			}
 			return fitness;
 		} else {
-			return attributeConfusionValue(instances, individual);
+			double value = attributeConfusionValue(instances, individual);				
+			return Double.isNaN(value) ? 0 : value;
 		}
 	}
 
@@ -360,7 +364,7 @@ public abstract class TreeConfusionFitness extends
 		// attributes
 		if (attrIndex == -1) {
 			if (instances.numClasses() == 2) {
-				attrIndex = 0;
+				attrIndex = 1;
 				return attributeConfusionValue(instances, individual);
 			}
 

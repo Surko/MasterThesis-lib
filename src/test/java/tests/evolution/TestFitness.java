@@ -247,15 +247,15 @@ public class TestFitness {
 		assertTrue(function.objectInfo().equals(name + " INDEX,0,DATA,0,AVERAGE,WEIGHTED"));
 
 		name = TreeFMeasureFitness.initName;
-		function = new TreeFMeasureFitness();		
-		assertTrue(function.objectInfo().equals(name + " x"));
+		function = new TreeFMeasureFitness();			
+		assertTrue(function.objectInfo().equals(name + " BETA,1.0"));
 		function.setParam("INDEX,0");
-		assertTrue(function.objectInfo().equals(name + " INDEX,0"));
+		assertTrue(function.objectInfo().equals(name + " INDEX,0,BETA,1.0"));
 		function.setParam("INDEX,0,AVERAGE,WEIGHTED");
 		assertTrue(function.objectInfo().equals(
-				name + " INDEX,0,AVERAGE,WEIGHTED"));
+				name + " INDEX,0,AVERAGE,WEIGHTED,BETA,1.0"));
 		function.setParam("MAXIMIZE,true");
-		assertTrue(function.objectInfo().equals(name + " MAXIMIZE,true"));
+		assertTrue(function.objectInfo().equals(name + " MAXIMIZE,true,BETA,1.0"));
 		function.setParam("BETA,0.5");		
 		assertTrue(function.objectInfo().equals(name + " BETA,0.5"));
 		

@@ -32,6 +32,7 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable,
 
 	/** for serialization */
 	private static final long serialVersionUID = -8654725926081507012L;
+	/** logger */
 	private static final Logger LOG = Logger.getLogger(EvolutionAlgorithm.class
 			.getName());
 	/** actual population */

@@ -66,7 +66,7 @@ public class TreeFMeasureFitness extends TreeConfusionFitness {
 	/** name for this fitness function, should be t$LabelOfFitness$ */
 	public static final String initName = "tFMsr";
 	/** beta * beta parameter which is used in computation of f-measure */
-	public Double doubleBeta = null;
+	public Double doubleBeta = Double.valueOf(1);
 
 	/**
 	 * {@inheritDoc} </p> Overriden to utilize Beta parameter.
@@ -103,7 +103,7 @@ public class TreeFMeasureFitness extends TreeConfusionFitness {
 	 */
 	@Override
 	public void setParam(String param) {
-		doubleBeta = null;
+		doubleBeta = Double.valueOf(1);
 		super.setParam(param);
 	};
 

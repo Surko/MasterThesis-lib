@@ -12,6 +12,14 @@ import genlib.utils.Utils;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Class that implements TreePopulationInitializator to create TreeIndividuals.
+ * Generated trees from individual generator is inserted into population without
+ * any further processing. This class is designated for non weka use.
+ * 
+ * @author Lukas Surin
+ *
+ */
 public class CompletedTrees extends TreePopulationInitializator {
 
 	/** for serialization */
@@ -19,9 +27,23 @@ public class CompletedTrees extends TreePopulationInitializator {
 	/** name of this initializator */
 	public static final String initName = "CompTree";
 
+	/**
+	 * Default constructor
+	 */
 	public CompletedTrees() {
 	}
 
+	/**
+	 * Constructor that initializes population size, divide param and resample
+	 * tag
+	 * 
+	 * @param popSize
+	 *            population size
+	 * @param divideParam
+	 *            how many time dataset is divided
+	 * @param resample
+	 *            if dataset is resampled
+	 */
 	public CompletedTrees(int popSize, int divideParam, boolean resample) {
 		this.popSize = popSize;
 		this.divideParam = divideParam;
@@ -29,6 +51,16 @@ public class CompletedTrees extends TreePopulationInitializator {
 		this.random = Utils.randomGen;
 	}
 
+	/**
+	 * Method initialized the population using GenLibInstances. Divided or
+	 * resampled dataset is used to construct decision trees. Construction can
+	 * be done with multiple threads. No further processing takes place.
+	 * 
+	 * @param data
+	 *            to be used to initialize
+	 * @throws Exception
+	 *             thrown if problem occured initializing population
+	 */
 	private void initPopulation(GenLibInstances data) throws Exception {
 		if (gen == null) {
 			this.gen = new DummyTreeGenerator();
@@ -95,6 +127,10 @@ public class CompletedTrees extends TreePopulationInitializator {
 		fillPopulation();
 	}
 
+	/**
+	 * Method fills the population to have population size individuals. It just randomly chooses 
+	 * individuals and copies them.
+	 */
 	protected void fillPopulation() {
 		TreeIndividual[] filledPopulation = new TreeIndividual[popSize];
 
@@ -111,6 +147,9 @@ public class CompletedTrees extends TreePopulationInitializator {
 		this.population = filledPopulation;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void initPopulation() throws Exception {
 		if (data.isGenLibInstances()) {
@@ -123,16 +162,25 @@ public class CompletedTrees extends TreePopulationInitializator {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean isWekaCompatible() {
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getInitName() {
 		return initName;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String objectInfo() {
 		return String.format(
@@ -141,6 +189,9 @@ public class CompletedTrees extends TreePopulationInitializator {
 				nThreads);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public CompletedTrees copy() {
 		return new CompletedTrees();
 	}
