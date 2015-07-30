@@ -1,6 +1,7 @@
 package genlib.classifier.weka;
 
-import genlib.GenLib;
+import genlib.GenDTLib;
+import genlib.classifier.Classifier;
 import genlib.classifier.classifierextensions.WekaClassifierExtension;
 import genlib.classifier.common.EvolutionTreeClassifier;
 import genlib.configurations.Config;
@@ -19,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import weka.classifiers.Classifier;
 import weka.core.AdditionalMeasureProducer;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
@@ -55,10 +55,9 @@ import weka.core.converters.ConverterUtils.DataSource;
  * @author Lukas Surin
  *
  */
-public class WekaEvolutionTreeClassifier extends Classifier implements
-		Randomizable, OptionHandler, TechnicalInformationHandler, Drawable,
-		AdditionalMeasureProducer, genlib.classifier.Classifier,
-		WekaClassifierExtension {
+public class WekaEvolutionTreeClassifier extends WekaClassifierExtension
+		implements Randomizable, OptionHandler, TechnicalInformationHandler,
+		Drawable, AdditionalMeasureProducer, Classifier {
 
 	/** for serialization */
 	private static final long serialVersionUID = 5314273117546487901L;
@@ -75,7 +74,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	 *             Throws exception if
 	 */
 	public WekaEvolutionTreeClassifier() {
-		GenLib.reconfig();
+		GenDTLib.reconfig();
 		this.e_tree_class = new EvolutionTreeClassifier(true);
 	}
 
@@ -96,19 +95,19 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 
 		newVector.addElement(new Option("\tFitness functions.\n"
 				+ "\t(default " + e_tree_class.getFitnessFunctionsString()
-				+ ")", "FF", 1,
-				"-FF <function probability;function probability;...>"));
+				+ ")", "F", 1,
+				"-F <function probability;function probability;...>"));
 
 		newVector.addElement(new Option("\tFitness comparator.\n"
 				+ "\t(default " + e_tree_class.getFitnessComparatorString()
 				+ ")", "FC", 1, "-FC <comparator params>"));
 
 		newVector.addElement(new Option("\tMutation probability.\n"
-				+ "\t(default " + e_tree_class.getMutString() + ")", "MP", 1,
-				"-MP <mutation probability;mutation probability;...>"));
+				+ "\t(default " + e_tree_class.getMutString() + ")", "M", 1,
+				"-M <mutation probability;mutation probability;...>"));
 		newVector.addElement(new Option("\tCrossover probability.\n"
-				+ "\t(default " + e_tree_class.getXoverString() + ")", "XP", 1,
-				"-XP <xover probability;xover probability;...>"));
+				+ "\t(default " + e_tree_class.getXoverString() + ")", "X", 1,
+				"-X <xover probability;xover probability;...>"));
 		newVector
 				.addElement(new Option("\tElitism rate.\n" + "\t(default "
 						+ e_tree_class.getElitism() + ")", "E", 1,
@@ -118,24 +117,24 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 				"-SE <selector param>"));
 		newVector.addElement(new Option("\tEnvironmental selectors.\n"
 				+ "\t(default " + e_tree_class.getEnvSelectorsString() + ")",
-				"ESE", 1, "-ESE <env_selector param>"));
+				"ES", 1, "-ES <env_selector param>"));
 		newVector.addElement(new Option("\tSeed for random data shuffling.\n"
 				+ "\t(default " + e_tree_class.getSeed() + ")", "S", 1,
 				"-S <seed>"));
-		newVector.addElement(new Option("\tPopulation generator", "PopP", 1,
-				"-PopP <pop_params>"));
-		newVector.addElement(new Option("\tIndividual generator", "IG", 1,
-				"-IG <indgen_params>"));
-		newVector.addElement(new Option("\tPopulation size", "PS", 1,
-				"-PS <pop_size>"));
-		newVector.addElement(new Option("\tNumber of generations", "NoG", 1,
-				"-NoG <num_of_gens>"));
+		newVector.addElement(new Option("\tPopulation initializator", "PI", 1,
+				"-PI <pop_params>"));
+		newVector.addElement(new Option("\tIndividual generator", "G", 1,
+				"-G <indgen_params>"));
+		newVector.addElement(new Option("\tPopulation size", "P", 1,
+				"-P <pop_size>"));
+		newVector.addElement(new Option("\tNumber of generations", "N", 1,
+				"-N <num_of_gens>"));
 		newVector.addElement(new Option("\tFitness threads", "FT", 1,
 				"-FT <#threads>"));
 		newVector.addElement(new Option("\tGenerator threads", "GT", 1,
 				"-GT <#threads>"));
 		newVector.addElement(new Option("\tNumber of instances to classify?",
-				"NtC", 1, "-NtC <#number to classify>"));
+				"NC", 1, "-NC <#number to classify>"));
 		newVector.addElement(new Option("\tForced Reconfiguration?", "C", 1,
 				"-C <True|False>"));
 
@@ -163,7 +162,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 		result.add(getData());
 
 		// stands for fitness functions
-		result.add("-FF");
+		result.add("-F");
 		result.add(getFitnessFunctions());
 
 		// stands for fitness comparator
@@ -171,11 +170,11 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 		result.add(getFitComp());
 
 		// stands for mutation probability
-		result.add("-MP");
+		result.add("-M");
 		result.add(getMutationOperators());
 
 		// stands for crossover probability
-		result.add("-XP");
+		result.add("-X");
 		result.add(getXoverOperators());
 
 		// stands for elitism
@@ -187,23 +186,23 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 		result.add("" + getSelectors());
 
 		// stands for environmental selectors
-		result.add("-ESE");
+		result.add("-ES");
 		result.add("" + getEnvSelectors());
 
 		// stands for initial population size
-		result.add("-PS");
+		result.add("-P");
 		result.add("" + getPopulationSize());
 
 		// stands for number of generations
-		result.add("-NoG");
+		result.add("-N");
 		result.add("" + getNumberOfGenerations());
 
 		// stands for population generator parameter
-		result.add("-PopP");
+		result.add("-PI");
 		result.add(getPopulationInit());
 
 		// stands for individual generator parameter
-		result.add("-IG");
+		result.add("-G");
 		result.add(getIndividualGenerator());
 
 		// stands for fitness threads
@@ -219,7 +218,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 		result.add("" + getSeed());
 
 		// stands for number of instances to classify
-		result.add("-NtC");
+		result.add("-NC");
 		result.add("" + getClassify());
 
 		// stands for configuration configured :)
@@ -287,7 +286,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 			e_tree_class.setData(tmpStr);
 		}
 
-		tmpStr = Utils.getOption("FF", options);
+		tmpStr = Utils.getOption("F", options);
 		if (tmpStr.length() != 0) {
 			e_tree_class.setFitFuncsString(tmpStr);
 		}
@@ -297,12 +296,12 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 			e_tree_class.setFitCompString(tmpStr);
 		}
 
-		tmpStr = Utils.getOption("MP", options);
+		tmpStr = Utils.getOption("M", options);
 		if (tmpStr.length() != 0) {
 			e_tree_class.setMutString(tmpStr);
 		}
 
-		tmpStr = Utils.getOption("XP", options);
+		tmpStr = Utils.getOption("X", options);
 		if (tmpStr.length() != 0) {
 			e_tree_class.setXoverString(tmpStr);
 		}
@@ -322,22 +321,22 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 			e_tree_class.setEnvSelectorsString(tmpStr);
 		}
 
-		tmpStr = Utils.getOption("PopP", options);
+		tmpStr = Utils.getOption("PI", options);
 		if (tmpStr.length() != 0) {
 			e_tree_class.setPopInitString(tmpStr);
 		}
 
-		tmpStr = Utils.getOption("IG", options);
+		tmpStr = Utils.getOption("G", options);
 		if (tmpStr.length() != 0) {
 			e_tree_class.setIndividualGeneratorString(tmpStr);
 		}
 
-		tmpStr = Utils.getOption("PS", options);
+		tmpStr = Utils.getOption("P", options);
 		if (tmpStr.length() != 0) {
 			e_tree_class.setPopulationSize(Integer.parseInt(tmpStr));
 		}
 
-		tmpStr = Utils.getOption("NoG", options);
+		tmpStr = Utils.getOption("N", options);
 		if (tmpStr.length() != 0) {
 			e_tree_class.setNumberOfGenerations(Integer.parseInt(tmpStr));
 		}
@@ -347,7 +346,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 			e_tree_class.setSeed(Integer.parseInt(tmpStr));
 		}
 
-		tmpStr = Utils.getOption("NtC", options);
+		tmpStr = Utils.getOption("NC", options);
 		if (tmpStr.length() != 0) {
 			e_tree_class.setClassify(Integer.parseInt(tmpStr));
 		}
@@ -1088,7 +1087,7 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	 */
 	public void setConfigured(boolean configured) {
 		Config.configured = configured;
-		GenLib.reconfig();
+		GenDTLib.reconfig();
 		e_tree_class.reconfig();
 	}
 
@@ -1210,27 +1209,30 @@ public class WekaEvolutionTreeClassifier extends Classifier implements
 	 * 
 	 * @return a description of the classifier
 	 */
-	public String toString() {
-		try {
-			return graph();
-		} catch (Exception e) {}
+	public String toString() {		
 		if (e_tree_class.getBestIndividuals() == null) {
 			return "No classifier built \n";
 		} else {
-			return "Start genetic tree\n------------------\n"
-					+ e_tree_class.getStartIndividual().toString() + "\n"
-					+ e_tree_class.getStartIndividual().getTreeSize() + "\n"
-					+ e_tree_class.getStartIndividual().getNumLeaves() + "\n"
-					+ e_tree_class.getStartIndividual().getTreeHeight() + "\n"
-					+ "Created genetic tree\n------------------\n"
-					+ e_tree_class.getBestIndividuals().get(0).toString()
-					+ "\n"
-					+ e_tree_class.getBestIndividuals().get(0).getTreeSize()
-					+ "\n"
-					+ e_tree_class.getBestIndividuals().get(0).getNumLeaves()
-					+ "\n"
-					+ e_tree_class.getBestIndividuals().get(0).getTreeHeight()
-					+ "\n\n";
+			try {
+				return "Start genetic tree\n------------------\n"
+						+ e_tree_class.getStartIndividual().toString() + "\n"
+						+ e_tree_class.getStartIndividual().getTreeSize() + "\n"
+						+ e_tree_class.getStartIndividual().getNumLeaves() + "\n"
+						+ e_tree_class.getStartIndividual().getTreeHeight() + "\n"
+						+ "Created genetic tree\n------------------\n"
+						+ e_tree_class.getBestIndividuals().get(0).toString()
+						+ "\n"
+						+ e_tree_class.getBestIndividuals().get(0).getTreeSize()
+						+ "\n"
+						+ e_tree_class.getBestIndividuals().get(0).getNumLeaves()
+						+ "\n"
+						+ e_tree_class.getBestIndividuals().get(0).getTreeHeight()
+						+ "\n\n"
+						+ graph();
+			} catch (Exception e) {				
+				e.printStackTrace();
+				return "No classifier built \n";
+			}
 		}
 	}
 

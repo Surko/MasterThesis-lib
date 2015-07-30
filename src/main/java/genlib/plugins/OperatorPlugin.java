@@ -5,9 +5,23 @@ import genlib.evolution.operators.Operator;
 
 import java.util.HashMap;
 
+/**
+ * Class that represents plugin for operators. It implements Plugin interface,
+ * so it must implement methods on how to add plugin and where is the storage
+ * for the plugins.
+ * 
+ * @author Lukas Surin
+ *
+ */
 public abstract class OperatorPlugin implements
 		Plugin<Class<? extends Operator<? extends Individual>>> {
 
+	/**
+	 * Enum that differentiate what kind of operator plugin we implement
+	 * 
+	 * @author Lukas Surin
+	 *
+	 */
 	public enum OperatorEnum {
 		MUTATION, CROSSOVER
 	}

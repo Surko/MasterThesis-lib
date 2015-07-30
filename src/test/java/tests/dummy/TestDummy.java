@@ -3,7 +3,7 @@ package tests.dummy;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import genlib.GenLib;
+import genlib.GenDTLib;
 import genlib.annotations.PopInitAnnot;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.population.IPopulation;
@@ -105,7 +105,7 @@ public class TestDummy {
 
 	@Test
 	public void test5() {
-		GenLib.reconfig();
+		GenDTLib.reconfig();
 	}
 
 	@Test

@@ -26,19 +26,61 @@ public class WekaRandomStumpCombinator extends RandomStumpCombinator {
 	/** name of this initializator */
 	public static final String initName = "wRanStump";
 
+	/**
+	 * Default constructor
+	 */
 	public WekaRandomStumpCombinator() {
 	}
 
+	/**
+	 * Constructor that sets the population size, maxDepth, divideParam and
+	 * resample tag
+	 * 
+	 * @param popSize
+	 *            population size
+	 * @param maxDepth
+	 *            maximal depth
+	 * @param divideParam
+	 *            divide parameter of data set
+	 * @param resample
+	 *            resampling data set
+	 */
 	public WekaRandomStumpCombinator(int popSize, int depth, int divideParam,
 			boolean resample) {
 		super(popSize, depth, divideParam, resample);
 	}
 
+	/**
+	 * Constructor that sets the population size, maxDepth, divideParam,
+	 * resample tag and generator.
+	 * 
+	 * @param popSize
+	 *            population size
+	 * @param maxDepth
+	 *            maximal depth
+	 * @param divideParam
+	 *            divide parameter of data set
+	 * @param resample
+	 *            resampling data set
+	 * @param gen
+	 *            generator used to generate stumps to combine
+	 */
 	public WekaRandomStumpCombinator(int popSize, int depth, int divideParam,
 			boolean resample, TreeGenerator gen) {
 		super(popSize, depth, divideParam, resample, gen);
 	}
 
+	/**
+	 * Method initialized the population using Instances. Divided or
+	 * resampled dataset is used to construct decision trees. Construction can
+	 * be done with multiple threads. After generation of trees the combination
+	 * of them takes place.
+	 * 
+	 * @param data
+	 *            to be used to initialize
+	 * @throws Exception
+	 *             thrown if problem occured initializing population
+	 */
 	private void initPopulation(Instances data) throws Exception {
 		if (gen == null) {
 			this.gen = new WekaSimpleStumpGenerator();
@@ -114,9 +156,7 @@ public class WekaRandomStumpCombinator extends RandomStumpCombinator {
 	}
 
 	/**
-	 * 
-	 * @throws Exception
-	 *             if data (saved as Object) is not of weka Instances type.
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void initPopulation() throws Exception {
@@ -127,16 +167,25 @@ public class WekaRandomStumpCombinator extends RandomStumpCombinator {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean isWekaCompatible() {
 		return true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getInitName() {
 		return initName;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public String objectInfo() {
 		return String.format(
 				"type %s;gen %s;depth %s;divide %s;resample %s;threads %s",

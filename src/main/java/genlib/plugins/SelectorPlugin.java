@@ -4,6 +4,14 @@ import genlib.evolution.selectors.Selector;
 
 import java.util.HashMap;
 
+/**
+ * Class that represents plugin for selectors (mating). It implements Plugin
+ * interface, so it must implement methods on how to add plugin and where is the
+ * storage for the plugins.
+ * 
+ * @author Lukas Surin
+ *
+ */
 public abstract class SelectorPlugin implements
 		Plugin<Class<? extends Selector>> {
 
@@ -47,7 +55,7 @@ public abstract class SelectorPlugin implements
 			PluginManager.envSelectors.put(key, pluginClass);
 		case SELECTORS:
 			PluginManager.selectors.put(key, pluginClass);
-		}		
+		}
 
 	}
 

@@ -9,6 +9,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Abstract class (interface) that is the individual of the genetic algorithm.
+ * Possible extension is tree individual.
  * 
  * @author Lukas Surin
  * @see TreeIndividual
@@ -17,6 +19,7 @@ public abstract class Individual implements Serializable {
 
 	/** for serialization */
 	private static final long serialVersionUID = 8997460860747264220L;
+	/** logger */
 	private static final Logger LOG = Logger.getLogger(Individual.class
 			.getName());
 	/**
@@ -128,5 +131,5 @@ public abstract class Individual implements Serializable {
 	 * Overriden method that returns the representation of this individual.
 	 */
 	public abstract String toString();
-	
+
 }

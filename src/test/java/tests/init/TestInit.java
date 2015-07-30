@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 
-import genlib.GenLib;
+import genlib.GenDTLib;
 import genlib.classifier.common.EvolutionTreeClassifier;
 import genlib.configurations.Config;
 import genlib.configurations.PathManager;
@@ -34,9 +34,9 @@ public class TestInit {
 	@Test
 	public void testLoggerInit() {
 		// Must be only two handlers
-		assertTrue(GenLib.LOG.getHandlers().length == 2);
+		assertTrue(GenDTLib.LOG.getHandlers().length == 2);
 		// Logger does not send to parent loggers
-		assertFalse(GenLib.LOG.getUseParentHandlers());
+		assertFalse(GenDTLib.LOG.getUseParentHandlers());
 	}
 
 	@Test
@@ -92,10 +92,10 @@ public class TestInit {
 
 	@Test
 	public void testGenLibAccessConfiguration() {
-		GenLib.getApplicationVersion();
+		GenDTLib.getApplicationVersion();
 		assertTrue(Config.configured);
 		// only once init
-		assertFalse(GenLib.reconfig());
+		assertFalse(GenDTLib.reconfig());
 	}
 
 	@Test

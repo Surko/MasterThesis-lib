@@ -13,10 +13,26 @@ import genlib.structures.trees.MultiWayHeightNode;
  */
 public interface SizeExtension {
 
+	/**
+	 * Gets the tree size
+	 * @return
+	 */
 	public int getTreeSize();
 
+	/**
+	 * Sets the tree size.
+	 * 
+	 * @param treeSize
+	 *            size of the tree starting from this node
+	 */
 	public void setTreeSize(int treeSize);
 
+	/**
+	 * Method automatically updates the treesize of this node and its
+	 * ascendants.
+	 * 
+	 * @param treeSizeToUpdate update value (negative, positive)
+	 */
 	public void updateTreeSize(int treeSizeToUpdate);
 
 }

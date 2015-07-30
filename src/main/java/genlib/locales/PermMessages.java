@@ -1,5 +1,11 @@
 package genlib.locales;
 
+/**
+ * Class with static resources (texts).
+ * 
+ * @author Lukas Surin
+ *
+ */
 public final class PermMessages {
 
 	private PermMessages() {

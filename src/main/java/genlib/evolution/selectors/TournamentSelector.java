@@ -7,19 +7,32 @@ import genlib.evolution.population.IPopulation;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Class that implements selector interface and selects individuals as it's
+ * defined by tournament selector for 2 individuals.
+ * 
+ * @author Lukas Surin
+ *
+ */
 public class TournamentSelector implements Selector {
 	/** for serialization */
 	private static final long serialVersionUID = 2541161181988190800L;
-
+	/** name of selector */
 	public static final String initName = "Tmt";
-
+	/** random object */
 	private Random rng;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public <T extends Individual> ArrayList<T> select(ArrayList<T> origin,
 			FitnessComparator<T> comp, int count) {
 		return select(origin, null, comp, count);
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public <T extends Individual> ArrayList<T> select(ArrayList<T> origin,
 			ArrayList<T> dest, FitnessComparator<T> comp, int count) {
 		if (dest == null) {
@@ -43,19 +56,25 @@ public class TournamentSelector implements Selector {
 				if (rng.nextDouble() < 0.8) {
 					dest.add(ind2);
 				} else {
-					dest.add(ind1);					
-				}				
+					dest.add(ind1);
+				}
 			}
 		}
 
 		return dest;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public <T extends Individual> IPopulation<T> select(IPopulation<T> origin,
 			int count) {
 		return select(origin, null, count);
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public <T extends Individual> IPopulation<T> select(IPopulation<T> origin,
 			IPopulation<T> dest, int count) {
 		if (dest == null) {
@@ -80,18 +99,24 @@ public class TournamentSelector implements Selector {
 				if (rng.nextDouble() < 0.8) {
 					dest.add(ind2);
 				} else {
-					dest.add(ind1);					
-				}				
+					dest.add(ind1);
+				}
 			}
 		}
 
 		return dest;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setRandomGenerator(Random random) {
 		this.rng = random;
 	}
 
+	/**
+	 * This method is not used
+	 */
 	public void setParam(String s) {
 	}
 }

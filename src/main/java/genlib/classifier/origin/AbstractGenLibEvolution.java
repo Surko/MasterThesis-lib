@@ -1,6 +1,6 @@
 package genlib.classifier.origin;
 
-import genlib.GenLib;
+import genlib.GenDTLib;
 import genlib.classifier.Classifier;
 import genlib.classifier.classifierextensions.GenLibClassifierExtension;
 import genlib.classifier.common.EvolutionTreeClassifier;
@@ -59,7 +59,7 @@ public abstract class AbstractGenLibEvolution implements Serializable,
 	 *             Throws exception if
 	 */
 	public AbstractGenLibEvolution() throws Exception {
-		GenLib.reconfig();
+		GenDTLib.reconfig();
 		this.e_tree_class = new EvolutionTreeClassifier(false);
 	}
 

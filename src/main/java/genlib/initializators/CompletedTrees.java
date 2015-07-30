@@ -4,7 +4,6 @@ import genlib.evolution.individuals.TreeIndividual;
 import genlib.exceptions.WrongDataException;
 import genlib.generators.DummyTreeGenerator;
 import genlib.generators.TreeGenerator;
-import genlib.locales.PermMessages;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
 import genlib.structures.data.GenLibInstances;
@@ -19,7 +18,7 @@ public class CompletedTrees extends TreePopulationInitializator {
 	private static final long serialVersionUID = 1312621842322682763L;
 	/** name of this initializator */
 	public static final String initName = "CompTree";
-	
+
 	public CompletedTrees() {
 	}
 
@@ -29,7 +28,7 @@ public class CompletedTrees extends TreePopulationInitializator {
 		this.resample = resample;
 		this.random = Utils.randomGen;
 	}
-	
+
 	private void initPopulation(GenLibInstances data) throws Exception {
 		if (gen == null) {
 			this.gen = new DummyTreeGenerator();

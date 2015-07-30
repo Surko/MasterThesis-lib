@@ -18,8 +18,9 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 /**
- * 
- * 
+ * Main config instance that is used to load configurations from property file.
+ * This file is parsed and saved in Property instance. Keys for different
+ * components are defined in this class.
  * 
  * @author Lukas Surin
  */
@@ -147,6 +148,9 @@ public class Config implements Serializable {
 		return instance;
 	}
 
+	/**
+	 * Private constructor for Singleton.
+	 */
 	private Config() {
 	}
 
@@ -176,6 +180,10 @@ public class Config implements Serializable {
 		return this;
 	}
 
+	/**
+	 * Method load properties from config file. Absent properties are set to
+	 * default values with method {@link #setAbsentProperties()}.
+	 */
 	private void loadProperties() {
 		prop = new Properties();
 		try {
@@ -195,6 +203,9 @@ public class Config implements Serializable {
 
 	}
 
+	/**
+	 * Method save properties to config file.
+	 */
 	public void saveProperties() {
 		try {
 			OutputStream ostream = new FileOutputStream(sFile);
@@ -208,6 +219,9 @@ public class Config implements Serializable {
 		}
 	}
 
+	/**
+	 * Method which set the default values for absent component.
+	 */
 	public void setAbsentProperties() {
 		putIfAbsent(CLASSIFY, "1");
 		putIfAbsent(DEBUG, "false");
@@ -232,6 +246,15 @@ public class Config implements Serializable {
 		putIfAbsent(LOCALE, "en");
 	}
 
+	/**
+	 * Method which changes the specific property referenced by key to value.
+	 * 
+	 * @param key
+	 *            for which we change property
+	 * @param value
+	 *            to which we change property
+	 * @return true iff property with key exists
+	 */
 	public boolean changeProperty(String key, String value) {
 		if (prop.containsKey(key)) {
 			prop.setProperty(key, value);
@@ -240,6 +263,14 @@ public class Config implements Serializable {
 		return false;
 	}
 
+	/**
+	 * Method sets the absent property with key to value
+	 * 
+	 * @param key
+	 *            for which we set the property (if absent)
+	 * @param value
+	 *            to which we set the property (if absent).
+	 */
 	private void putIfAbsent(String key, String value) {
 		if (!prop.containsKey(key)) {
 			prop.put(key, value);
@@ -453,7 +484,7 @@ public class Config implements Serializable {
 	public String getData() {
 		return prop.getProperty(DATA);
 	}
-	
+
 	/**
 	 * Getter which returns classify integer from config file
 	 * 
@@ -462,81 +493,189 @@ public class Config implements Serializable {
 	public int getClassify() {
 		return Integer.parseInt(prop.getProperty(CLASSIFY));
 	}
-	
+
 	//
 	/*
 	 * SETTERS
 	 */
 	//
 
+	/**
+	 * Sets the mutation operator argument
+	 * 
+	 * @param mutOperString
+	 *            mutation operator string
+	 */
 	public void setMutationOperators(String mutOperString) {
 		prop.setProperty(MUT_OPERATORS, mutOperString);
 	}
 
+	/**
+	 * Sets the crossover operator argument
+	 * 
+	 * @param xoverOperString
+	 *            crossover operator string
+	 */
 	public void setXoverOperators(String xoverOperString) {
 		prop.setProperty(XOVER_OPERATORS, xoverOperString);
 	}
 
+	/**
+	 * Sets the elitism rate argument
+	 * 
+	 * @param elitism
+	 *            rate
+	 */
 	public void setElitismRate(double elitism) {
 		prop.setProperty(ELITISM, String.valueOf(elitism));
 	}
 
+	/**
+	 * Sets the population init argument
+	 * 
+	 * @param popInitString
+	 *            argument
+	 */
 	public void setPopulationInit(String popInitString) {
 		prop.setProperty(POP_INIT, popInitString);
 	}
 
+	/**
+	 * Sets the individual generator argument
+	 * 
+	 * @param indGenString
+	 *            argument
+	 */
 	public void setIndGenerators(String indGenString) {
 		prop.setProperty(IND_GEN, indGenString);
 	}
 
+	/**
+	 * Sets the number of generations (int value)
+	 * 
+	 * @param numberOfGen
+	 *            argument
+	 */
 	public void setNumberOfGenerations(int numberOfGen) {
 		prop.setProperty(NUM_OF_GEN, String.valueOf(numberOfGen));
 	}
 
+	/**
+	 * Sets the population size (int value)
+	 * 
+	 * @param popSize
+	 *            argument
+	 */
 	public void setPopulationSize(int popSize) {
 		prop.setProperty(POP_SIZE, String.valueOf(popSize));
 	}
 
+	/**
+	 * Sets the seed of algorithm (int value)
+	 * 
+	 * @param seed
+	 *            argument
+	 */
 	public void setSeed(int seed) {
 		prop.setProperty(SEED, String.valueOf(seed));
 	}
 
+	/**
+	 * Sets the fitness comparator string
+	 * 
+	 * @param fitCompString
+	 *            argument
+	 */
 	public void setFitnessComparator(String fitCompString) {
 		prop.setProperty(FIT_COMPARATOR, fitCompString);
 	}
 
+	/**
+	 * Sets the fitness functions string
+	 * 
+	 * @param fitFuncsString
+	 *            argument
+	 */
 	public void setFitnessFunctions(String fitFuncsString) {
 		prop.setProperty(FIT_FUNCTIONS, fitFuncsString);
 	}
 
+	/**
+	 * Sets the selectors string
+	 * 
+	 * @param selectorString
+	 *            argument
+	 */
 	public void setSelectors(String selectorString) {
 		prop.setProperty(SELECTORS, selectorString);
 	}
 
+	/**
+	 * Sets the environmental selectors string
+	 * 
+	 * @param envSelectorString
+	 *            argument
+	 */
 	public void setEnvSelectors(String envSelectorString) {
 		prop.setProperty(ENV_SELECTORS, envSelectorString);
 	}
 
+	/**
+	 * Sets the fitness threads (int value)
+	 * 
+	 * @param fitThreads
+	 *            argument
+	 */
 	public void setFitnessThreads(int fitThreads) {
 		prop.setProperty(FIT_THREADS, String.valueOf(fitThreads));
 	}
 
+	/**
+	 * Sets the generator threads (int value)
+	 * 
+	 * @param genThreads
+	 *            argument
+	 */
 	public void setGeneratorThreads(int genThreads) {
 		prop.setProperty(GEN_THREADS, String.valueOf(genThreads));
 	}
 
+	/**
+	 * Sets the operator threads (int value)
+	 * 
+	 * @param operThreads
+	 *            argument
+	 */
 	public void setOperatorThreads(int operThreads) {
 		prop.setProperty(OPER_THREADS, String.valueOf(operThreads));
 	}
 
+	/**
+	 * Sets the data string argument
+	 * 
+	 * @param dataString
+	 *            argument
+	 */
 	public void setData(String dataString) {
 		prop.setProperty(DATA, dataString);
 	}
-	
+
+	/**
+	 * Sets the classify string argument
+	 * 
+	 * @param classify
+	 *            argument
+	 */
 	public void setClassify(String classify) {
 		prop.setProperty(CLASSIFY, classify);
 	}
-	
+
+	/**
+	 * Sets the locale for this run of application (can be reloaded)
+	 * 
+	 * @param locale
+	 *            of string files
+	 */
 	public void setLocale(Locale locale) {
 		prop.setProperty(LOCALE, locale.toString());
 	}

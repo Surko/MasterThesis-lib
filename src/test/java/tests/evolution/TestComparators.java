@@ -239,6 +239,7 @@ public class TestComparators {
 		accFunction.setData(wekaData);
 		FitnessFunction<TreeIndividual> sizeFunction = new TreeSizeFitness();
 		sizeFunction.setIndex(1);
+		sizeFunction.setParam("MEAN,0,BASE,2");
 
 		ArrayList<FitnessFunction<TreeIndividual>> fitFuncs = new ArrayList<>();
 		fitFuncs.add(accFunction);
@@ -282,20 +283,41 @@ public class TestComparators {
 
 	@Test
 	public void testPriorityComparator() {
-		FitnessComparator<TreeIndividual> comp = new PriorityFitnessComparator<TreeIndividual>();
+		transIndividual.change();
+		testIndividual.change();
+		wekaIndividual.change();
+		
+		FitnessComparator<TreeIndividual> comp = new PriorityFitnessComparator<TreeIndividual>(2);
 
+		transIndividual.change();
+		testIndividual.change();
+		wekaIndividual.change();
+		
 		FitnessFunction<TreeIndividual> accFunction = new TreeAccuracyFitness();
 		accFunction.setIndex(0);
 		accFunction.setData(wekaData);
 		FitnessFunction<TreeIndividual> depthFunction = new TreeSizeFitness();
 		depthFunction.setIndex(1);
-
+		
 		ArrayList<FitnessFunction<TreeIndividual>> fitFuncs = new ArrayList<>();
 		fitFuncs.add(accFunction);
 		fitFuncs.add(depthFunction);
 		FitnessFunction.registeredFunctions = fitFuncs.size();
 
 		comp.setFitFuncs(fitFuncs);
+		comp.setParam("x");				
+		
+		assertTrue(comp.compare(wekaIndividual, testIndividual) < 0);
+		assertTrue(comp.compare(testIndividual, transIndividual) < 0);
+		assertTrue(comp.compare(wekaIndividual, transIndividual) < 0);
+
+		ArrayList<TreeIndividual> notSorted = new ArrayList<TreeIndividual>();
+		notSorted.add(wekaIndividual);
+		notSorted.add(transIndividual);
+		notSorted.add(testIndividual);
+		System.out.println(notSorted);
+		Collections.sort(notSorted, comp);
+		System.out.println(notSorted);
 	}
 
 }

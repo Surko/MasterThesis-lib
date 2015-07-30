@@ -34,6 +34,13 @@ import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Class that serves the purpose of manager for plugins of all types. It loads
+ * inner classes and plugins inside predefined directory.
+ * 
+ * @author Lukas Surin
+ *
+ */
 public class PluginManager {
 	public static final HashMap<String, Class<? extends Classifier>> classifiers = new HashMap<>();
 	/** loaded population initializators */

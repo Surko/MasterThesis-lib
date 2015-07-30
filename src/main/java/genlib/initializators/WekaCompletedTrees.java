@@ -4,10 +4,8 @@ import genlib.evolution.individuals.TreeIndividual;
 import genlib.exceptions.WrongDataException;
 import genlib.generators.TreeGenerator;
 import genlib.generators.WekaJ48TreeGenerator;
-import genlib.locales.PermMessages;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
-import genlib.structures.data.GenLibInstances;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,7 +30,7 @@ public class WekaCompletedTrees extends CompletedTrees {
 	private void initPopulation(Instances data) throws Exception {
 		if (gen == null) {
 			this.gen = new WekaJ48TreeGenerator(new String[] { "-C", "0.25",
-					"-M", "2"});
+					"-M", "2" });
 			this.gen.setPopulationInitializator(this);
 		}
 

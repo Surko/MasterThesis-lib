@@ -1,7 +1,7 @@
 package tests.plugins;
 
 import static org.junit.Assert.assertTrue;
-import genlib.GenLib;
+import genlib.GenDTLib;
 import genlib.plugins.PluginManager;
 
 import java.util.logging.Level;
@@ -15,7 +15,7 @@ public class TestPlugins {
 
 	static {
 		if (!TestProperties.testPrints)
-			Logger.getLogger(GenLib.class.getPackage().getName()).setLevel(
+			Logger.getLogger(GenDTLib.class.getPackage().getName()).setLevel(
 					Level.OFF);
 	}
 

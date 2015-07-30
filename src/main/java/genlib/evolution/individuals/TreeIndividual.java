@@ -13,6 +13,14 @@ import genlib.utils.Utils;
 
 import java.util.Arrays;
 
+/**
+ * Class that extends Individual interface used when working with trees from
+ * graph theory. It has one root element {@link Node} that is the chromozome of
+ * this individual.
+ * 
+ * @author Lukas Surin
+ *
+ */
 public class TreeIndividual extends Individual {
 
 	/** for serialization */
@@ -158,7 +166,7 @@ public class TreeIndividual extends Individual {
 	 */
 	public void setRoot(Node root) {
 		root.setParent(null);
-		this.root = root;		
+		this.root = root;
 	}
 
 	/**

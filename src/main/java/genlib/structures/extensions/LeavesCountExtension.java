@@ -13,7 +13,16 @@ import genlib.structures.trees.MultiWayHeightNode;
  */
 public interface LeavesCountExtension {
 
+	/**
+	 * Gets the number of leaves in subtree defined by this node
+	 * @return number of leaves
+	 */
 	public int getNumLeaves();	
+	
+	/**
+	 * Method updates number of leaves in subtree
+	 * @param numLeavesToUpdate value to update leaves 
+	 */
 	public void updateNumLeaves(int numLeavesToUpdate);
 	
 }

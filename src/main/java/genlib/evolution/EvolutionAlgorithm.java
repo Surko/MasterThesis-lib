@@ -16,6 +16,17 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Main class that represents EvolutionAlgorithm for specific type of
+ * Individual. It contains methods to run algorithm and evolve actualPopulation.
+ * Behavior of operators, selectors, etc are specific for each one of the
+ * Population container.
+ * 
+ * @author Lukas Surin
+ *
+ * @param <T>
+ *            individual type
+ */
 public class EvolutionAlgorithm<T extends Individual> implements Runnable,
 		Serializable {
 
@@ -23,21 +34,40 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable,
 	private static final long serialVersionUID = -8654725926081507012L;
 	private static final Logger LOG = Logger.getLogger(EvolutionAlgorithm.class
 			.getName());
+	/** actual population */
 	private IPopulation<T> actualPopulation;
+	/** max number of generations */
 	private int numberOfGenerations;
+	/** number of threads used to compute fitness */
 	private int fitNumOfThreads = 1;
+	/** blocks of individuals that one thread will process */
 	private int fitBlockSize = 1;
 	// it's not used, but can be in future
 	@SuppressWarnings("unused")
 	private int operNumOfThreads;
+	/** elitism rate */
 	private double elitism;
 
+	/** data object */
 	private Data data;
+	/** fitness comparator */
 	private FitnessComparator<T> fitComp;
+	/** fitness functions */
 	private ArrayList<FitnessFunction<T>> fitFunctions;
+	/** selectors */
 	private ArrayList<Selector> selectors, envSelectors;
+	/** operators */
 	private ArrayList<Operator<T>> crossOperators, mutationOperators;
 
+	/**
+	 * Constructor that creates EvolutionAlgorithm with initialized data and
+	 * starting population.
+	 * 
+	 * @param data
+	 *            with instances
+	 * @param population
+	 *            starting population
+	 */
 	public EvolutionAlgorithm(Data data, IPopulation<T> population) {
 		Config c = Config.getInstance();
 		this.data = data;
@@ -46,6 +76,14 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable,
 		this.operNumOfThreads = c.getOperNumOfThreads();
 	}
 
+	/**
+	 * Constructor that creates EvolutionAlgorithm with initialized data and
+	 * number of generations.
+	 * 
+	 * @param data
+	 *            with instances
+	 * @param numberOfGenerations
+	 */
 	public EvolutionAlgorithm(Data data, int numberOfGenerations) {
 		Config c = Config.getInstance();
 		this.data = data;
@@ -54,6 +92,16 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable,
 		this.operNumOfThreads = c.getOperNumOfThreads();
 	}
 
+	/**
+	 * Constructor that creates EvolutionAlgorithm with initialized data,
+	 * starting population and maximal number of generations.
+	 * 
+	 * @param data
+	 *            with instances
+	 * @param population
+	 *            starting population
+	 * @param numberOfGenerations
+	 */
 	public EvolutionAlgorithm(Data data, IPopulation<T> population,
 			int numberOfGenerations) {
 		Config c = Config.getInstance();
@@ -64,58 +112,127 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable,
 		this.operNumOfThreads = c.getOperNumOfThreads();
 	}
 
+	/**
+	 * Gets the data.
+	 * 
+	 * @return data object
+	 */
 	public Data getData() {
 		return data;
 	}
 
+	/**
+	 * Gets the maximal number of generations.
+	 * 
+	 * @return
+	 */
 	public int getNumberOfGenerations() {
 		return numberOfGenerations;
 	}
 
+	/**
+	 * Gets the actual evolved population of this algorithm.
+	 * 
+	 * @return actual population
+	 */
 	public IPopulation<T> getActualPopulation() {
 		return actualPopulation;
 	}
 
+	/**
+	 * Method sets the crossover operators.
+	 * 
+	 * @param crossOperators
+	 *            used in this algorithm
+	 */
 	public void setCrossOperators(ArrayList<Operator<T>> crossOperators) {
 		this.crossOperators = crossOperators;
 	}
 
+	/**
+	 * Method adds new crossover operator.
+	 * 
+	 * @param operator
+	 *            new crossover operator
+	 */
 	public void addCrossOperator(Operator<T> operator) {
 		if (crossOperators == null)
 			crossOperators = new ArrayList<Operator<T>>();
 		crossOperators.add(operator);
 	}
 
+	/**
+	 * Method sets the mutation operators.
+	 * 
+	 * @param mutationOperators
+	 *            used in this algorithm
+	 */
 	public void setMutationOperators(ArrayList<Operator<T>> mutationOperators) {
 		this.mutationOperators = mutationOperators;
 	}
 
+	/**
+	 * Method adds new mutation operator.
+	 * 
+	 * @param operator
+	 *            new mutation operator
+	 */
 	public void addMutationOperator(Operator<T> operator) {
 		if (mutationOperators == null)
 			mutationOperators = new ArrayList<Operator<T>>();
 		mutationOperators.add(operator);
 	}
 
+	/**
+	 * Method sets the selectors (mating).
+	 * 
+	 * @param selectors
+	 *            used in this algorithm
+	 */
 	public void setSelectors(ArrayList<Selector> selectors) {
 		this.selectors = selectors;
 	}
 
+	/**
+	 * Method adds new selector (mating).
+	 * 
+	 * @param operator
+	 *            new selector
+	 */
 	public void addSelector(Selector selector) {
 		if (selectors == null)
 			selectors = new ArrayList<Selector>();
 		selectors.add(selector);
 	}
 
+	/**
+	 * Method sets the environmental selectors.
+	 * 
+	 * @param envSelectors
+	 *            used in this algorithm
+	 */
 	public void setEnvSelectors(ArrayList<Selector> envSelectors) {
 		this.envSelectors = envSelectors;
 	}
 
+	/**
+	 * Method adds new environmental selector.
+	 * 
+	 * @param operator
+	 *            new selector
+	 */
 	public void addEnvSelector(Selector selector) {
 		if (envSelectors == null)
 			envSelectors = new ArrayList<Selector>();
 		envSelectors.add(selector);
 	}
 
+	/**
+	 * Method sets the fitness functions.
+	 * 
+	 * @param fitFunctions
+	 *            used in this algorithm
+	 */
 	public void setFitnessFunctions(ArrayList<FitnessFunction<T>> fitFunctions) {
 		this.fitFunctions = fitFunctions;
 		for (FitnessFunction<T> function : fitFunctions) {
@@ -123,22 +240,50 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable,
 		}
 	}
 
+	/**
+	 * Method sets the starting population that is further evolved.
+	 * 
+	 * @param population
+	 *            startin population
+	 */
 	public void setInitialPopulation(Population<T> population) {
 		this.actualPopulation = population;
 	}
 
+	/**
+	 * Method sets maximal number of generations that the algorithm will run
+	 * 
+	 * @param numberOfGenerations
+	 *            maximal
+	 */
 	public void setNumberOfGenerations(int numberOfGenerations) {
 		this.numberOfGenerations = numberOfGenerations;
 	}
 
+	/**
+	 * Method sets the elitism rate of this run.
+	 * 
+	 * @param elite
+	 *            elitism rate
+	 */
 	public void setElitism(double elite) {
 		this.elitism = elite;
 	}
 
+	/**
+	 * Method sets the fitness comparator.
+	 * 
+	 * @param fitComp
+	 *            fitness comparator
+	 */
 	public void setFitnessComparator(FitnessComparator<T> fitComp) {
 		this.fitComp = fitComp;
 	}
 
+	/**
+	 * Run method that start the evolution algorithm. It has the main cycle for
+	 * number of generations. There we call the method {@link #evolve()}.
+	 */
 	@Override
 	public void run() {
 		if (fitComp == null || mutationOperators == null
@@ -155,7 +300,7 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable,
 		fitComp.setFitFuncs(fitFunctions);
 		// first computation of fitness for actual population
 		actualPopulation.computeFitness(fitNumOfThreads, fitBlockSize);
-		
+
 		for (int i = 0; i < numberOfGenerations; i++) {
 			// LOGGING OR OTHER ADDITIONAL METHODS CAN BE ADDED IF WE CARE
 			actualPopulation.sortIndividuals();
@@ -166,6 +311,11 @@ public class EvolutionAlgorithm<T extends Individual> implements Runnable,
 
 	}
 
+	/**
+	 * Main evolving method that selects individuals, execute operators on them,
+	 * take the elite and selects the best with environmental selection. It
+	 * calls update method on population in each step.
+	 */
 	protected void evolve() {
 		// phase of mate selection
 		IPopulation<T> selected = actualPopulation.selectionPhase(selectors);

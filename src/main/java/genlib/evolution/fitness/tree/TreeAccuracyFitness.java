@@ -1,7 +1,6 @@
 package genlib.evolution.fitness.tree;
 
 import genlib.evolution.fitness.FitnessFunction;
-import genlib.evolution.fitness.tree.confusion.TreePrevalenceFitness;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.locales.PermMessages;
 import genlib.locales.TextKeys;
@@ -18,6 +17,12 @@ import java.util.logging.Logger;
 import weka.core.Instance;
 import weka.core.Instances;
 
+/**
+ * Class which is used to compute accuracy of the tree on specific data set.
+ * 
+ * @author Lukas Surin
+ *
+ */
 public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 
 	/**
@@ -55,8 +60,11 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 			.getLogger(TreeAccuracyFitness.class.getName());
 	/** for serialization */
 	private static final long serialVersionUID = 7900391876130772354L;
+	/** name of fitness function */
 	public static final String initName = "tAcc";
+	/** data object */
 	private Data data;
+	/** index of attribute for this we compute accuracy */
 	private int attrIndex = -1;
 	/** type of data split used in computing fitness */
 	protected int typeOfData = -1;
@@ -89,6 +97,15 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 
 	}
 
+	/**
+	 * Method computes accuracy criteria from Instances.
+	 * 
+	 * @param instances
+	 *            that are used to compute fitness
+	 * @param individual
+	 *            for which we compute fitness
+	 * @return accuracy fitness value
+	 */
 	@SuppressWarnings("unchecked")
 	private double computeFitness(Instances instances, TreeIndividual individual) {
 		Node root = individual.getRootNode();
@@ -101,8 +118,8 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 			while (!root.isLeaf()) {
 				if (instance.attribute(root.getAttribute()).isNumeric()) {
 					if (genlib.utils.Utils.isValueProper(
-							instance.value(root.getAttribute()), root.getSign(),
-							root.getValue())) {
+							instance.value(root.getAttribute()),
+							root.getSign(), root.getValue())) {
 						root = root.getChildAt(0);
 					} else {
 						root = root.getChildAt(1);
@@ -121,6 +138,16 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 		return val;
 	}
 
+	/**
+	 * Method computes accuracy criteria from GenLibInstances. GENLIBINSTANCES
+	 * NOT IMPLEMENTED => METHOD NOT PROPERLY IMPLEMENTED
+	 * 
+	 * @param instances
+	 *            that are used to compute fitness
+	 * @param individual
+	 *            for which we compute fitness
+	 * @return accuracy fitness value
+	 */
 	@SuppressWarnings("unchecked")
 	private double computeFitness(GenLibInstances instances,
 			TreeIndividual individual) {
@@ -132,16 +159,28 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 		return correct;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setData(Data data) {
 		this.data = data.getDataOfType(typeOfData);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Class<TreeIndividual> getIndividualClassType() {
 		return TreeIndividual.class;
 	}
 
+	/**
+	 * This method sets the parameters INDEX and DATA for function.
+	 * 
+	 * @param parameter
+	 *            in string format
+	 */
 	@Override
 	public void setParam(String param) {
 		this.attrIndex = -1;
@@ -177,6 +216,9 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String objectInfo() {
 		String paramString = "";
@@ -200,6 +242,9 @@ public class TreeAccuracyFitness extends FitnessFunction<TreeIndividual> {
 		return String.format(PermMessages._fit_format, initName, paramString);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean canHandleNumeric() {
 		return true;

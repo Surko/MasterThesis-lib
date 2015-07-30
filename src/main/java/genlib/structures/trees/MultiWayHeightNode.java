@@ -5,10 +5,18 @@ import genlib.locales.TextResource;
 import genlib.structures.extensions.HeightExtension;
 import genlib.utils.Utils.Sign;
 
+/**
+ * Class that represents Node with multiple childs. It implements
+ * {@link MultiWayNode} and {@link HeightExtension} so it recomputes its size
+ * and height automatically.
+ * 
+ * @author Lukas Surin
+ */
 public class MultiWayHeightNode extends MultiWayNode implements HeightExtension {
 	/** for serialization */
 	private static final long serialVersionUID = 6475434862235450574L;
 
+	/** height of node */
 	protected int treeHeight = 0;
 
 	/**
@@ -65,6 +73,12 @@ public class MultiWayHeightNode extends MultiWayNode implements HeightExtension 
 	public MultiWayHeightNode() {
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param toCopy
+	 *            instance
+	 */
 	public MultiWayHeightNode(MultiWayHeightNode toCopy) {
 		this.attribute = toCopy.attribute;
 		this.value = toCopy.value;
@@ -80,10 +94,28 @@ public class MultiWayHeightNode extends MultiWayNode implements HeightExtension 
 		}
 	}
 
+	/**
+	 * Constructor of MultiWayNode that will have childCount childs
+	 * 
+	 * @param childCount
+	 *            number of childs
+	 */
 	public MultiWayHeightNode(int childCount) {
 		this(childCount, 0, null, Integer.MIN_VALUE);
 	}
 
+	/**
+	 * Constructor of MultiWayHeightNode that sets the node fields in advance.
+	 * 
+	 * @param childCount
+	 *            number of childs
+	 * @param attribute
+	 *            on which we test instances
+	 * @param sign
+	 *            Sign
+	 * @param value
+	 *            of split
+	 */
 	public MultiWayHeightNode(int childCount, int attribute, Sign sign,
 			double value) {
 		if (childCount > 0 && attribute != -1) {
@@ -107,10 +139,16 @@ public class MultiWayHeightNode extends MultiWayNode implements HeightExtension 
 	}
 
 	// SETTERS
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setParent(Node parent) {
 		this.parent = (MultiWayHeightNode) parent;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setChildAt(int index, Node node) {
 		super.setChildAt(index, node);
 
@@ -142,11 +180,17 @@ public class MultiWayHeightNode extends MultiWayNode implements HeightExtension 
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setChilds(Node[] childs) {
 		super.setChilds(childs);
 		updateTreeHeight(0);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setChildCount(int count) {
 		if (count > 0) {
 			this.childs = new MultiWayHeightNode[count];
@@ -209,6 +253,9 @@ public class MultiWayHeightNode extends MultiWayNode implements HeightExtension 
 		return new MultiWayHeightNode(this);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public MultiWayHeightNode newInstance() {
 		return new MultiWayHeightNode();
 	}

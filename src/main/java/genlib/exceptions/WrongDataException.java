@@ -14,10 +14,19 @@ public class WrongDataException extends RuntimeException {
 	/** for serialization */
 	private static final long serialVersionUID = -8284526649594695521L;
 
+	/**
+	 * Default constructor
+	 */
 	public WrongDataException() {
 		super();
 	}
 
+	/**
+	 * Constructor with additional message
+	 * 
+	 * @param s
+	 *            message
+	 */
 	public WrongDataException(String message) {
 		super(message);
 	}

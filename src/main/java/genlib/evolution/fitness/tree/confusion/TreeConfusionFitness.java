@@ -15,6 +15,13 @@ import java.util.logging.Logger;
 
 import weka.core.Instances;
 
+/**
+ * Abstract class (interface) that should be implemented by fitness functions
+ * that are based on some criteria from confusion matrix.
+ * 
+ * @author Lukas Surin
+ *
+ */
 public abstract class TreeConfusionFitness extends
 		FitnessFunction<TreeIndividual> {
 
@@ -51,7 +58,8 @@ public abstract class TreeConfusionFitness extends
 	 * ConfusionEnum that defines what kind of parameters are possible for
 	 * fitness function that are based on confusion matrix.</p> Defined kinds of
 	 * parameters: </br> {@link ConfusionEnum#AVERAGE} </br>
-	 * {@link ConfusionEnum#INDEX} </br> {@link ConfusionEnum#MAXIMIZE} </br> {@link ConfusionEnum#DATA}
+	 * {@link ConfusionEnum#INDEX} </br> {@link ConfusionEnum#MAXIMIZE} </br>
+	 * {@link ConfusionEnum#DATA}
 	 * 
 	 * @author Lukas Surin
 	 *
@@ -96,13 +104,18 @@ public abstract class TreeConfusionFitness extends
 		}
 	}
 
+	/** logger */
 	private static final Logger LOG = Logger
 			.getLogger(TreeConfusionFitness.class.getName());
 	/** for serialization */
 	private static final long serialVersionUID = 3138044426446243798L;
+	/** data on which we compute fitness */
 	protected Data data;
+	/** if we should maximize */
 	protected Boolean maximize = null;
+	/** what kind of averaging we use */
 	protected AverageEnum averageEnum = null;
+	/** index of this function */
 	protected int attrIndex = -1;
 	/** type of data split used in computing fitness */
 	protected int typeOfData = -1;
@@ -138,11 +151,17 @@ public abstract class TreeConfusionFitness extends
 		return fitness;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Class<TreeIndividual> getIndividualClassType() {
 		return TreeIndividual.class;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setData(Data data) {
 		this.data = data.getDataOfType(typeOfData);
@@ -160,7 +179,7 @@ public abstract class TreeConfusionFitness extends
 		if (confusionEnum == null) {
 			LOG.log(Level.INFO, String.format(TextResource
 					.getString(TextKeys.iExcessParam), String.format(
-					PermMessages._param_format, paramLabel, paramValue)));		
+					PermMessages._param_format, paramLabel, paramValue)));
 			return;
 		}
 
@@ -179,9 +198,15 @@ public abstract class TreeConfusionFitness extends
 			return;
 		default:
 			return;
-		}		
+		}
 	}
 
+	/**
+	 * This method sets the parameters INDEX and DATA for function.
+	 * 
+	 * @param parameter
+	 *            in string format
+	 */
 	@Override
 	public void setParam(String param) {
 		this.attrIndex = -1;
@@ -202,6 +227,9 @@ public abstract class TreeConfusionFitness extends
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String objectInfo() {
 		String paramString = "";
@@ -246,6 +274,15 @@ public abstract class TreeConfusionFitness extends
 
 	}
 
+	/**
+	 * Method computes confusion criteria from Instances.
+	 * 
+	 * @param instances
+	 *            that are used to compute fitness
+	 * @param individual
+	 *            for which we compute fitness
+	 * @return fitness value for this criteria
+	 */
 	protected double computeFitness(Instances instances,
 			TreeIndividual individual) {
 		// test if fitness should be computed in regards to one or all(-1)
@@ -308,13 +345,22 @@ public abstract class TreeConfusionFitness extends
 		}
 	}
 
+	/**
+	 * Method computes confusion criteria from GenLibInstances.
+	 * 
+	 * @param instances
+	 *            that are used to compute fitness
+	 * @param individual
+	 *            for which we compute fitness
+	 * @return fitness value for this criteria
+	 */
 	protected double computeFitness(GenLibInstances instances,
 			TreeIndividual individual) {
 		// test if fitness should be computed in regards to one or all(-1)
 		// attributes
 		if (attrIndex == -1) {
 			if (instances.numClasses() == 2) {
-				attrIndex = 1;
+				attrIndex = 0;
 				return attributeConfusionValue(instances, individual);
 			}
 
@@ -370,6 +416,13 @@ public abstract class TreeConfusionFitness extends
 		}
 	}
 
+	/**
+	 * Method computes the confusion values for all the attributes.
+	 * 
+	 * @param individual
+	 *            for which we compute confusion values
+	 * @return array of confusion values
+	 */
 	public double[] getConfusionValues(TreeIndividual individual) {
 		if (data.isGenLibInstances()) {
 			return totalConfusionValues(data.toGenLibInstances(), individual);

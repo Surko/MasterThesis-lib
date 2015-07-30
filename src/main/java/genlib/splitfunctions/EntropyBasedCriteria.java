@@ -3,11 +3,27 @@ package genlib.splitfunctions;
 import genlib.utils.Utils;
 import weka.classifiers.trees.j48.Distribution;
 
-public abstract class EntropyBasedCriteria<I,D> implements SplitCriteria<I,D> {	
-	
+/**
+ * Abstract class (interface) for split criterias that are based on entropy.
+ * @author Lukas Surin
+ *
+ * @param <I>
+ *            instances type (Instances, GenLibInstances)
+ * @param <D>
+ *            distribution (Distribution, GenLibDistribution)
+ */
+public abstract class EntropyBasedCriteria<I, D> implements SplitCriteria<I, D> {
+
 	/** for serialization */
 	private static final long serialVersionUID = 7370846015456945993L;
 
+	/**
+	 * Method computes old entropy (without splits) for specific distribution.
+	 * 
+	 * @param distribution
+	 *            of the values
+	 * @return entropy
+	 */
 	public double oldEnt(Distribution distribution) {
 		double oldEnt = 0d;
 
@@ -17,6 +33,13 @@ public abstract class EntropyBasedCriteria<I,D> implements SplitCriteria<I,D> {
 		return oldEnt;
 	}
 
+	/**
+	 * Method computes new entropy (splitted) for specific distribution.
+	 * 
+	 * @param distribution
+	 *            of the values
+	 * @return entropy
+	 */ 
 	public double newEnt(Distribution distribution) {
 		double newEnt = 0d;
 
@@ -28,6 +51,6 @@ public abstract class EntropyBasedCriteria<I,D> implements SplitCriteria<I,D> {
 		}
 
 		return newEnt;
-	}		
-	
+	}
+
 }

@@ -4,6 +4,14 @@ import genlib.splitfunctions.SplitCriteria;
 
 import java.util.HashMap;
 
+/**
+ * Class that represents plugin for split criterias. It implements Plugin
+ * interface, so it must implement methods on how to add plugin and where is the
+ * storage for the plugins.
+ * 
+ * @author Lukas Surin
+ *
+ */
 public abstract class SplitCriteriaPlugin implements
 		Plugin<SplitCriteria<?, ?>> {
 
@@ -24,8 +32,8 @@ public abstract class SplitCriteriaPlugin implements
 	}
 
 	/**
-	 * Method that is called from plugin manager which initializes the
-	 * split criterias. It is done by calling addPlugin method.
+	 * Method that is called from plugin manager which initializes the split
+	 * criterias. It is done by calling addPlugin method.
 	 */
 	public abstract void initCriterias();
 

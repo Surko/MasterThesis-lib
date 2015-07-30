@@ -31,10 +31,10 @@ import java.util.logging.SimpleFormatter;
  * @author Lukas Surin
  *
  */
-public class GenLib {
+public class GenDTLib {
 
 	/** logger for this class */
-	public static final Logger LOG = Logger.getLogger(GenLib.class.getPackage()
+	public static final Logger LOG = Logger.getLogger(GenDTLib.class.getPackage()
 			.getName());
 
 	/**

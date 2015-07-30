@@ -7,6 +7,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+/**
+ * Interface which should be implemented by all comparators that can be used to
+ * compare individuals.
+ * 
+ * @author Lukas Surin
+ *
+ * @param <T> type of individual
+ */
 public abstract class FitnessComparator<T extends Individual> implements
 		Comparator<T>, Serializable {
 	/** for serialization */

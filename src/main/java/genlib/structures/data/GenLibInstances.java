@@ -78,8 +78,18 @@ public interface GenLibInstances extends Serializable {
 	 */
 	public GenLibInstances resample(Random random);
 
+	/**
+	 * Methods enumerate the instances
+	 * 
+	 * @return Enumeration of instances
+	 */
 	public Enumeration<GenLibInstance> getInstances();
 
+	/**
+	 * Method returns the distribution (class values) of instances inside this object
+	 * 
+	 * @return distribution of instances
+	 */
 	public GenLibDistribution getDistribution();
 
 }

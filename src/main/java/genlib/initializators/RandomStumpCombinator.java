@@ -33,14 +33,33 @@ import weka.core.Instances;
  * @see WekaRandomStumpCombinator
  */
 public class RandomStumpCombinator extends TreePopulationInitializator {
-	
+
 	/** for serialization */
 	private static final long serialVersionUID = 4669352194412819499L;
 	/** name of this initializator */
 	public static final String initName = "RanStump";
 
-	public RandomStumpCombinator() {}
-	
+	/**
+	 * Default constructor
+	 */
+	public RandomStumpCombinator() {
+	}
+
+	/**
+	 * Constructor that sets the population size, maxDepth, divideParam,
+	 * resample tag and generator.
+	 * 
+	 * @param popSize
+	 *            population size
+	 * @param maxDepth
+	 *            maximal depth
+	 * @param divideParam
+	 *            divide parameter of data set
+	 * @param resample
+	 *            resampling data set
+	 * @param gen
+	 *            generator used to generate stumps to combine
+	 */
 	public RandomStumpCombinator(int popSize, int maxDepth, int divideParam,
 			boolean resample, TreeGenerator gen) {
 		this.maxHeight = maxDepth;
@@ -52,28 +71,52 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 		this.random = Utils.randomGen;
 	}
 
+	/**
+	 * Constructor that sets the population size, maxDepth, divideParam and
+	 * resample tag
+	 * 
+	 * @param popSize
+	 *            population size
+	 * @param maxDepth
+	 *            maximal depth
+	 * @param divideParam
+	 *            divide parameter of data set
+	 * @param resample
+	 *            resampling data set
+	 */
 	public RandomStumpCombinator(int popSize, int maxDepth, int divideParam,
 			boolean resample) {
 		this.maxHeight = maxDepth;
 		this.divideParam = divideParam;
-		this.resample = resample;		
+		this.resample = resample;
 		this.popSize = popSize;
 		// default random gen
 		this.random = Utils.randomGen;
 	}
 
-	private void initPopulation(GenLibInstances data) throws Exception {			
+	/**
+	 * Method initialized the population using GenLibInstances. Divided or
+	 * resampled dataset is used to construct decision trees. Construction can
+	 * be done with multiple threads. After generation of trees the combination
+	 * of them takes place.
+	 * 
+	 * @param data
+	 *            to be used to initialize
+	 * @throws Exception
+	 *             thrown if problem occured initializing population
+	 */
+	private void initPopulation(GenLibInstances data) throws Exception {
 		if (gen == null) {
 			this.gen = new DummyTreeGenerator();
 			this.gen.setPopulationInitializator(this);
 		}
-		
+
 		// not consistent generator with population initializator, throwing
 		// exception
 		if (gen.getGeneratorHeight() != 1)
 			throw new Exception(String.format(TextResource
-					.getString("eConsistencyStumpGen"), gen.getClass().getName()));
-
+					.getString("eConsistencyStumpGen"), gen.getClass()
+					.getName()));
 
 		int n_attr = data.numAttributes() - 1;
 		population = new TreeIndividual[n_attr * divideParam];
@@ -85,10 +128,10 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 			for (int i = 0; i < divideParam; i++) {
 				Instances dataPart = null;
 				if (!resample) {
-					// size of instances = data.length / divideParam.					
+					// size of instances = data.length / divideParam.
 				} else {
 					// instances of same length as training data. Sampling with
-					// replacement					
+					// replacement
 				}
 				TreeGenerator popG = gen.copy();
 				popG.setInstances(dataPart);
@@ -104,7 +147,7 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 			try {
 				es.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
-				
+
 			}
 
 			population = gen.getIndividuals();
@@ -112,10 +155,10 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 			for (int i = 0; i < divideParam; i++) {
 				Instances dataPart = null;
 				if (!resample) {
-					// size of instances = data.length / divideParam.					
+					// size of instances = data.length / divideParam.
 				} else {
 					// instances of same length as training data. Sampling with
-					// replacement					
+					// replacement
 				}
 
 				gen.setInstances(dataPart);
@@ -131,9 +174,7 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 	}
 
 	/**
-	 * 
-	 * @throws Exception
-	 *             if data (saved as Object) is not of GenLibInstances type.
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void initPopulation() throws Exception {
@@ -172,6 +213,14 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 		population = combPopulation;
 	}
 
+	/**
+	 * Method which is used to combine individuals. Combination is done by
+	 * replacing leaf with randomly chosen stump to construct bigger and bigger
+	 * trees.
+	 * 
+	 * @param node
+	 *            which we combine
+	 */
 	private void combineAtNode(Node node) {
 
 		Node[] childs = node.getChilds();
@@ -182,9 +231,18 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 			childs[childIndex].setParent(node);
 		}
 		// Can do because we know that we are combining stumps with depth = 1
-		combineNodes(childs, maxHeight - 2);		
+		combineNodes(childs, maxHeight - 2);
 	}
 
+	/**
+	 * Method which works the same as {@link #combineAtNode(Node)} but for more
+	 * nodes until d == 0.
+	 * 
+	 * @param nodes
+	 *            to be combined
+	 * @param d
+	 *            actual height
+	 */
 	private void combineNodes(Node[] nodes, int d) {
 		if (d == 0) {
 			return;
@@ -198,32 +256,43 @@ public class RandomStumpCombinator extends TreePopulationInitializator {
 				childs[childIndex] = chosen.getRootNode().copy();
 				childs[childIndex].setParent(nodes[k]);
 			}
-			combineNodes(childs, d - 1);			
+			combineNodes(childs, d - 1);
 		}
 
 	}
 
+	/**
+	 * Method that returns generated stumps
+	 * 
+	 * @return individuals that represents stumps
+	 */
 	public TreeIndividual[] getGeneratedStumps() {
 		return gen.getIndividuals();
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean isWekaCompatible() {
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getInitName() {
 		return initName;
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public String objectInfo() {
-		return String.format("type %s;gen %s;depth %s;divide %s;resample %s;threads %s", 
-				initName,
-				gen.getGenName(),
-				maxHeight,
-				divideParam,
-				resample,
+		return String.format(
+				"type %s;gen %s;depth %s;divide %s;resample %s;threads %s",
+				initName, gen.getGenName(), maxHeight, divideParam, resample,
 				nThreads);
 	}
 

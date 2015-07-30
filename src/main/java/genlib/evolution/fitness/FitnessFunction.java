@@ -30,11 +30,13 @@ public abstract class FitnessFunction<T extends Individual> implements
 
 	/** How many fitness functions is already registered */
 	public static int registeredFunctions = 0;
+	/** instance of evolution algorithm for future use */
 	protected EvolutionAlgorithm<T> ea;
+	/** index of this function in individual */
 	protected int index = -1;
 
 	/**
-	 * Method which should compute fitness for specific class that you create.
+	 * Method which should compute fitness for specific class.
 	 * You can look at particular examples of implemented fitness functions and
 	 * their compute fitness method. Usually this method contains some type of
 	 * differentiation of which data we use (weka or built-in type). Other thing
@@ -50,11 +52,29 @@ public abstract class FitnessFunction<T extends Individual> implements
 	 */
 	public abstract double computeFitness(T individual);
 
+	/**
+	 * Method that cycles through population and compute fitness for each one of
+	 * the individuals.
+	 * 
+	 * @param population
+	 *            for which we compute fitness
+	 */
 	public void computeFitness(Population<T> population) {
 		for (T individual : population.getIndividuals())
 			computeFitness(individual);
 	}
 
+	/**
+	 * Method that cycles individuals from start to end and compute fitness
+	 * their fitnesses.
+	 * 
+	 * @param population
+	 *            individuals for which we compute fitness
+	 * @param start
+	 *            index
+	 * @param end
+	 *            index
+	 */
 	public void computeFitness(ArrayList<T> population, int start, int end) {
 		end = Math.min(population.size(), end);
 		for (int i = start; i < end; i++) {
@@ -62,16 +82,32 @@ public abstract class FitnessFunction<T extends Individual> implements
 		}
 	}
 
+	/**
+	 * Method returns the individual class type (Individual.class,
+	 * TreeIndividual.class).
+	 * 
+	 * @return individual class type
+	 */
 	public abstract Class<T> getIndividualClassType();
 
+	/**
+	 * Method sets the data to be used by fitness function
+	 * @param data to be used 
+	 */
 	public abstract void setData(Data data);
 
+	/**
+	 * Method sets the instance of evolution algorithm. NOT USED IN ANY 
+	 * OF THE FUNCTION BUT LEFT FOR FUTURE VERSIONS.
+	 * @param ea
+	 */
 	public void setEvolutionAlgorithm(EvolutionAlgorithm<T> ea) {
 		this.ea = ea;
 	}
 
 	/**
 	 * Get the index (used in individuals) of this function. It should be unique
+	 * 
 	 * @return index of this function
 	 */
 	public int getIndex() {
@@ -80,14 +116,16 @@ public abstract class FitnessFunction<T extends Individual> implements
 
 	/**
 	 * Set the index (used in individuals) of this function. It should be unique
-	 * @param index to be set to this function (unique).
+	 * 
+	 * @param index
+	 *            to be set to this function (unique).
 	 */
 	public void setIndex(int index) {
 		this.index = index;
 	}
 
 	/**
-	 * Method which should return if this fitness function can handle numeric
+	 * Method which should return true if this fitness function can handle numeric
 	 * class atributes.
 	 * 
 	 * @return true iff fitness function can handle numeric class attribute
@@ -106,7 +144,7 @@ public abstract class FitnessFunction<T extends Individual> implements
 
 	/**
 	 * Method which should return String object with info about this instance.
-	 * Name of function with additional parameters.
+	 * (name of function with additional parameters)
 	 * 
 	 * @return info about fitness function
 	 */

@@ -1,7 +1,7 @@
 package tests.evolution;
 
 import static org.junit.Assert.assertTrue;
-import genlib.GenLib;
+import genlib.GenDTLib;
 import genlib.evolution.fitness.FitnessFunction;
 import genlib.evolution.fitness.tree.TreeAccuracyFitness;
 import genlib.evolution.fitness.tree.confusion.TreeConfusionFitness;
@@ -43,7 +43,7 @@ public class TestFitness {
 	static {
 
 		if (!TestProperties.testPrints)
-			Logger.getLogger(GenLib.class.getPackage().getName()).setLevel(
+			Logger.getLogger(GenDTLib.class.getPackage().getName()).setLevel(
 					Level.OFF);
 
 		// without this individual don't have big enough array for fitness
@@ -457,8 +457,8 @@ public class TestFitness {
 
 		assertTrue(f1 != 0);
 		assertTrue(f2 != 0);
-		assertTrue(Double.compare(f1, 1 / 8d) == 0);
-		assertTrue(Double.compare(f2, 1 / Math.pow(2, 21d)) == 0);
+		assertTrue(Double.compare(f1, -3) == 0);
+		assertTrue(Double.compare(f2, -21) == 0);
 		assertTrue(testIndividual.getFitnessValue(fIndex) != 0);
 		assertTrue(wekaIndividual.getFitnessValue(fIndex) != 0);
 		assertTrue(testIndividual.getFitnessValue(fIndex) == f1);

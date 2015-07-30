@@ -5,6 +5,13 @@ import genlib.locales.TextResource;
 import genlib.structures.extensions.HeightExtension;
 import genlib.utils.Utils.Sign;
 
+/**
+ * Class that represents Node with 2 childs. It implements {@link BinaryNode}
+ * and {@link HeightExtension} so it recomputes its size and height
+ * automatically.
+ * 
+ * @author Lukas Surin
+ */
 public class BinaryHeightNode extends BinaryNode implements HeightExtension {
 
 	/** for serialization */
@@ -60,6 +67,12 @@ public class BinaryHeightNode extends BinaryNode implements HeightExtension {
 	public BinaryHeightNode() {
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param toCopy
+	 *            instance
+	 */
 	public BinaryHeightNode(BinaryHeightNode toCopy) {
 		this.attribute = toCopy.attribute;
 		this.value = toCopy.value;
@@ -75,16 +88,32 @@ public class BinaryHeightNode extends BinaryNode implements HeightExtension {
 		}
 	}
 
+	/**
+	 * Constructor of BinaryNode that sets the node fields in advance.
+	 * 
+	 * @param attribute
+	 *            on which we test instances
+	 * @param sign
+	 *            Sign
+	 * @param value
+	 *            of split
+	 */
 	public BinaryHeightNode(int attribute, Sign sign, double value) {
 		super(attribute, sign, value);
 	}
 
 	// GETTERS
+	/**
+	 * {@inheritDoc}
+	 */
 	public int getTreeHeight() {
 		return treeHeight;
 	}
 
 	// SETTERS
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setChildAt(int index, Node node) {
 		super.setChildAt(index, node);
@@ -142,6 +171,9 @@ public class BinaryHeightNode extends BinaryNode implements HeightExtension {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setChilds(Node[] childs) {
 		super.setChilds(childs);
@@ -172,14 +204,23 @@ public class BinaryHeightNode extends BinaryNode implements HeightExtension {
 			((HeightExtension) parent).updateTreeHeight(1);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public BinaryHeightNode copy() {
 		return new BinaryHeightNode(this);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public BinaryHeightNode newInstance() {
 		return new BinaryHeightNode();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		// NO HASH COMPUTING

@@ -1,11 +1,18 @@
 package genlib.configurations;
 
-import genlib.GenLib;
+import genlib.GenDTLib;
 import genlib.locales.PermMessages;
 
 import java.io.File;
 import java.net.URL;
 
+/**
+ * Class which contains all the paths to locations that are used from inside
+ * this application.
+ * 
+ * @author Lukas Surin
+ *
+ */
 public class PathManager {
 
 	/** instance of this PathManager */
@@ -49,7 +56,7 @@ public class PathManager {
 		 * z jar zase cestu k jaru.
 		 */
 
-		URL url = GenLib.class.getProtectionDomain().getCodeSource()
+		URL url = GenDTLib.class.getProtectionDomain().getCodeSource()
 				.getLocation();
 		//
 		File _pRoot = new File(url.getFile());
@@ -61,11 +68,11 @@ public class PathManager {
 
 		// Ostatne cesty nastavime priamo z root
 		try {
-			localePath = new File(rootPath, "locales");
+			localePath = new File(rootPath, "../locales");
 			localePath.mkdir();
-			pluginPath = new File(rootPath, "plugins");
+			pluginPath = new File(rootPath, "../plugins");
 			pluginPath.mkdir();
-			logPath = new File(rootPath, "_logs");
+			logPath = new File(rootPath, "../_logs");
 			logPath.mkdir();
 		} catch (SecurityException se) {
 			System.err.println(PermMessages._security_exc);

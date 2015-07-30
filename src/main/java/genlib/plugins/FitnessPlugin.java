@@ -5,6 +5,14 @@ import genlib.evolution.individuals.Individual;
 
 import java.util.HashMap;
 
+/**
+ * Class that represents plugin for fitness functions. It implements Plugin interface,
+ * so it must implement methods on how to add plugin and where is the storage
+ * for the plugins.
+ * 
+ * @author Lukas Surin
+ *
+ */
 public abstract class FitnessPlugin implements
 		Plugin<Class<? extends FitnessFunction<? extends Individual>>> {
 

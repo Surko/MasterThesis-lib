@@ -1,10 +1,19 @@
 package genlib.evolution.fitness.comparators;
 
 import genlib.evolution.individuals.Individual;
+import genlib.utils.Utils;
 
 import java.util.Comparator;
 import java.util.logging.Logger;
 
+/**
+ * Class that compares individuals by their value of weighted fitness functions.
+ * 
+ * @author Lukas Surin
+ *
+ * @param <T>
+ *            type of individual
+ */
 public class WeightedFitnessComparator<T extends Individual> extends
 		FitnessComparator<T> {
 	/** Logger */
@@ -108,7 +117,7 @@ public class WeightedFitnessComparator<T extends Individual> extends
 	@Override
 	public void setParam(String s) {
 
-		if (s == null || s.isEmpty()) {
+		if (s == null || s.isEmpty() || s.equals(Utils.bPARAM)) {
 			for (int i = 0; i < weights.length; i++) {
 				weights[i] = 1d;
 			}

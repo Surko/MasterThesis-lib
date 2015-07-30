@@ -1,5 +1,6 @@
 package genlib.classifier.common;
 
+import genlib.GenDTLib;
 import genlib.configurations.Config;
 import genlib.evolution.EvolutionAlgorithm;
 import genlib.evolution.fitness.FitnessFunction;
@@ -46,12 +47,23 @@ import java.util.logging.Logger;
 
 import weka.core.Instances;
 
+/**
+ * Common class that summarize the genetic algorithm and allow to use it from
+ * Classifier (weka or non weka). Other classes should call
+ * {@link EvolutionTreeClassifier#buildClassifier(GenLibInstances)} or
+ * {@link EvolutionTreeClassifier#buildClassifier(Instances)} depending on type
+ * of classifier
+ * 
+ * @author Lukas Surin
+ *
+ */
 public class EvolutionTreeClassifier implements Serializable {
 	private static final Logger LOG = Logger
 			.getLogger(EvolutionTreeClassifier.class.getName());
 	/** for serialization */
 	private static final long serialVersionUID = -762451118775604722L;
 
+	/** data which we work with */
 	private Data workData;
 
 	/* Random generator for this run */
@@ -93,6 +105,13 @@ public class EvolutionTreeClassifier implements Serializable {
 	private double elitismRateDouble;
 	private long seed;
 
+	/**
+	 * Constructor that creates instance of EvolutionTreeClassifier. It sets the
+	 * private fields for components from {@link Config}.
+	 * 
+	 * @param isWeka
+	 *            true iff we are using it from Weka.
+	 */
 	public EvolutionTreeClassifier(boolean isWeka) {
 		this.c = Config.getInstance();
 		this.isWeka = isWeka;
@@ -129,7 +148,19 @@ public class EvolutionTreeClassifier implements Serializable {
 		this.random = new Random(seed);
 	}
 
+	/**
+	 * Method which initialize the components and data to be used and calls the
+	 * {@link #commonBuildClassifier(Data)} that calls the population
+	 * initialization and evolution algorithm
+	 * 
+	 * @param data
+	 *            with weka Instances
+	 * @throws Exception
+	 *             if error occured when creating model
+	 */
 	public void buildClassifier(Instances data) throws Exception {
+		GenDTLib.reconfig();
+
 		theBestIndividuals = null;
 		startIndividual = null;
 
@@ -147,7 +178,18 @@ public class EvolutionTreeClassifier implements Serializable {
 		commonBuildClassifier(workData);
 	}
 
+	/**
+	 * Method which initialize the components and data to be used and calls the
+	 * {@link #commonBuildClassifier(Data)} that calls the population
+	 * initialization and evolution algorithm
+	 * 
+	 * @param data
+	 *            with GenLibInstances
+	 * @throws Exception
+	 *             if error occured when creating model
+	 */
 	public void buildClassifier(GenLibInstances data) throws Exception {
+		GenDTLib.reconfig();
 		theBestIndividuals = null;
 		startIndividual = null;
 
@@ -166,6 +208,15 @@ public class EvolutionTreeClassifier implements Serializable {
 
 	}
 
+	/**
+	 * Method that initializes the population and calls the evolution algorithm
+	 * that is firstly set up. In the end the bestIndividual is set up.
+	 * 
+	 * @param workData
+	 *            that are used by evolution algorithm
+	 * @throws Exception
+	 *             if error occured when creating model
+	 */
 	private void commonBuildClassifier(Data workData) throws Exception {
 		popInit.setRandomGenerator(new Random(random.nextLong()));
 		popInit.setData(workData);
@@ -195,13 +246,23 @@ public class EvolutionTreeClassifier implements Serializable {
 		ea.setFitnessComparator(fitComp);
 		// percentage of parents that stay into next generation
 		ea.setElitism(elitismRateDouble);
+
+		// start run time
+		long start = System.nanoTime();
 		// run population evolving
 		ea.run();
+		// log the amount of time to build classifier
+		LOG.info(String.format(TextResource.getString(TextKeys.done),
+				((double) (System.nanoTime() - start)) / 1000000000d));
 
 		theBestIndividuals = ea.getActualPopulation().getSortedIndividuals(
 				fitComp);
+
 	}
 
+	/**
+	 * Reconfig method that resets the config of components.
+	 */
 	public void reconfig() {
 		this.seed = c.getSeed();
 		this.dataString = c.getData();
@@ -229,6 +290,13 @@ public class EvolutionTreeClassifier implements Serializable {
 		this.random = new Random(seed);
 	}
 
+	/**
+	 * Method which sets the additional parameters to components. In this case
+	 * we set up the data object into components.
+	 * 
+	 * @param data
+	 *            object that are used by components
+	 */
 	public void setAdditionalParams(Data data) {
 		// set the data for fitness functions
 		for (FitnessFunction<TreeIndividual> function : fitFuncs) {
@@ -246,6 +314,15 @@ public class EvolutionTreeClassifier implements Serializable {
 		}
 	}
 
+	/**
+	 * Method that make different type of sets from configuration file.
+	 * 
+	 * @param isNumeric
+	 *            if the attributes are numeric
+	 * @throws Exception
+	 *             if error occured when creating component from configuration
+	 *             file
+	 */
 	public void makePropsFromString(boolean isNumeric) throws Exception {
 		if (fitFunctionsString != null) {
 			makeFitnessFunctionsSet(isNumeric);
@@ -273,6 +350,16 @@ public class EvolutionTreeClassifier implements Serializable {
 		}
 	}
 
+	/**
+	 * Method accessed only from this method that parses parameter population
+	 * type which contains information about population containers. Method makes
+	 * the population container. Definition is taken from config property file.
+	 * 
+	 * @throws PopulationTypeStringFormatException
+	 *             if there is bad format for population containers
+	 * @throws NotDefClassException
+	 *             if there isn't config for population
+	 */
 	public IPopulation<TreeIndividual> makePopulation() throws Exception {
 		String[] parameters = populationTypeString.split(Utils.oDELIM);
 
@@ -392,6 +479,16 @@ public class EvolutionTreeClassifier implements Serializable {
 		}
 	}
 
+	/**
+	 * Method accessed only from this method that parses parameter fitComp which
+	 * contains information about fitness comparators. Method makes the fitness
+	 * comparators set. Definition is taken from config property file.
+	 * 
+	 * @throws FitCompStringFormatException
+	 *             if there is bad format for fit comparators
+	 * @throws NotDefClassException
+	 *             if there isn't config for fit comparators
+	 */
 	private void makeFitnessCompSet() throws Exception {
 		fitComp = null;
 		String[] parameters = fitCompString.split(Utils.oDELIM);
@@ -409,7 +506,7 @@ public class EvolutionTreeClassifier implements Serializable {
 			fitComp = new ParetoFitnessComparator<>();
 			break;
 		case PRIORITY:
-			fitComp = new PriorityFitnessComparator<>();
+			fitComp = new PriorityFitnessComparator<>(fitFuncs.size());
 			break;
 		case SINGLE:
 			fitComp = new SingleFitnessComparator<>();
@@ -429,6 +526,16 @@ public class EvolutionTreeClassifier implements Serializable {
 		}
 	}
 
+	/**
+	 * Method accessed only from this method that parses parameter fit-functions
+	 * which contains information about fitness functions. Method makes the
+	 * fitness function set. Definition is taken from config property file.
+	 * 
+	 * @throws FitnessStringFormatException
+	 *             if there is bad format for fitness functions
+	 * @throws NotDefClassException
+	 *             if there isn't config for fitness functions
+	 */
 	private void makeFitnessFunctionsSet(boolean isNumeric) throws Exception {
 		fitFuncs.clear();
 		String[] parameters = fitFunctionsString.split(Utils.oDELIM);
@@ -826,114 +933,250 @@ public class EvolutionTreeClassifier implements Serializable {
 		popInit.setGenerator(genList);
 	}
 
+	/**
+	 * Gets the seed used by pseudo random generator.
+	 * 
+	 * @return seed
+	 */
 	public long getSeed() {
 		return seed;
 	}
 
+	/**
+	 * Gets the random object used by classifier.
+	 * 
+	 * @return Random object
+	 */
 	public Random getRandom() {
 		return random;
 	}
 
+	/**
+	 * Gets the parameters for data argument
+	 * 
+	 * @return parameters in string format
+	 */
 	public String getData() {
 		return dataString;
 	}
 
+	/**
+	 * Gets the parameters for classify argument
+	 * 
+	 * @return parameters in string format
+	 */
 	public int getClassify() {
 		return classify;
 	}
 
+	/**
+	 * Gets the number of threads used by generators
+	 * 
+	 * @return number of threads
+	 */
 	public int getGeneratorThreads() {
 		return genThreadsInt;
 	}
 
+	/**
+	 * Gets the number of threads used by operators
+	 * 
+	 * @return number of threads
+	 */
 	public int getOperatorThreads() {
 		return operThreadsInt;
 	}
 
+	/**
+	 * Gets the number of threads used by fitness functions
+	 * 
+	 * @return number of threads
+	 */
 	public int getFitnessThreads() {
 		return fitThreadsInt;
 	}
 
+	/**
+	 * Gets the count of generations to be cycled throught by evolution
+	 * algorithm.
+	 * 
+	 * @return number of generations
+	 */
 	public int getNumberOfGenerations() {
 		return numOfGensInt;
 	}
 
+	/**
+	 * Gets the elitism rate.
+	 * 
+	 * @return elitism rate
+	 */
 	public double getElitism() {
 		return elitismRateDouble;
 	}
 
+	/**
+	 * List of tree individual mutation operators used by genetic algorithm.
+	 * 
+	 * @return list of mutation operators
+	 */
 	public ArrayList<Operator<TreeIndividual>> getMutSet() {
 		return mutSet;
 	}
 
+	/**
+	 * Gets the mutation operators config.
+	 * 
+	 * @return mutation operators
+	 */
 	public String getMutString() {
 		return mutOpString;
 	}
 
+	/**
+	 * List of tree individual crossover operators used by genetic algorithm.
+	 * 
+	 * @return list of crossover operators
+	 */
 	public ArrayList<Operator<TreeIndividual>> getXoverSet() {
 		return xoverSet;
 	}
 
+	/**
+	 * Gets the crossover operators config.
+	 * 
+	 * @return crossover operators
+	 */
 	public String getXoverString() {
 		return xOverOpString;
 	}
 
+	/**
+	 * Gets the size of the population
+	 * 
+	 * @return population size
+	 */
 	public int getPopulationSize() {
 		return populationSizeInt;
 	}
 
+	/**
+	 * Gets the individual generator argument string
+	 * 
+	 * @return individual generator string
+	 */
 	public String getIndividualGeneratorString() {
 		return indGenString;
 	}
 
+	/**
+	 * Gets the population initializator argument string
+	 * 
+	 * @return population initializator string
+	 */
 	public String getPopInitString() {
 		return populationInitString;
 	}
 
+	/**
+	 * Gets the selector argument string
+	 * 
+	 * @return selector string
+	 */
 	public String getSelectorsString() {
 		return selectorsString;
 	}
 
+	/**
+	 * Gets the environmental selector argument string
+	 * 
+	 * @return environmental selector string
+	 */
 	public String getEnvSelectorsString() {
 		return envSelectorsString;
 	}
 
+	/**
+	 * Gets the tree population initializator argument string
+	 * 
+	 * @return population initializator string
+	 */
 	public TreePopulationInitializator getPopInitializator() {
 		return popInit;
 	}
 
+	/**
+	 * Gets the fitness comparator
+	 * 
+	 * @return fitness comparator
+	 */
 	public FitnessComparator<TreeIndividual> getFitnessComparator() {
 		return fitComp;
 	}
 
+	/**
+	 * Gets the fitness comparator argument
+	 * 
+	 * @return fitness comparator string
+	 */
 	public String getFitnessComparatorString() {
 		return fitCompString;
 	}
 
+	/**
+	 * Gets the fitness function list
+	 * 
+	 * @return fitness functions as array list
+	 */
 	public ArrayList<FitnessFunction<TreeIndividual>> getFitnessFunctions() {
 		return fitFuncs;
 	}
 
+	/**
+	 * Gets the fitness function argument
+	 * 
+	 * @return fitness functions string
+	 */
 	public String getFitnessFunctionsString() {
 		return fitFunctionsString;
 	}
 
+	/**
+	 * Gets the best starting tree individual from starting population.
+	 * 
+	 * @return best starting tree individual
+	 */
 	public TreeIndividual getStartIndividual() {
 		return startIndividual;
 	}
 
+	/**
+	 * Gets the n best tree individuals created with genetic algorithm
+	 * 
+	 * @return n best tree individuals
+	 */
 	public ArrayList<TreeIndividual> getBestIndividuals() {
 		return theBestIndividuals;
 	}
 
+	/**
+	 * Gets the whole final population created with genetic algorithms.
+	 * 
+	 * @return tree individuals from last generations
+	 */
 	public ArrayList<TreeIndividual> getActualIndividuals() {
 		return ea.getActualPopulation().getIndividuals();
 	}
 
+	/**
+	 * Gets the working data which we work with
+	 * 
+	 * @return data with instances
+	 */
 	public Data getWorkData() {
 		return workData;
 	}
-	
+
 	/**
 	 * Set seed for this run of classifier. Seed is further set from
 	 * buildClassifier function into Random object. It even serves purpose of
@@ -948,6 +1191,12 @@ public class EvolutionTreeClassifier implements Serializable {
 		random.setSeed(seed);
 	}
 
+	/**
+	 * Sets the data argument string
+	 * 
+	 * @param dataString
+	 *            argument
+	 */
 	public void setData(String dataString) {
 		this.dataString = dataString;
 	}
@@ -962,62 +1211,153 @@ public class EvolutionTreeClassifier implements Serializable {
 		this.classify = classify;
 	}
 
+	/**
+	 * Sets the fitness threads
+	 * 
+	 * @param fitThreads
+	 *            number of threads
+	 */
 	public void setFitnessThreads(int fitThreads) {
 		this.fitThreadsInt = fitThreads;
 	}
 
+	/**
+	 * Sets the generator threads
+	 * 
+	 * @param genThreads
+	 *            number of threads
+	 */
 	public void setGeneratorThreads(int genThreads) {
 		this.genThreadsInt = genThreads;
 	}
 
+	/**
+	 * Sets the operator threads
+	 * 
+	 * @param operThreads
+	 *            number of threads
+	 */
 	public void setOperatorThreads(int operThreads) {
 		this.operThreadsInt = operThreads;
 	}
 
+	/**
+	 * Sets the number of generations to be cycled through with genetic
+	 * algorithm.
+	 * 
+	 * @param numberOfGenerations
+	 *            for genetic algorithm
+	 */
 	public void setNumberOfGenerations(int numberOfGenerations) {
 		this.numOfGensInt = numberOfGenerations;
 	}
 
+	/**
+	 * Sets the fitness functions argument string
+	 * 
+	 * @param fitFuncsString
+	 *            argument
+	 */
 	public void setFitFuncsString(String fitFuncsString) {
 		this.fitFunctionsString = fitFuncsString;
 	}
 
+	/**
+	 * Sets the fitness comparator argument string
+	 * 
+	 * @param fitCompString
+	 *            argument
+	 */
 	public void setFitCompString(String fitCompString) {
 		this.fitCompString = fitCompString;
 	}
 
+	/**
+	 * Sets the mutation operators config.
+	 * 
+	 * @param mutString
+	 *            mutation operators string
+	 */
 	public void setMutString(String mutString) {
 		this.mutOpString = mutString;
 	}
 
+	/**
+	 * Sets the elitism rate
+	 * 
+	 * @param elitism
+	 *            rate
+	 */
 	public void setElitism(double elitism) {
 		this.elitismRateDouble = elitism;
 	}
 
+	/**
+	 * Sets the crossover operators config.
+	 * 
+	 * @param xoverString
+	 *            crossover operators string
+	 */
 	public void setXoverString(String xoverString) {
 		this.xOverOpString = xoverString;
 	}
 
+	/**
+	 * Sets the fixed population size
+	 * 
+	 * @param populationSize
+	 *            of the population from algorithm
+	 */
 	public void setPopulationSize(int populationSize) {
 		this.populationSizeInt = populationSize;
 	}
 
+	/**
+	 * Sets the individual generator string argument
+	 * 
+	 * @param indGenString
+	 *            argument
+	 */
 	public void setIndividualGeneratorString(String indGenString) {
 		this.indGenString = indGenString;
 	}
 
-	public void setPopInitString(String popInitString) throws Exception {
+	/**
+	 * Sets the population initializator string argument
+	 * 
+	 * @param popInitString
+	 *            argument
+	 */
+	public void setPopInitString(String popInitString) {
 		this.populationInitString = popInitString;
 	}
 
+	/**
+	 * Sets the selector string argument
+	 * 
+	 * @param selectorString
+	 *            argument
+	 */
 	public void setSelectorsString(String selectorString) {
 		this.selectorsString = selectorString;
 	}
 
+	/**
+	 * Sets the environmental selector string argument
+	 * 
+	 * @param envSelectorString
+	 *            argument
+	 */
 	public void setEnvSelectorsString(String envSelectorString) {
 		this.envSelectorsString = envSelectorString;
 	}
 
+	/**
+	 * Sets the population initializator used to initialize starting population.
+	 * 
+	 * @param popInit
+	 *            TreePopulationInitializator
+	 */
 	public void setPopInitializator(TreePopulationInitializator popInit) {
 		this.popInit = popInit;
 	}

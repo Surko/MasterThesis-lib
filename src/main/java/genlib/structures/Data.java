@@ -85,6 +85,14 @@ public class Data implements Serializable {
 	/** Index of attribute to access correct attribute from String */
 	public HashMap<String, Integer> attrIndexMap;
 
+	/**
+	 * Constructor that creates Data instance with weka Instances inside it.
+	 * 
+	 * @param data
+	 *            Instances from weka
+	 * @param random
+	 *            object
+	 */
 	public Data(Instances data, Random random) {
 		this.random = random;
 		this.train = this;
@@ -95,10 +103,24 @@ public class Data implements Serializable {
 		this.isInstances = true;
 	}
 
+	/**
+	 * Method returns data (GenLibInstances or Instances). First it should be
+	 * called what kind of instances resides inside.
+	 * 
+	 * @return object (GenLibInstances or Instances) that needs to be retyped
+	 */
 	public Object getData() {
 		return data;
 	}
 
+	/**
+	 * Constructor that creates Data instance with GenLibInstances inside it.
+	 * 
+	 * @param data
+	 *            Instances from weka
+	 * @param random
+	 *            object
+	 */
 	public Data(GenLibInstances data, Random random) {
 		this.random = random;
 		this.train = this;
@@ -342,6 +364,11 @@ public class Data implements Serializable {
 		return attrIndexMap;
 	}
 
+	/**
+	 * Method makes the attrValueIndex hashmaps by calling
+	 * {@link Utils#makeAttrValueIndexMap(GenLibInstances)} or
+	 * {@link WekaUtils#makeAttrValueIndexMap(Instances)}
+	 */
 	public void makeAttrValueIndexMap() {
 		if (isInstances) {
 			attrValueIndexMap = WekaUtils
@@ -352,6 +379,11 @@ public class Data implements Serializable {
 		}
 	}
 
+	/**
+	 * Method makes the attrIndex hashmap by calling
+	 * {@link Utils#makeAttrIndexMap(GenLibInstances)} or
+	 * {@link WekaUtils#makeAttrIndexMap(Instances)}
+	 */
 	public void makeAttrIndexMap() {
 		if (isInstances) {
 			attrIndexMap = WekaUtils.makeAttrIndexMap((Instances) data);
@@ -361,7 +393,13 @@ public class Data implements Serializable {
 
 	}
 
-	public void setParam(String param) {		
+	/**
+	 * Method that is used to set the parameters for this data container.
+	 * 
+	 * @param param
+	 *            string that is parsed and used to set the data container
+	 */
+	public void setParam(String param) {
 		if (param.equals(PermMessages._blank_param)) {
 			return;
 		}

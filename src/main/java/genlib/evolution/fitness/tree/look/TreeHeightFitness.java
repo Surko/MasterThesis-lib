@@ -5,6 +5,12 @@ import genlib.evolution.individuals.TreeIndividual;
 import genlib.locales.PermMessages;
 import genlib.structures.Data;
 
+/**
+ * Class which is used to compute height of the tree.
+ * 
+ * @author Lukas Surin
+ *
+ */
 public class TreeHeightFitness extends FitnessFunction<TreeIndividual> {
 	/** for serialization */
 	private static final long serialVersionUID = -1445027840209171480L;
@@ -30,25 +36,40 @@ public class TreeHeightFitness extends FitnessFunction<TreeIndividual> {
 		return individual.getFitnessValue(index);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setData(Data data) {
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Class<TreeIndividual> getIndividualClassType() {
 		return TreeIndividual.class;
 	}
 
+	/**
+	 * This method is not used
+	 */
 	@Override
 	public void setParam(String param) {
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String objectInfo() {
 		return String.format(PermMessages._fit_format, initName,
 				PermMessages._blank_param);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean canHandleNumeric() {
 		return true;

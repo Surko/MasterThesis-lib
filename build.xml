@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="allTests" name="GenTree">
 	
-	<property name="jar.name" value="GenLib.jar" />
+	<property name="jar.name" value="GenDTLib.jar" />
 	<property name="jar.output.dir" value="${basedir}/build/libs" />
 	<property name="weka.genlib.path" value="${basedir}/../MasterThesis-weka/src/main/java/genlib" />
 	<property name="project.class.path" value="${basedir}/build/classes/main" />
@@ -25,15 +25,15 @@
 		<delete dir="${weka.genlib.path}" />
 		<copydir src="${project.genlib.path}" dest="${weka.genlib.path}" />
 		<delete dir="${jar.output.dir}" />
-		<delete file="${project.class.path}/GenLib.log" />
+		<delete file="${project.class.path}/GenDTLib.log" />
 		<delete file="${project.class.path}/config.properties" />
 		<jar destfile="${jar.output.dir}/${jar.name}">
 			<manifest>
-				<attribute name="Main-Class" value="genlib.GenLib" />
+				<attribute name="Main-Class" value="genlib.GenDTLib" />
 			</manifest>
 			<fileset dir="${project.class.path}" />
 		</jar>		
-		<copy todir="${final.structure}">
+		<copy todir="${final.structure}/GenDTLib/bin">
 			<file name="${jar.output.dir}/${jar.name}" />
 		</copy>
 	</target>

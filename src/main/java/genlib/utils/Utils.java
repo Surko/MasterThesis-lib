@@ -3,6 +3,7 @@ package genlib.utils;
 import genlib.evolution.individuals.Individual;
 import genlib.evolution.individuals.TreeIndividual;
 import genlib.evolution.population.Population;
+import genlib.locales.PermMessages;
 import genlib.structures.data.GenLibInstance;
 import genlib.structures.data.GenLibInstances;
 import genlib.structures.extensions.SizeExtension;
@@ -19,7 +20,7 @@ import java.util.Random;
 import java.util.Stack;
 
 /**
- * Class that contains a lot of static methods for computing different often
+ * Class that contains a lot of static methods for computing different and often
  * used measures.
  * 
  * @author Lukas Surin
@@ -35,6 +36,8 @@ public class Utils {
 	public static final String oDELIM = "(;|[ ]+)";
 	/** delimiter for global use when delimiting parameters */
 	public static final String pDELIM = ",";
+	/** reused blank param from perm messages */
+	public static final String bPARAM = PermMessages._blank_param;
 
 	/**
 	 * Enum of different signs that can appear in node field sign. This serves
@@ -74,6 +77,16 @@ public class Utils {
 	};
 	public static boolean DEBUG = false;
 
+	/**
+	 * Static method that creates confusion matrix for individual on set of
+	 * instances.
+	 * 
+	 * @param individual
+	 *            for which we are making confusion matrix
+	 * @param instances
+	 *            instances used to fill the confusion matrix
+	 * @return confusion matrix, 2D array
+	 */
 	public static double[][] makeConfusionMatrix(TreeIndividual individual,
 			GenLibInstances instances) {
 		if (instances.numClasses() <= 0) {
@@ -112,6 +125,13 @@ public class Utils {
 		return confusion;
 	}
 
+	/**
+	 * Static method which makes the sign from string representation
+	 * 
+	 * @param sSign
+	 *            string representation of sign
+	 * @return Sign
+	 */
 	public static Sign makeSign(String sSign) {
 		switch (sSign) {
 		case "<":
@@ -240,8 +260,7 @@ public class Utils {
 	 * @return True/False whether values are equal
 	 */
 	public static boolean eq(double a, double b, double threshold) {
-		return Double.compare(a, b) == 0
-				|| ((a - b) < threshold && (b - a) > threshold);
+		return Double.compare(a, b) == 0 || Math.abs(a - b) <= threshold;
 	}
 
 	/**
@@ -433,6 +452,7 @@ public class Utils {
 		}
 
 		int attr = root.getAttribute();
+		@SuppressWarnings("unused")
 		double value = root.getValue();
 		Sign sign = root.getSign();
 
@@ -725,6 +745,17 @@ public class Utils {
 		return getNodes(root, new ArrayList<Node>());
 	}
 
+	/**
+	 * Method that makes the test of attributes in nodes.
+	 * 
+	 * @param instanceValue
+	 *            value of instance
+	 * @param compare
+	 *            sign
+	 * @param nodeValue
+	 *            in node
+	 * @return true iff the instance value is proper in compare with node value
+	 */
 	public static boolean isValueProper(double instanceValue, Sign compare,
 			double nodeValue) {
 
@@ -751,6 +782,16 @@ public class Utils {
 
 	}
 
+	/**
+	 * Method filters the instances depending on tree defined with root. It
+	 * return the mean value (regressions) of filtered instances.
+	 * 
+	 * @param instances
+	 *            to be filtered
+	 * @param root
+	 *            of the tree from which we start filtering
+	 * @return value of regressions
+	 */
 	public static double getFilteredInstancesRegression(
 			GenLibInstances instances, Node root) {
 
@@ -839,6 +880,16 @@ public class Utils {
 		return value / numOfFiltered;
 	}
 
+	/**
+	 * Method filters the instances depending on tree defined with root. It
+	 * return the distribution of classes of filtered instances.
+	 * 
+	 * @param instances
+	 *            to be filtered
+	 * @param root
+	 *            of the tree from which we start filtering
+	 * @return array with distribution of classes
+	 */
 	public static double[] getFilteredInstancesClasses(
 			GenLibInstances instances, Node root) {
 

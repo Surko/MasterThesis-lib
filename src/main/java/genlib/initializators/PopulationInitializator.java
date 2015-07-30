@@ -30,30 +30,99 @@ import java.util.Random;
 public interface PopulationInitializator<T extends Individual> extends
 		Serializable {
 
+	/**
+	 * Method gets the initialized population
+	 * 
+	 * @return starting population
+	 */
 	public T[] getPopulation();
 
+	/**
+	 * Method gets the origin population that is further processed.
+	 * 
+	 * @return origin population
+	 */
 	public T[] getOriginPopulation();
 
+	/**
+	 * Method initializes the population, call the individual generator, process
+	 * the generated individuals and copies them until some size is reached.
+	 * 
+	 * @throws Exception
+	 *             if some problem occured
+	 */
 	public void initPopulation() throws Exception;
 
+	/**
+	 * Method sets the parameters for this population initializator.
+	 * 
+	 * @param param
+	 *            string with parameters for this initializator
+	 */
 	public void setParam(String param);
 
+	/**
+	 * Method sets the data used to initialize population
+	 */
 	public void setData(Data data);
 
+	/**
+	 * Method sets the random generator
+	 * 
+	 * @param random
+	 *            object
+	 */
 	public void setRandomGenerator(Random random);
 
+	/**
+	 * Method sets how many individuals will be generated and initialized
+	 * 
+	 * @param popSize
+	 *            number of individuals
+	 */
 	public void setPopulationSize(int popSize);
 
+	/**
+	 * Method sets the generator used to generate individuals
+	 * 
+	 * @param generator
+	 *            to be used to generate individuals
+	 */
 	public void setGenerator(ArrayList<? extends Generator<T>> generator);
 
+	/**
+	 * Method gets number of individuals that must be generated
+	 * 
+	 * @return number of individuals to generate
+	 */
 	public int getPopulationSize();
 
+	/**
+	 * Method returns the generator used to generate individuals
+	 * 
+	 * @return individual generator
+	 */
 	public Generator<T> getGenerator();
 
+	/**
+	 * Method gets the name of this population initializator.
+	 * 
+	 * @return name of this initializator
+	 */
 	public String getInitName();
 
+	/**
+	 * Method tests if the initializer is compatible with weka.
+	 * 
+	 * @return true iff initializer is compatible with weka
+	 */
 	public boolean isWekaCompatible();
 
+	/**
+	 * Method gets the info about object
+	 * 
+	 * @return object info
+	 */
 	public String objectInfo();
 
 }

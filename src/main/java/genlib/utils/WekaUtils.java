@@ -16,10 +16,23 @@ import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
 
+/**
+ * Class that contains a lot of static methods for computing different and often
+ * used measures. It can work only with weka instances.
+ * 
+ * @author Lukas Surin
+ */
 public class WekaUtils {
-
+	/** counter used in recursion */
 	private static int counter = 0;
 
+	/**
+	 * Method that converts instances into arrays
+	 * 
+	 * @param instances
+	 *            from weka
+	 * @return 2D array with instances
+	 */
 	@SuppressWarnings("unchecked")
 	public static double[][] instacesToArray(Instances instances) {
 		double[][] insArray = new double[instances.numInstances()][instances
@@ -33,6 +46,16 @@ public class WekaUtils {
 		return insArray;
 	}
 
+	/**
+	 * Static method that creates confusion matrix for individual on set of
+	 * instances from weka.
+	 * 
+	 * @param individual
+	 *            for which we are making confusion matrix
+	 * @param instances
+	 *            instances used to fill the confusion matrix
+	 * @return confusion matrix, 2D array
+	 */
 	@SuppressWarnings("unchecked")
 	public static double[][] makeConfusionMatrix(TreeIndividual individual,
 			Instances instances) {
@@ -71,10 +94,35 @@ public class WekaUtils {
 		return confusion;
 	}
 
+	/**
+	 * Static method which makes the sign from string representation
+	 * 
+	 * @param sSign
+	 *            string representation of sign
+	 * @return Sign
+	 */
 	public static Sign makeSign(String sSign) {
 		return Utils.makeSign(sSign);
 	}
 
+	/**
+	 * Method which is used to contruct tree individual from weka graph
+	 * representations.
+	 * 
+	 * @param sTree
+	 *            graph representation of tree
+	 * @param nodeCount
+	 *            number of nodes
+	 * @param instCount
+	 *            number of instances
+	 * @param attrIndexMap
+	 *            HashMap with relation attribute <-> index
+	 * @param attrValueIndexMap
+	 *            HashMaps with relation attribute <-> index
+	 * @param autoDepth
+	 *            if the nodes should be able to compute their height
+	 * @return
+	 */
 	public static TreeIndividual constructTreeIndividual(String sTree,
 			double nodeCount, int instCount,
 			HashMap<String, Integer> attrIndexMap,
@@ -182,6 +230,16 @@ public class WekaUtils {
 		return treeInd;
 	}
 
+	/**
+	 * Method filters the instances depending on tree defined with root. It
+	 * return the mean value (regressions) of filtered instances.
+	 * 
+	 * @param instances
+	 *            to be filtered
+	 * @param root
+	 *            of the tree from which we start filtering
+	 * @return value of regressions
+	 */
 	public static double getFilteredInstancesRegression(Instances instances,
 			Node root) {
 
@@ -286,6 +344,16 @@ public class WekaUtils {
 		return value / numOfFiltered;
 	}
 
+	/**
+	 * Method filters the instances depending on tree defined with root. It
+	 * return the distribution of classes of filtered instances.
+	 * 
+	 * @param instances
+	 *            to be filtered
+	 * @param root
+	 *            of the tree from which we start filtering
+	 * @return array with distribution of classes
+	 */
 	public static double[] getFilteredInstancesClasses(Instances instances,
 			Node root) {
 		if (instances.numClasses() <= 1) {
@@ -397,6 +465,13 @@ public class WekaUtils {
 		return classes;
 	}
 
+	/**
+	 * Method which makes the hashmap with mapping of attributes to indeces.
+	 * 
+	 * @param data
+	 *            instances to be used on creating hashmap
+	 * @return HashMap
+	 */
 	public static HashMap<String, Integer> makeAttrIndexMap(Instances data) {
 		HashMap<String, Integer> retHashMap = new HashMap<String, Integer>();
 		for (int i = 0; i < data.numAttributes(); i++) {
@@ -406,6 +481,14 @@ public class WekaUtils {
 		return retHashMap;
 	}
 
+	/**
+	 * Methodh which makes the array of hashmaps (length = number of attribute)
+	 * with mapping of attribute values to indeces
+	 * 
+	 * @param data
+	 *            instances to be used on creating hashmaps
+	 * @return Hashmap[]
+	 */
 	@SuppressWarnings("unchecked")
 	public static HashMap<String, Integer>[] makeAttrValueIndexMap(
 			Instances data) {
@@ -425,6 +508,18 @@ public class WekaUtils {
 		return retHashMap;
 	}
 
+	/**
+	 * Method which mimics the behavior of {@link #makeAttrIndexMap(Instances)}
+	 * and {@link #makeAttrValueIndexMap(Instances)} but instead of returning
+	 * hashmaps it uses reference approach and fill the parameters.
+	 * 
+	 * @param data
+	 *            instances to be used on creating hashmaps
+	 * @param attrIndexMap
+	 *            hashmap with mapping attribute <-> index
+	 * @param attrValueIndexMap
+	 *            hashmap with mapping attributevalue <-> index
+	 */
 	public static void makeAttrMap(Instances data,
 			HashMap<String, Integer> attrIndexMap,
 			HashMap<String, Integer>[] attrValueIndexMap) {

@@ -1,30 +1,45 @@
 package genlib.splitfunctions;
 
 import genlib.utils.Utils;
-
-import java.util.Enumeration;
-
 import weka.classifiers.trees.j48.Distribution;
-import weka.classifiers.trees.j48.InfoGainSplitCrit;
-import weka.core.Instance;
 import weka.core.Instances;
 
+/**
+ * Class that represents the information gain split criteria used in decision
+ * trees. It is entropy based and parametrized for Instances and Distribution
+ * for Weka. 
+ * 
+ * @author Lukas Surin
+ *
+ */
 public class InformationGainCriteria extends
 		EntropyBasedCriteria<Instances, Distribution> {
 
 	/** for serialization */
-	private static final long serialVersionUID = -7729464952878929743L;	
+	private static final long serialVersionUID = -7729464952878929743L;
+	/** name of this split criteria */
 	public static final String initName = "infoGain";
+	/** Singleton instance */
 	private final static InformationGainCriteria instance = new InformationGainCriteria();
 
+	/**
+	 * Method returns instance of InformationGainCriteria
+	 * 
+	 * @return singleton instance
+	 */
 	public static InformationGainCriteria getInstance() {
 		return instance;
 	}
-	
-	private Object readResolve() {		
+
+	/**
+	 * ReadResolve method so the singleton is correct when serialized
+	 * 
+	 * @return object returned after serialization
+	 */
+	private Object readResolve() {
 		return instance;
 	}
-	
+
 	/**
 	 * Default Constructor
 	 */
@@ -64,6 +79,7 @@ public class InformationGainCriteria extends
 	 *            oldEnt computation)
 	 * @return Information gain as it's defined for C4.5
 	 */
+	@SuppressWarnings("unused")
 	private final double computeInfo(Distribution distribution,
 			double totalInst, double oldEnt) {
 		double infoGain = 0d;
@@ -74,8 +90,11 @@ public class InformationGainCriteria extends
 		// we are dividing because we are not considering division in computing
 		// entropies.
 		return Utils.eq(infoGain, 0d) ? 0d : infoGain / distribution.total();
-	}	
+	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public double computeCriteria(Instances data, int totalIns)
 			throws Exception {
@@ -83,7 +102,7 @@ public class InformationGainCriteria extends
 		if (totalIns <= 0) {
 			return computeCriteria(distribution);
 		} else {
-			return computeCriteria(distribution, totalIns);
+			return computeCriteria(distribution, (double) totalIns);
 		}
 	}
 
@@ -116,6 +135,9 @@ public class InformationGainCriteria extends
 		return Utils.eq(infoGain, 0d) ? 0d : infoGain / totalIns;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public InformationGainCriteria copy() {
 		return new InformationGainCriteria();
 	}

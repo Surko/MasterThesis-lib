@@ -25,7 +25,6 @@ import java.util.logging.Logger;
  */
 public class ValueChangeMutation implements Operator<TreeIndividual> {
 
-
 	/** for serialization */
 	private static final long serialVersionUID = -8545768446148248971L;
 	/** logger for this class */

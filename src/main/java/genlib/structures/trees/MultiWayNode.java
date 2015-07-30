@@ -6,16 +6,29 @@ import genlib.locales.TextResource;
 import genlib.structures.extensions.SizeExtension;
 import genlib.utils.Utils.Sign;
 
+/**
+ * Class that represents Node with multiple childs. It implements {@link Node}
+ * and {@link SizeExtension} so it recomputes its size automatically.
+ * 
+ * @author Lukas Surin
+ */
 public class MultiWayNode implements Node, SizeExtension {
 
 	/** for serialization */
 	private static final long serialVersionUID = -6016127157752225320L;
+	/** parent of this node */
 	protected MultiWayNode parent;
+	/** childs of this node */
 	protected MultiWayNode[] childs;
+	/** tree size of this node */
 	protected int treeSize = 1;
+	/** attribute of this node */
 	protected int attribute = -1;
+	/** value of this node */
 	protected double value = Integer.MIN_VALUE;
+	/** criteria value NOT USED */
 	protected double criteriaValue = 0;
+	/** sign of this node */
 	protected Sign sign;
 
 	/**
@@ -72,6 +85,12 @@ public class MultiWayNode implements Node, SizeExtension {
 	public MultiWayNode() {
 	}
 
+	/**
+	 * Copy constructor
+	 * 
+	 * @param toCopy
+	 *            instance
+	 */
 	public MultiWayNode(MultiWayNode toCopy) {
 		this.attribute = toCopy.attribute;
 		this.value = toCopy.value;
@@ -86,10 +105,23 @@ public class MultiWayNode implements Node, SizeExtension {
 		}
 	}
 
+	/**
+	 * Constructor of MultiWayNode that will have childCount childs
+	 * 
+	 * @param childCount
+	 *            number of childs
+	 */
 	public MultiWayNode(int childCount) {
 		this(childCount, 0, null, Integer.MIN_VALUE);
 	}
 
+	/**
+	 * Constructor of MultiWayNode that sets the node fields in advance.
+	 * @param childCount number of childs
+	 * @param attribute on which we test instances
+	 * @param sign Sign
+	 * @param value of split
+	 */
 	public MultiWayNode(int childCount, int attribute, Sign sign, double value) {
 		if (childCount > 0 && attribute != -1) {
 			this.childs = new MultiWayNode[childCount];
@@ -134,23 +166,38 @@ public class MultiWayNode implements Node, SizeExtension {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setAttribute(int attribute) {
 		this.attribute = attribute;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setValue(double value) {
 		this.value = value;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setSign(Sign sign) {
 		this.sign = sign;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setChildCount(int count) {
 		if (count > 0)
 			this.childs = new MultiWayNode[count];
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setChilds(Node[] childs) {
 		this.childs = (MultiWayNode[]) childs;
 		this.treeSize = 1;
@@ -160,10 +207,16 @@ public class MultiWayNode implements Node, SizeExtension {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setParent(Node parent) {
 		this.parent = (MultiWayNode) parent;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setTreeSize(int treeSize) {
 		if (parent != null) {
@@ -245,7 +298,7 @@ public class MultiWayNode implements Node, SizeExtension {
 	 * Make this node a leaf.
 	 */
 	public void makeLeaf() {
-		this.sign = null;		
+		this.sign = null;
 		this.attribute = -1;
 		this.childs = null;
 		updateTreeSize(1 - this.treeSize);
@@ -281,14 +334,14 @@ public class MultiWayNode implements Node, SizeExtension {
 		if (childs == null) {
 			return 0;
 		}
-		
+
 		return childs.length;
 	}
 
 	/**
-	 * Getter which provides treeSize of this tree.
+	 * {@inheritDoc}
 	 * 
-	 * @return size of tree
+	 * @return treeSize
 	 */
 	public int getTreeSize() {
 		return treeSize;
@@ -296,6 +349,9 @@ public class MultiWayNode implements Node, SizeExtension {
 
 	/**** OTHER METHODS ****/
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void updateTreeSize(int treeSizeToUpdate) {
 		this.treeSize += treeSizeToUpdate;
@@ -325,10 +381,13 @@ public class MultiWayNode implements Node, SizeExtension {
 		return new MultiWayNode(this);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public MultiWayNode newInstance() {
 		return new MultiWayNode();
 	}
-	
+
 	/**
 	 * Equal method for this type of instances which provide correct comparison
 	 * which was intended for it. There is the comparison of main fields such as
@@ -371,16 +430,18 @@ public class MultiWayNode implements Node, SizeExtension {
 		if (isLeaf()) {
 			return String.format("c%s", value);
 		}
-		
+
 		String done = "";
 		for (Node child : childs) {
 			if (done.isEmpty()) {
 				done = child.toString();
 				continue;
 			}
-			done = String.format("%s,%s", done, child == null ? null : child.toString());				
+			done = String.format("%s,%s", done,
+					child == null ? null : child.toString());
 		}
-		return String.format("(%s)a%s%s%s", done, attribute, sign == null ? "" : sign.getValue(), sign == null ? "" : value);		
+		return String.format("(%s)a%s%s%s", done, attribute, sign == null ? ""
+				: sign.getValue(), sign == null ? "" : value);
 	}
-	
+
 }

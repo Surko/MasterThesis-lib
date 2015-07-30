@@ -5,6 +5,14 @@ import genlib.generators.Generator;
 
 import java.util.HashMap;
 
+/**
+ * Class that represents plugin for individual generators. It implements Plugin interface,
+ * so it must implement methods on how to add plugin and where is the storage
+ * for the plugins.
+ * 
+ * @author Lukas Surin
+ *
+ */
 public abstract class GenPlugin implements
 		Plugin<Class<? extends Generator<? extends Individual>>> {
 

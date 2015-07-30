@@ -10,6 +10,12 @@ import genlib.utils.Utils;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Class that compares individuals by comparing only one function.
+ * @author Lukas Surin
+ *
+ * @param <T> type of individual
+ */
 public class SingleFitnessComparator<T extends Individual> extends
 		FitnessComparator<T> {
 	/** Logger */

@@ -1,7 +1,7 @@
 package tests.textres;
 
 import static org.junit.Assert.assertTrue;
-import genlib.GenLib;
+import genlib.GenDTLib;
 import genlib.configurations.Config;
 import genlib.locales.TextKeys;
 import genlib.locales.TextResource;
@@ -18,7 +18,7 @@ import org.junit.Test;
 public class TestTextResources {
 
 	static {
-		Logger LOG = Logger.getLogger(GenLib.class.getPackage().getName());
+		Logger LOG = Logger.getLogger(GenDTLib.class.getPackage().getName());
 		LOG.setLevel(Level.SEVERE);
 	}
 
